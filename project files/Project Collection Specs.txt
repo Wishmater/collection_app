@@ -1,7 +1,7 @@
 
 *** No multi-platform or release work needed, so that makes things faster...
 *** Rough time estimate for working proof of concept: 
-	choice of technoligies + basic logic implementation
+	choice of technologies + basic logic implementation
 		5 working days
 	minimal UI implementation
 		5 working days
@@ -9,34 +9,49 @@
 
 
 
-Items
-	usually an item corresponds to a file
-		there might be folder/abstract items later, so it needs to be extensible
-	extra info in the item:
-		date added
-		width
-		height
-	??? how to load items from files
-		??? just load path and remember it
-		??? what if it is moved
-
-Ratings
-	an item can have a rating 1-10 (including floating)
-
 Tags
 	an item can have n tags
 	tags can have child tags, creating a tree
 	when adding a tag to an item, also add all its parents
-		when demoving a tag from an item, also remove all its children
+		when removing a tag from an item, also remove all its children
 		when reparenting a tag, need to update all items accordingly (out of scope for now)
 	extra info in the tag:
 		date created
 		- item count
+	??? should tag name be unique (? case sensitive)
+
+Items
+	usually an item corresponds to a file
+		there might be folder/abstract items later, so it needs to be extensible
+	extra info in the item:
+	    int rating;
+		int width
+		int height
+		DateTime dateAdded;
+		DateTime dateLastSeen;
+	File handling
+		the collection has a root 
+		the app has a file explorer view, starting from this root
+			in this view it will be easy to see which files are not added as items (with color)
+				folders will have a color for all added, one for none, one for some
+			you can right-click to add an unadded file
+				you can right-click a folder to add all its filre
+					optionally reccursively
+					also, allow to set a series of tags to all the files in this folder
+			!!! write this in the UI part
+			--- how to make sure files won't be moved (which would be BAD)
 
 
 
 
 UI
+	Splash / CollectionSelection
+	    shows a list of existing collections to choose one
+	    saves last opened and opens it automatically on startup
+	Collection
+		show items list (lazy loading)
+		allow custom filters by rating/tag
+		??? sorting
 	Tags management
 		allow creating/managing tags
 	View
@@ -45,20 +60,45 @@ UI
 		there is a virtual keyboard that takes in input
 			typing a number will set the rating
 			typing a text will set a tag (showing suggestions)
+				pressing up while typing text will brig up recent applied tags (like in a console)
 			(submit on enter or on timer)
-	Collection
-		show items list (lazy loading)
-		allow custom filters by rating/tag
+	Extra needed features
+		Fast Tag Adding
+			ctrl + n begins the process
+			first search + submit parent tag. submit empty = root
+			then, take tag name, default to '${parentTag} group $next' and start with it selected to overwrite
+		allow deleting items (file+item or item only)
 
 
 
 
 Actual tags on my collection
+	IRL
 	Copyright
 		Fate
 			Tamamo-no-Mae
+				Summer
+				Koyanskaya
 	Author
-		---
+		Unknown
+			Unknown group 1
+			Unknown group 2
+			Unknown group 3
+			Unknown group 4
+		Wada Arco
+			Wada Arco group 1
+			Wada Arco group 2
+			mangaX
+				tome 1
+					chapter 1
+					chapter 2
+				tome 2
+					chapter 3
+					chapter 4
+			// there whould be a fast way to create groups below an author
+			// this way, sorting by author should also sort groups together
+			// items inside a group should just be names 1, 2, 3... for sorting
+	3D
 	??? how to differentiate ecchi steps
 		pics that are a bit ecchi but can also be walls
 		pics that are really good but not that ecchi, so I don't want them to show when I search for high ecchi

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:collection_app/pages/page_not_found.dart';
+import 'package:collection_app/providers/_isar_provider.dart';
 import 'package:collection_app/router.dart';
 import 'package:collection_app/theme_parameters.dart';
 import 'package:flutter/foundation.dart';
@@ -13,10 +14,13 @@ import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
 
 
+const appDirectorySubDir = 'Collections';
+
+
 void main() async {
 
   // init from_zero_ui stuff
-  await initHive('Collections');
+  await initHive(appDirectorySubDir);
   themeParametersProvider = ChangeNotifierProvider((ref) {
     return ThemeParameters();
   });
@@ -52,7 +56,7 @@ void main() async {
 
 }
 _reportWindowError(e, st) {
-  File logFile = File('cutrans_3.0_log_window.txt')..createSync(recursive: true);
+  File logFile = File('log_window.txt')..createSync(recursive: true);
   final logFileWrite = logFile.openWrite();
   logFileWrite.writeln('FATAL ERROR WHILE SHOWING WINDOW');
   logFileWrite.writeln(e.toString());
@@ -68,7 +72,7 @@ class MyApp extends StatelessWidget {
     urlPathStrategy: UrlPathStrategy.path,
     // debugLogDiagnostics: true,
     redirect: (state) {
-      if (!initialized && state.location!='/') {
+      if ((!initialized) && state.location!='/') {
         // ensure to always go through splash screen
         return '/?redirect=${state.subloc}';
       }

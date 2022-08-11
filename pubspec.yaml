@@ -25,6 +25,10 @@ dependencies:
   flutter_riverpod: ^2.0.0-dev.9
   hive: ^2.2.2
   hive_flutter: ^1.1.0
+  isar: ^3.0.0-dev.8
+  isar_flutter_libs: ^3.0.0-dev.8
+  built_collection: ^5.1.1
+  built_value: ^8.4.0
 
   # * Widgets / UI
   flutter_icons: ^1.1.0
@@ -43,6 +47,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  build_runner: ^2.1.11
+  isar_generator: ^3.0.0-dev.8
   flutter_lints: ^2.0.0
   flutter_launcher_icons: ^0.9.3  # flutter pub run flutter_launcher_icons:main
   flutter_native_splash: ^2.2.3+1  # flutter pub run flutter_native_splash:create
@@ -52,6 +58,7 @@ dependency_overrides:
   xml: ^6.1.0
   meta: ^1.8.0
   platform: ^3.1.0
+  ffi: ^2.0.0
   bitsdojo_window:
     git:
       url: https://github.com/Wishmater/bitsdojo_window_windows_7_support.git

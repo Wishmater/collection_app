@@ -1,13 +1,18 @@
+import 'package:collection_app/daos/collection.dart';
+import 'package:collection_app/models/collection.dart';
+import 'package:collection_app/providers/_isar_provider.dart';
+import 'package:collection_app/providers/collection_provider.dart';
 import 'package:collection_app/router.dart';
 import 'package:collection_app/theme_parameters.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
+import 'package:from_zero_ui/util/my_sticky_header.dart';
 import 'package:go_router/go_router.dart';
 
 
-class PageSplash extends StatefulWidget {
+class PageSplash extends ConsumerStatefulWidget {
 
   final String redirectPath;
 
@@ -22,13 +27,16 @@ class PageSplash extends StatefulWidget {
 }
 
 
-class PageSplashState extends State<PageSplash> {
+class PageSplashState extends ConsumerState<PageSplash> {
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      init();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      await Future.delayed(const Duration(milliseconds: 200));
+      if (mounted) {
+        init();
+      }
     });
   }
 
@@ -36,10 +44,11 @@ class PageSplashState extends State<PageSplash> {
   void init() async{
     try {
       initialized = true;
-      await Future.delayed(const Duration(milliseconds: 200));
-      String redirectPath = widget.redirectPath=='/' ? '/home' : widget.redirectPath;
-      if (mounted) {
-        GoRouter.of(context).go(redirectPath);
+      if (ref.read(IsarProvider.selectedCollectionName)!=null) {
+        String redirectPath = widget.redirectPath=='/' ? '/home' : widget.redirectPath;
+        if (mounted) {
+          GoRouter.of(context).go(redirectPath);
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -54,25 +63,47 @@ class PageSplashState extends State<PageSplash> {
   Widget build(BuildContext context) {
     Widget result;
     if (error==null) {
-      result = Column(
-        mainAxisSize: MainAxisSize.min,
-        children: const [
-          // Hero(
-          //   tag: "title_logo",
-          //   child: Container(
-          //     height: 96, width: 96,
-          //     padding: const EdgeInsets.fromLTRB(6, 6, 0, 6),
-          //     child: Image.asset('assets/images/logo.png', filterQuality: FilterQuality.medium,),
-          //   ),
-          // ),
-          SizedBox(height: 12,),
-          // SizedBox(
-          //   width: 192,
-          //   child: LinearProgressIndicator(
-          //     valueColor: AlwaysStoppedAnimation(Theme.of(context).accentColor),
-          //   ),
-          // )
-        ],
+      result = ApiProviderBuilder<List<CollectionData>>(
+        provider: CollectionProvider.all,
+        dataBuilder: (context, collections) {
+          final scrollController = ScrollController();
+          return Center(
+            child: ResponsiveHorizontalInsets(
+              child: SizedBox(
+                width: 612,
+                child: Card(
+                  child: ScrollbarFromZero(
+                    controller: scrollController,
+                    child: StickyHeader(
+                      controller: scrollController,
+                      header: AppbarFromZero(
+                        title: const Text('Collections'),
+                        actions: [
+                          ActionFromZero(
+                            title: 'New Collection',
+                            icon: const Icon(Icons.add),
+                            onTap: (actionContext) {
+                              CollectionDAO.buildDao(null).maybeEdit(context);
+                            },
+                          ),
+                        ],
+                      ),
+                      content: ListView.builder(
+                        controller: scrollController,
+                        itemCount: collections.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            title: Text(collections[index].name),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
       );
     } else {
       result = Consumer(
