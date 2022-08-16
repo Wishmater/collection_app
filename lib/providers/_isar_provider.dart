@@ -19,7 +19,7 @@ abstract class IsarProvider {
       var appDir = await getApplicationDocumentsDirectory();
       return await Isar.open(
         [CollectionDataSchema],
-        name: 'collections', // TODO 1 ban name 'collections' from Collection names
+        name: 'collections',
         directory: path.join(appDir.path, appDirectorySubDir),
       );
     });
@@ -27,10 +27,10 @@ abstract class IsarProvider {
     cacheTime: const Duration(days: 999999999999),
   );
 
-  static String? get lastOpenedCollection => Hive.box('settings').get('lastOpenedCollection');
-  static set lastOpenedCollection(String? value) => Hive.box('settings').put('lastOpenedCollection', value);
+  static int? get lastOpenedCollection => Hive.box('settings').get('lastOpenedCollection');
+  static set lastOpenedCollection(int? value) => Hive.box('settings').put('lastOpenedCollection', value);
 
-  static final selectedCollectionName = StateProvider<String?>((ref) => lastOpenedCollection);
+  static final selectedCollectionName = StateProvider<int?>((ref) => lastOpenedCollection);
   static final openCollection = ApiProvider<Isar>((ref) {
     return ApiState(ref, (apiState) async {
       final selected = ref.watch(selectedCollectionName);
@@ -41,7 +41,7 @@ abstract class IsarProvider {
       var appDir = await getApplicationDocumentsDirectory();
       return await Isar.open(
         [TagSchema, ItemSchema],
-        name: selected,
+        name: selected.toString(),
         directory: path.join(appDir.path, appDirectorySubDir),
       );
     });

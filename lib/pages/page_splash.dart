@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
+import 'package:from_zero_ui/util/my_sliver_sticky_header.dart';
 import 'package:from_zero_ui/util/my_sticky_header.dart';
 import 'package:go_router/go_router.dart';
 
@@ -60,7 +61,7 @@ class PageSplashState extends ConsumerState<PageSplash> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext mnainContext) {
     Widget result;
     if (error==null) {
       result = ApiProviderBuilder<List<CollectionData>>(
@@ -68,34 +69,75 @@ class PageSplashState extends ConsumerState<PageSplash> {
         dataBuilder: (context, collections) {
           final scrollController = ScrollController();
           return Center(
-            child: ResponsiveHorizontalInsets(
-              child: SizedBox(
-                width: 612,
-                child: Card(
-                  child: ScrollbarFromZero(
-                    controller: scrollController,
-                    child: StickyHeader(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 6),
+              child: ResponsiveHorizontalInsets(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 512, minHeight: 512),
+                  child: Card(
+                    clipBehavior: Clip.antiAlias,
+                    child: ScrollbarFromZero(
                       controller: scrollController,
-                      header: AppbarFromZero(
-                        title: const Text('Collections'),
-                        actions: [
-                          ActionFromZero(
-                            title: 'New Collection',
-                            icon: const Icon(Icons.add),
-                            onTap: (actionContext) {
-                              CollectionDAO.buildDao(null).maybeEdit(context);
-                            },
-                          ),
-                        ],
-                      ),
-                      content: ListView.builder(
-                        controller: scrollController,
-                        itemCount: collections.length,
-                        itemBuilder: (context, index) {
-                          return ListTile(
-                            title: Text(collections[index].name),
-                          );
-                        },
+                      applyOpacityGradientToChildren: false,
+                      child: ScrollOpacityGradient(
+                        scrollController: scrollController,
+                        applyAtStart: false,
+                        child: CustomScrollView(
+                          controller: scrollController,
+                          shrinkWrap: true,
+                          slivers: [
+                            SliverStickyHeader.builder(
+                              builder: (context, state) {
+                                return Stack(
+                                  clipBehavior: Clip.none,
+                                  children: [
+                                    AppbarFromZero(
+                                      title: const Text('Collections'),
+                                      backgroundColor: Theme.of(context).cardColor,
+                                      elevation: 8 * state.scrollPercentage,
+                                      actions: [
+                                        ActionFromZero(
+                                          title: 'New Collection',
+                                          icon: const Icon(Icons.add),
+                                          onTap: (actionContext) {
+                                            CollectionDAO.buildDao(null).maybeEdit(mnainContext);
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                    AnimatedPositioned(
+                                      left: 0, right: 0, bottom: -2,
+                                      height: state.isPinned ? 2 : 0,
+                                      duration: const Duration(milliseconds: 300),
+                                      curve: Curves.easeOutCubic,
+                                      child: const CustomPaint(
+                                        painter: SimpleShadowPainter(
+                                          direction: SimpleShadowPainter.down,
+                                          shadowOpacity: 0.2,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                              sliver: SliverList(
+                                delegate: SliverChildListDelegate(
+                                  [
+                                    ...collections.map((e) {
+                                      return ListTile(
+                                        title: Text(e.name),
+                                        onTap: () {
+                                          ref.read(IsarProvider.selectedCollectionName.state).state = e.id;
+                                          IsarProvider.lastOpenedCollection = e.id;
+                                        },
+                                      );
+                                    }).toList(),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),

@@ -59,7 +59,7 @@ class ThemeParameters extends ThemeParametersFromZero{
   @override
   ThemeData get defaultDarkTheme => ThemeData(
     brightness: Brightness.dark,
-    primarySwatch: Colors.blue,
+    primarySwatch: Colors.blue, // TODO 1 use Tamamo colors: blue, pink, orange/yellow
     accentColor: Colors.cyanAccent,
     hoverColor: Colors.cyanAccent.withOpacity(0.1),
     highlightColor: Colors.cyanAccent.withOpacity(0.1),
@@ -67,13 +67,8 @@ class ThemeParameters extends ThemeParametersFromZero{
 //    secondaryHeaderColor: Color.fromRGBO(180, 143, 107, 1),
     errorColor: Colors.red.shade500,
     visualDensity: VisualDensity.compact,
-    textTheme: const TextTheme(
-      headline1: TextStyle(
-        fontFamily: 'Baloo',
-        fontFamilyFallback: ['Roboto'],
-        fontSize: 32,
-        color: Colors.cyanAccent,
-      ),
+    cardTheme: CardTheme(
+      // TODO 1 think of a clever and unique card theme
     ),
     tooltipTheme: TooltipThemeData(
       decoration: BoxDecoration(

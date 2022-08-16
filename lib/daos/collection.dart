@@ -37,11 +37,14 @@ abstract class CollectionDAO {
               ],
             ),
             'baseDirectory': FileField(
-              uiNameGetter: (field, dao) => 'Collection Name',
+              uiNameGetter: (field, dao) => 'Base Directory',
               value: model?.name,
               pickDirectory: true,
               enableDragAndDrop: true,
               allowDragAndDropInWholeScreen: true,
+              onValueChanged: (dao, field, value) {
+                print (value);
+              },
               validatorsGetter: (field, dao) => [
                 fieldValidatorRequired,
               ],
@@ -57,7 +60,7 @@ abstract class CollectionDAO {
     final originalModel = (props['model'] as HiddenValueField<CollectionData?>).hiddenValue;
     final result = CollectionData()
         ..name = (props['name'] as StringField).value ?? ''
-        ..baseDirectory = (props['baseDirectory'] as StringField).value ?? ''
+        ..baseDirectory = (props['baseDirectory'] as FileField).value ?? ''
         ..dateCreated = originalModel?.dateCreated ?? DateTime.now()
         ..dateLastOpened = originalModel?.dateLastOpened ?? DateTime.now()
         ..itemCount = originalModel?.itemCount ?? 0
