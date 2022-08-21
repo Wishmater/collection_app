@@ -7,6 +7,7 @@ late final ChangeNotifierProvider<ThemeParameters> themeParametersProvider;
 
 class ThemeParameters extends ThemeParametersFromZero{
 
+  // TODO 2 remove deprecations and update theme parameters to achieve a custom look and feel
   @override
   ThemeData get defaultLightTheme => ThemeData(
     canvasColor: Colors.grey.shade300,

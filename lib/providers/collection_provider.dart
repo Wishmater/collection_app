@@ -18,6 +18,15 @@ abstract class CollectionProvider {
     cacheTime: const Duration(days: 999999999999),
   );
 
+  static final openCollection = ApiProvider<CollectionData>((ref) {
+    return ApiState(ref, (apiState) async {
+      final selected = ref.watch(IsarProvider.selectedCollectionId)!;
+      final isar = await apiState.watch(IsarProvider.collections);
+      return (await isar.collectionDatas.get(selected))!;
+    });
+  },
+    cacheTime: const Duration(days: 999999999999),
+  );
 
   static ApiState<CollectionData> save(WidgetRef ref, CollectionData collection) {
     return ApiState.noProvider((apiState) async {

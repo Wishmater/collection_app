@@ -45,7 +45,7 @@ class PageSplashState extends ConsumerState<PageSplash> {
   void init() async{
     try {
       initialized = true;
-      if (ref.read(IsarProvider.selectedCollectionName)!=null) {
+      if (ref.read(IsarProvider.selectedCollectionId)!=null) {
         String redirectPath = widget.redirectPath=='/' ? '/home' : widget.redirectPath;
         if (mounted) {
           GoRouter.of(context).go(redirectPath);
@@ -127,8 +127,9 @@ class PageSplashState extends ConsumerState<PageSplash> {
                                       return ListTile(
                                         title: Text(e.name),
                                         onTap: () {
-                                          ref.read(IsarProvider.selectedCollectionName.state).state = e.id;
+                                          ref.read(IsarProvider.selectedCollectionId.state).state = e.id;
                                           IsarProvider.lastOpenedCollection = e.id;
+                                          RouteHome().go(context);
                                         },
                                       );
                                     }).toList(),

@@ -789,7 +789,7 @@ packages:
     source: hosted
     version: "1.5.1"
   preload_page_view:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: preload_page_view
       url: "https://pub.dartlang.org"

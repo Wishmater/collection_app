@@ -23,3 +23,33 @@ class Tag {
   final items = IsarLinks<Item>();
 
 }
+
+
+
+class DirectoryTag implements Tag {
+
+  @override
+  String name;
+
+  DirectoryTag(this.name);
+
+  @override
+  Id get id => throw UnimplementedError();
+  @override
+  set id(Id _) => throw UnimplementedError();
+  @override
+  DateTime get dateCreated => throw UnimplementedError();
+  @override
+  set dateCreated(DateTime _) => throw UnimplementedError();
+  @override
+  int get itemCount => throw UnimplementedError();
+  @override
+  set itemCount(int _) => throw UnimplementedError();
+  @override
+  IsarLink<Tag> get parentTag => throw UnimplementedError();
+  @override
+  IsarLinks<Tag> get childrenTags => throw UnimplementedError();
+  @override
+  IsarLinks<Item> get items => throw UnimplementedError();
+
+}

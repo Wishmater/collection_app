@@ -30,10 +30,10 @@ abstract class IsarProvider {
   static int? get lastOpenedCollection => Hive.box('settings').get('lastOpenedCollection');
   static set lastOpenedCollection(int? value) => Hive.box('settings').put('lastOpenedCollection', value);
 
-  static final selectedCollectionName = StateProvider<int?>((ref) => lastOpenedCollection);
+  static final selectedCollectionId = StateProvider<int?>((ref) => lastOpenedCollection);
   static final openCollection = ApiProvider<Isar>((ref) {
     return ApiState(ref, (apiState) async {
-      final selected = ref.watch(selectedCollectionName);
+      final selected = ref.watch(selectedCollectionId);
       while (selected==null) {
         await Future.delayed(const Duration(seconds: 1));
       }
