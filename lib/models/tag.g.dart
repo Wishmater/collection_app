@@ -7,83 +7,113 @@ part of 'tag.dart';
 // **************************************************************************
 
 // coverage:ignore-file
-// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, avoid_js_rounded_ints, prefer_final_locals
 
 extension GetTagCollection on Isar {
-  IsarCollection<Tag> get tags => collection();
+  IsarCollection<Tag> get tags => this.collection();
 }
 
 const TagSchema = CollectionSchema(
   name: r'Tag',
-  schema:
-      r'{"name":"Tag","idName":"id","properties":[{"name":"dateCreated","type":"Long"},{"name":"itemCount","type":"Long"},{"name":"name","type":"String"}],"indexes":[],"links":[{"name":"parentTag","target":"Tag"}]}',
-  idName: r'id',
-  propertyIds: {r'dateCreated': 0, r'itemCount': 1, r'name': 2},
-  listProperties: {},
-  indexIds: {},
-  indexValueTypes: {},
-  linkIds: {r'parentTag': 0, r'items': 1, r'childrenTags': 2},
-  backlinkLinkNames: {r'items': r'tags', r'childrenTags': r'parentTag'},
-  getId: _tagGetId,
-  setId: _tagSetId,
-  getLinks: _tagGetLinks,
-  attachLinks: _tagAttachLinks,
+  id: 4007045862261149568,
+  properties: {
+    r'dateCreated': PropertySchema(
+      id: 0,
+      name: r'dateCreated',
+      type: IsarType.dateTime,
+    ),
+    r'itemCount': PropertySchema(
+      id: 1,
+      name: r'itemCount',
+      type: IsarType.long,
+    ),
+    r'name': PropertySchema(
+      id: 2,
+      name: r'name',
+      type: IsarType.string,
+    )
+  },
+  estimateSize: _tagEstimateSize,
   serializeNative: _tagSerializeNative,
   deserializeNative: _tagDeserializeNative,
   deserializePropNative: _tagDeserializePropNative,
   serializeWeb: _tagSerializeWeb,
   deserializeWeb: _tagDeserializeWeb,
   deserializePropWeb: _tagDeserializePropWeb,
-  version: 4,
+  idName: r'id',
+  indexes: {},
+  links: {
+    r'parentTag': LinkSchema(
+      id: -3515075751954170283,
+      name: r'parentTag',
+      target: r'Tag',
+      isSingle: true,
+    ),
+    r'childrenTags': LinkSchema(
+      id: -5315015940420698418,
+      name: r'childrenTags',
+      target: r'Tag',
+      isSingle: false,
+      linkName: r'parentTag',
+    ),
+    r'items': LinkSchema(
+      id: -4594045520067971683,
+      name: r'items',
+      target: r'Item',
+      isSingle: false,
+      linkName: r'tags',
+    )
+  },
+  embeddedSchemas: {},
+  getId: _tagGetId,
+  getLinks: _tagGetLinks,
+  attach: _tagAttach,
+  version: '3.0.0-dev.13',
 );
 
-int? _tagGetId(Tag object) {
-  if (object.id == Isar.autoIncrement) {
-    return null;
-  } else {
-    return object.id;
-  }
+int _tagEstimateSize(
+  Tag object,
+  List<int> offsets,
+  Map<Type, List<int>> allOffsets,
+) {
+  var bytesCount = offsets.last;
+  bytesCount += 3 + object.name.length * 3;
+  return bytesCount;
 }
 
-void _tagSetId(Tag object, int id) {
-  object.id = id;
-}
-
-List<IsarLinkBase<dynamic>> _tagGetLinks(Tag object) {
-  return [object.parentTag, object.items, object.childrenTags];
-}
-
-void _tagSerializeNative(IsarCollection<Tag> collection, IsarCObject cObj,
-    Tag object, int staticSize, List<int> offsets, AdapterAlloc alloc) {
-  final name$Bytes = IsarBinaryWriter.utf8Encoder.convert(object.name);
-  final size = (staticSize + 3 + (name$Bytes.length)) as int;
-  cObj.buffer = alloc(size);
-  cObj.buffer_length = size;
-
-  final buffer = IsarNative.bufAsBytes(cObj.buffer, size);
-  final writer = IsarBinaryWriter(buffer, staticSize);
-  writer.writeHeader();
+int _tagSerializeNative(
+  Tag object,
+  IsarBinaryWriter writer,
+  List<int> offsets,
+  Map<Type, List<int>> allOffsets,
+) {
   writer.writeDateTime(offsets[0], object.dateCreated);
   writer.writeLong(offsets[1], object.itemCount);
-  writer.writeByteList(offsets[2], name$Bytes);
+  writer.writeString(offsets[2], object.name);
+  return writer.usedBytes;
 }
 
-Tag _tagDeserializeNative(IsarCollection<Tag> collection, int id,
-    IsarBinaryReader reader, List<int> offsets) {
+Tag _tagDeserializeNative(
+  Id id,
+  IsarBinaryReader reader,
+  List<int> offsets,
+  Map<Type, List<int>> allOffsets,
+) {
   final object = Tag();
   object.dateCreated = reader.readDateTime(offsets[0]);
   object.id = id;
   object.itemCount = reader.readLong(offsets[1]);
   object.name = reader.readString(offsets[2]);
-  _tagAttachLinks(collection, id, object);
   return object;
 }
 
 P _tagDeserializePropNative<P>(
-    int id, IsarBinaryReader reader, int propertyIndex, int offset) {
-  switch (propertyIndex) {
-    case -1:
-      return id as P;
+  IsarBinaryReader reader,
+  int propertyId,
+  int offset,
+  Map<Type, List<int>> allOffsets,
+) {
+  switch (propertyId) {
     case 0:
       return (reader.readDateTime(offset)) as P;
     case 1:
@@ -91,61 +121,41 @@ P _tagDeserializePropNative<P>(
     case 2:
       return (reader.readString(offset)) as P;
     default:
-      throw IsarError('Illegal propertyIndex');
+      throw IsarError('Unknown property with id $propertyId');
   }
 }
 
 Object _tagSerializeWeb(IsarCollection<Tag> collection, Tag object) {
-  final jsObj = IsarNative.newJsObject();
-  IsarNative.jsObjectSet(
-      jsObj, r'dateCreated', object.dateCreated.toUtc().millisecondsSinceEpoch);
-  IsarNative.jsObjectSet(jsObj, r'id', object.id);
-  IsarNative.jsObjectSet(jsObj, r'itemCount', object.itemCount);
-  IsarNative.jsObjectSet(jsObj, r'name', object.name);
-  return jsObj;
+  /*final jsObj = IsarNative.newJsObject();*/ throw UnimplementedError();
 }
 
 Tag _tagDeserializeWeb(IsarCollection<Tag> collection, Object jsObj) {
-  final object = Tag();
-  object.dateCreated = IsarNative.jsObjectGet(jsObj, r'dateCreated') != null
-      ? DateTime.fromMillisecondsSinceEpoch(
-              IsarNative.jsObjectGet(jsObj, r'dateCreated') as int,
-              isUtc: true)
-          .toLocal()
-      : DateTime.fromMillisecondsSinceEpoch(0);
-  object.id = IsarNative.jsObjectGet(jsObj, r'id');
-  object.itemCount = IsarNative.jsObjectGet(jsObj, r'itemCount') ??
-      (double.negativeInfinity as int);
-  object.name = IsarNative.jsObjectGet(jsObj, r'name') ?? '';
-  _tagAttachLinks(collection, IsarNative.jsObjectGet(jsObj, r'id'), object);
-  return object;
+  /*final object = Tag();object.dateCreated = IsarNative.jsObjectGet(jsObj, r'dateCreated') != null ? DateTime.fromMillisecondsSinceEpoch(IsarNative.jsObjectGet(jsObj, r'dateCreated') as int, isUtc: true).toLocal() : DateTime.fromMillisecondsSinceEpoch(0);object.id = IsarNative.jsObjectGet(jsObj, r'id') ?? (double.negativeInfinity as int);object.itemCount = IsarNative.jsObjectGet(jsObj, r'itemCount') ?? (double.negativeInfinity as int);object.name = IsarNative.jsObjectGet(jsObj, r'name') ?? '';*/
+  //return object;
+  throw UnimplementedError();
 }
 
 P _tagDeserializePropWeb<P>(Object jsObj, String propertyName) {
   switch (propertyName) {
-    case r'dateCreated':
-      return (IsarNative.jsObjectGet(jsObj, r'dateCreated') != null
-          ? DateTime.fromMillisecondsSinceEpoch(
-                  IsarNative.jsObjectGet(jsObj, r'dateCreated') as int,
-                  isUtc: true)
-              .toLocal()
-          : DateTime.fromMillisecondsSinceEpoch(0)) as P;
-    case r'id':
-      return (IsarNative.jsObjectGet(jsObj, r'id')) as P;
-    case r'itemCount':
-      return (IsarNative.jsObjectGet(jsObj, r'itemCount') ??
-          (double.negativeInfinity as int)) as P;
-    case r'name':
-      return (IsarNative.jsObjectGet(jsObj, r'name') ?? '') as P;
     default:
       throw IsarError('Illegal propertyName');
   }
 }
 
-void _tagAttachLinks(IsarCollection<dynamic> col, int id, Tag object) {
-  object.parentTag.attach(col, col.isar.tags, r'parentTag', id);
-  object.items.attach(col, col.isar.items, r'items', id);
-  object.childrenTags.attach(col, col.isar.tags, r'childrenTags', id);
+Id _tagGetId(Tag object) {
+  return object.id;
+}
+
+List<IsarLinkBase<dynamic>> _tagGetLinks(Tag object) {
+  return [object.parentTag, object.childrenTags, object.items];
+}
+
+void _tagAttach(IsarCollection<dynamic> col, Id id, Tag object) {
+  object.id = id;
+  object.parentTag.attach(col, col.isar.collection<Tag>(), r'parentTag', id);
+  object.childrenTags
+      .attach(col, col.isar.collection<Tag>(), r'childrenTags', id);
+  object.items.attach(col, col.isar.collection<Item>(), r'items', id);
 }
 
 extension TagQueryWhereSort on QueryBuilder<Tag, Tag, QWhere> {
@@ -396,8 +406,8 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
 
   QueryBuilder<Tag, Tag, QAfterFilterCondition> nameGreaterThan(
     String value, {
-    bool caseSensitive = true,
     bool include = false,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
@@ -411,8 +421,8 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
 
   QueryBuilder<Tag, Tag, QAfterFilterCondition> nameLessThan(
     String value, {
-    bool caseSensitive = true,
     bool include = false,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
@@ -427,9 +437,9 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
   QueryBuilder<Tag, Tag, QAfterFilterCondition> nameBetween(
     String lower,
     String upper, {
-    bool caseSensitive = true,
     bool includeLower = true,
     bool includeUpper = true,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
@@ -490,42 +500,153 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
       ));
     });
   }
+
+  QueryBuilder<Tag, Tag, QAfterFilterCondition> nameIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'name',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Tag, Tag, QAfterFilterCondition> nameIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'name',
+        value: '',
+      ));
+    });
+  }
 }
+
+extension TagQueryObject on QueryBuilder<Tag, Tag, QFilterCondition> {}
 
 extension TagQueryLinks on QueryBuilder<Tag, Tag, QFilterCondition> {
   QueryBuilder<Tag, Tag, QAfterFilterCondition> parentTag(FilterQuery<Tag> q) {
     return QueryBuilder.apply(this, (query) {
-      return query.link(
-        query.collection.isar.tags,
-        q,
-        r'parentTag',
-      );
+      return query.link(q, r'parentTag');
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> items(FilterQuery<Item> q) {
+  QueryBuilder<Tag, Tag, QAfterFilterCondition> parentTagIsNull() {
     return QueryBuilder.apply(this, (query) {
-      return query.link(
-        query.collection.isar.items,
-        q,
-        r'items',
-      );
+      return query.linkLength(r'parentTag', 0, true, 0, true);
     });
   }
 
   QueryBuilder<Tag, Tag, QAfterFilterCondition> childrenTags(
       FilterQuery<Tag> q) {
     return QueryBuilder.apply(this, (query) {
-      return query.link(
-        query.collection.isar.tags,
-        q,
-        r'childrenTags',
-      );
+      return query.link(q, r'childrenTags');
+    });
+  }
+
+  QueryBuilder<Tag, Tag, QAfterFilterCondition> childrenTagsLengthEqualTo(
+      int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'childrenTags', length, true, length, true);
+    });
+  }
+
+  QueryBuilder<Tag, Tag, QAfterFilterCondition> childrenTagsIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'childrenTags', 0, true, 0, true);
+    });
+  }
+
+  QueryBuilder<Tag, Tag, QAfterFilterCondition> childrenTagsIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'childrenTags', 0, false, 999999, true);
+    });
+  }
+
+  QueryBuilder<Tag, Tag, QAfterFilterCondition> childrenTagsLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'childrenTags', 0, true, length, include);
+    });
+  }
+
+  QueryBuilder<Tag, Tag, QAfterFilterCondition> childrenTagsLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'childrenTags', length, include, 999999, true);
+    });
+  }
+
+  QueryBuilder<Tag, Tag, QAfterFilterCondition> childrenTagsLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(
+          r'childrenTags', lower, includeLower, upper, includeUpper);
+    });
+  }
+
+  QueryBuilder<Tag, Tag, QAfterFilterCondition> items(FilterQuery<Item> q) {
+    return QueryBuilder.apply(this, (query) {
+      return query.link(q, r'items');
+    });
+  }
+
+  QueryBuilder<Tag, Tag, QAfterFilterCondition> itemsLengthEqualTo(int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'items', length, true, length, true);
+    });
+  }
+
+  QueryBuilder<Tag, Tag, QAfterFilterCondition> itemsIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'items', 0, true, 0, true);
+    });
+  }
+
+  QueryBuilder<Tag, Tag, QAfterFilterCondition> itemsIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'items', 0, false, 999999, true);
+    });
+  }
+
+  QueryBuilder<Tag, Tag, QAfterFilterCondition> itemsLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'items', 0, true, length, include);
+    });
+  }
+
+  QueryBuilder<Tag, Tag, QAfterFilterCondition> itemsLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'items', length, include, 999999, true);
+    });
+  }
+
+  QueryBuilder<Tag, Tag, QAfterFilterCondition> itemsLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(
+          r'items', lower, includeLower, upper, includeUpper);
     });
   }
 }
 
-extension TagQueryWhereSortBy on QueryBuilder<Tag, Tag, QSortBy> {
+extension TagQuerySortBy on QueryBuilder<Tag, Tag, QSortBy> {
   QueryBuilder<Tag, Tag, QAfterSortBy> sortByDateCreated() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'dateCreated', Sort.asc);
@@ -563,7 +684,7 @@ extension TagQueryWhereSortBy on QueryBuilder<Tag, Tag, QSortBy> {
   }
 }
 
-extension TagQueryWhereSortThenBy on QueryBuilder<Tag, Tag, QSortThenBy> {
+extension TagQuerySortThenBy on QueryBuilder<Tag, Tag, QSortThenBy> {
   QueryBuilder<Tag, Tag, QAfterSortBy> thenByDateCreated() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'dateCreated', Sort.asc);

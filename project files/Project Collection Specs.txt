@@ -35,10 +35,9 @@ Items
 			in this view it will be easy to see which files are not added as items (with color)
 				folders will have a color for all added, one for none, one for some
 			you can right-click to add an unadded file
-				you can right-click a folder to add all its filre
+				you can right-click a folder to add all its files
 					optionally reccursively
 					also, allow to set a series of tags to all the files in this folder
-			!!! write this in the UI part
 			--- how to make sure files won't be moved (which would be BAD)
 
 

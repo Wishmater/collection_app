@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:collection_app/daos/tag.dart';
 import 'package:collection_app/models/collection.dart';
 import 'package:collection_app/models/item.dart';
 import 'package:collection_app/models/tag.dart';
@@ -43,6 +44,7 @@ class PageHomeState extends ConsumerState<PageHome> {
       body: ApiProviderBuilder<CollectionData>(
         provider: CollectionProvider.openCollection,
         dataBuilder: (context, collection) {
+          print ('BUILD HOME');
           return Row(
             children: [
               SizedBox(
@@ -62,22 +64,37 @@ class PageHomeState extends ConsumerState<PageHome> {
                             child: IntrinsicWidth(
                               child: Card(
                                 clipBehavior: Clip.hardEdge,
-                                child: TabBar(
-                                  isScrollable: true,
-                                  indicatorWeight: 3,
-                                  tabs: tabNames.map((e) {
-                                    return Container(
-                                      height: 32,
-                                      alignment: Alignment.center,
-                                      child: Text(e, style: Theme.of(context).textTheme.subtitle1,),
-                                    );
-                                  }).toList(),
-                                  onTap: (value) {
-                                    tabPageController.animateToPage(value,
-                                      duration: kTabScrollDuration,
-                                      curve: Curves.ease,
-                                    );
-                                  },
+                                child: ContextMenuFromZero(
+                                  actions: [
+                                    ActionFromZero(
+                                      title: 'New Tag',
+                                      icon: const Icon(Icons.add),
+                                      onTap: (context) async {
+                                        final model = await TagDAO.buildDao(null, null).maybeEdit(this.context);
+                                        if (mounted && model!=null) {
+                                          selectedTag.value = model;
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                  child: TabBar(
+                                    isScrollable: true,
+                                    indicatorWeight: 3,
+                                    tabs: tabNames.mapIndexed((i, e) {
+                                      Widget result = Container(
+                                        height: 32,
+                                        alignment: Alignment.center,
+                                        child: Text(e, style: Theme.of(context).textTheme.subtitle1,),
+                                      );
+                                      return result;
+                                    }).toList(),
+                                    onTap: (value) {
+                                      tabPageController.animateToPage(value,
+                                        duration: kTabScrollDuration,
+                                        curve: Curves.ease,
+                                      );
+                                    },
+                                  ),
                                 ),
                               ),
                             ),
@@ -100,8 +117,10 @@ class PageHomeState extends ConsumerState<PageHome> {
                           children: tabNames.mapIndexed((i, tabName) {
                             Widget result;
                             if (i==0) {
-                              // TODO 1 there is no root tag, so how to get root tags, or should there be one ?
-                              result = const Text('Tags/Items go here');
+                              result = TagExplorer(
+                                rootTag: null,
+                                selectedTag: selectedTag,
+                              );
                             } else if (i==1) {
                               result = TagExplorer(
                                 rootTag: DirectoryTag(collection.baseDirectory),

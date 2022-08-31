@@ -25,8 +25,8 @@ dependencies:
   flutter_riverpod: ^2.0.0-dev.9
   hive: ^2.2.2
   hive_flutter: ^1.1.0
-  isar: ^3.0.0-dev.8
-  isar_flutter_libs: ^3.0.0-dev.8
+  isar: ^3.0.0-dev.13
+  isar_flutter_libs: ^3.0.0-dev.13
   built_collection: ^5.1.1
   built_value: ^8.4.0
 

@@ -1,0 +1,78 @@
+
+****************************************************************************************
+P0
+****************************************************************************************
+
+Implement pages by order of normal app flow (Implement providers as needed)
+	item management (importing files into items, editing them)
+	item screen (fullscreen + zoom/pan controls)
+	advanced filtering by tag/rating
+		??? sorting
+	advanced control (global quick shortcuts)
+
+??? how to differentiate ecchi steps
+		pics that are a bit ecchi but can also be walls
+		pics that are really good but not that ecchi, so I don't want them to show when I search for high ecchi
+
+Implement app theme inspired by Tamamo colors: Blue, Pink, Orange/Yellow
+
+
+
+****************************************************************************************
+P1
+****************************************************************************************
+
+Always expand tag tree to the selected tag
+
+Implement file/folder delete
+
+
+
+****************************************************************************************
+P2
+****************************************************************************************
+
+Implement reparenting tags
+    need to fix all items that have said tag
+
+Implement better animations for PageHome middle and right panel
+    middle panel as shared axis horizontal
+    right panel as shared axis vertical
+
+
+
+****************************************************************************************
+P3
+****************************************************************************************
+
+
+
+
+
+
+
+
+
+
+
+// TODO 3 save this comparison for next project
+*** built_value vs freezed ***
+
+Same
+    immutable models
+    need code generation
+    copyWith() is easily done in built_value via rebuild()
+
+Pros of built_value
+    allows inheritance and polymorphism
+    serialization seems easier/cleaner
+        clear separation of serialization into native values and then into JSON (or into something else)
+    UnionClasses is done instead via normal inheritance, which is better for scaling and complex models
+        UnionClasses is better when the alternative
+
+Cons of built_value
+    doesn't support 'required' keyword in constructor (unless explicitly declaring constructor)
+    ??? test efficiency in serialization result
+            remove type indicator
+            hash keys
+            customize date serialization

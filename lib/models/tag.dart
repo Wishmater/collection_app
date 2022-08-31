@@ -34,7 +34,7 @@ class DirectoryTag implements Tag {
   DirectoryTag(this.name);
 
   @override
-  Id get id => throw UnimplementedError();
+  Id get id => name.hashCode;
   @override
   set id(Id _) => throw UnimplementedError();
   @override

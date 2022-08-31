@@ -7,90 +7,114 @@ part of 'item.dart';
 // **************************************************************************
 
 // coverage:ignore-file
-// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, avoid_js_rounded_ints, prefer_final_locals
 
 extension GetItemCollection on Isar {
-  IsarCollection<Item> get items => collection();
+  IsarCollection<Item> get items => this.collection();
 }
 
 const ItemSchema = CollectionSchema(
   name: r'Item',
-  schema:
-      r'{"name":"Item","idName":"id","properties":[{"name":"dateAdded","type":"Long"},{"name":"dateLastSeen","type":"Long"},{"name":"filePath","type":"String"},{"name":"height","type":"Long"},{"name":"name","type":"String"},{"name":"rating","type":"Double"},{"name":"width","type":"Long"}],"indexes":[],"links":[{"name":"tags","target":"Tag"}]}',
-  idName: r'id',
-  propertyIds: {
-    r'dateAdded': 0,
-    r'dateLastSeen': 1,
-    r'filePath': 2,
-    r'height': 3,
-    r'name': 4,
-    r'rating': 5,
-    r'width': 6
+  id: 7900997316587104717,
+  properties: {
+    r'dateAdded': PropertySchema(
+      id: 0,
+      name: r'dateAdded',
+      type: IsarType.dateTime,
+    ),
+    r'dateLastSeen': PropertySchema(
+      id: 1,
+      name: r'dateLastSeen',
+      type: IsarType.dateTime,
+    ),
+    r'filePath': PropertySchema(
+      id: 2,
+      name: r'filePath',
+      type: IsarType.string,
+    ),
+    r'height': PropertySchema(
+      id: 3,
+      name: r'height',
+      type: IsarType.long,
+    ),
+    r'name': PropertySchema(
+      id: 4,
+      name: r'name',
+      type: IsarType.string,
+    ),
+    r'rating': PropertySchema(
+      id: 5,
+      name: r'rating',
+      type: IsarType.double,
+    ),
+    r'width': PropertySchema(
+      id: 6,
+      name: r'width',
+      type: IsarType.long,
+    )
   },
-  listProperties: {},
-  indexIds: {},
-  indexValueTypes: {},
-  linkIds: {r'tags': 0},
-  backlinkLinkNames: {},
-  getId: _itemGetId,
-  setId: _itemSetId,
-  getLinks: _itemGetLinks,
-  attachLinks: _itemAttachLinks,
+  estimateSize: _itemEstimateSize,
   serializeNative: _itemSerializeNative,
   deserializeNative: _itemDeserializeNative,
   deserializePropNative: _itemDeserializePropNative,
   serializeWeb: _itemSerializeWeb,
   deserializeWeb: _itemDeserializeWeb,
   deserializePropWeb: _itemDeserializePropWeb,
-  version: 4,
+  idName: r'id',
+  indexes: {},
+  links: {
+    r'tags': LinkSchema(
+      id: -1444298628167129272,
+      name: r'tags',
+      target: r'Tag',
+      isSingle: false,
+    )
+  },
+  embeddedSchemas: {},
+  getId: _itemGetId,
+  getLinks: _itemGetLinks,
+  attach: _itemAttach,
+  version: '3.0.0-dev.13',
 );
 
-int? _itemGetId(Item object) {
-  if (object.id == Isar.autoIncrement) {
-    return null;
-  } else {
-    return object.id;
+int _itemEstimateSize(
+  Item object,
+  List<int> offsets,
+  Map<Type, List<int>> allOffsets,
+) {
+  var bytesCount = offsets.last;
+  bytesCount += 3 + object.filePath.length * 3;
+  {
+    final value = object.name;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
   }
+  return bytesCount;
 }
 
-void _itemSetId(Item object, int id) {
-  object.id = id;
-}
-
-List<IsarLinkBase<dynamic>> _itemGetLinks(Item object) {
-  return [object.tags];
-}
-
-void _itemSerializeNative(IsarCollection<Item> collection, IsarCObject cObj,
-    Item object, int staticSize, List<int> offsets, AdapterAlloc alloc) {
-  final filePath$Bytes = IsarBinaryWriter.utf8Encoder.convert(object.filePath);
-  IsarUint8List? name$Bytes;
-  final name$Value = object.name;
-  if (name$Value != null) {
-    name$Bytes = IsarBinaryWriter.utf8Encoder.convert(name$Value);
-  }
-  final size = (staticSize +
-      3 +
-      (filePath$Bytes.length) +
-      3 +
-      (name$Bytes?.length ?? 0)) as int;
-  cObj.buffer = alloc(size);
-  cObj.buffer_length = size;
-
-  final buffer = IsarNative.bufAsBytes(cObj.buffer, size);
-  final writer = IsarBinaryWriter(buffer, staticSize);
-  writer.writeHeader();
+int _itemSerializeNative(
+  Item object,
+  IsarBinaryWriter writer,
+  List<int> offsets,
+  Map<Type, List<int>> allOffsets,
+) {
   writer.writeDateTime(offsets[0], object.dateAdded);
   writer.writeDateTime(offsets[1], object.dateLastSeen);
-  writer.writeByteList(offsets[2], filePath$Bytes);
+  writer.writeString(offsets[2], object.filePath);
   writer.writeLong(offsets[3], object.height);
-  writer.writeByteList(offsets[4], name$Bytes);
+  writer.writeString(offsets[4], object.name);
   writer.writeDouble(offsets[5], object.rating);
   writer.writeLong(offsets[6], object.width);
+  return writer.usedBytes;
 }
 
-Item _itemDeserializeNative(IsarCollection<Item> collection, int id,
-    IsarBinaryReader reader, List<int> offsets) {
+Item _itemDeserializeNative(
+  Id id,
+  IsarBinaryReader reader,
+  List<int> offsets,
+  Map<Type, List<int>> allOffsets,
+) {
   final object = Item();
   object.dateAdded = reader.readDateTime(offsets[0]);
   object.dateLastSeen = reader.readDateTime(offsets[1]);
@@ -100,15 +124,16 @@ Item _itemDeserializeNative(IsarCollection<Item> collection, int id,
   object.name = reader.readStringOrNull(offsets[4]);
   object.rating = reader.readDouble(offsets[5]);
   object.width = reader.readLong(offsets[6]);
-  _itemAttachLinks(collection, id, object);
   return object;
 }
 
 P _itemDeserializePropNative<P>(
-    int id, IsarBinaryReader reader, int propertyIndex, int offset) {
-  switch (propertyIndex) {
-    case -1:
-      return id as P;
+  IsarBinaryReader reader,
+  int propertyId,
+  int offset,
+  Map<Type, List<int>> allOffsets,
+) {
+  switch (propertyId) {
     case 0:
       return (reader.readDateTime(offset)) as P;
     case 1:
@@ -124,90 +149,38 @@ P _itemDeserializePropNative<P>(
     case 6:
       return (reader.readLong(offset)) as P;
     default:
-      throw IsarError('Illegal propertyIndex');
+      throw IsarError('Unknown property with id $propertyId');
   }
 }
 
 Object _itemSerializeWeb(IsarCollection<Item> collection, Item object) {
-  final jsObj = IsarNative.newJsObject();
-  IsarNative.jsObjectSet(
-      jsObj, r'dateAdded', object.dateAdded.toUtc().millisecondsSinceEpoch);
-  IsarNative.jsObjectSet(jsObj, r'dateLastSeen',
-      object.dateLastSeen.toUtc().millisecondsSinceEpoch);
-  IsarNative.jsObjectSet(jsObj, r'filePath', object.filePath);
-  IsarNative.jsObjectSet(jsObj, r'height', object.height);
-  IsarNative.jsObjectSet(jsObj, r'id', object.id);
-  IsarNative.jsObjectSet(jsObj, r'name', object.name);
-  IsarNative.jsObjectSet(jsObj, r'rating', object.rating);
-  IsarNative.jsObjectSet(jsObj, r'width', object.width);
-  return jsObj;
+  /*final jsObj = IsarNative.newJsObject();*/ throw UnimplementedError();
 }
 
 Item _itemDeserializeWeb(IsarCollection<Item> collection, Object jsObj) {
-  final object = Item();
-  object.dateAdded = IsarNative.jsObjectGet(jsObj, r'dateAdded') != null
-      ? DateTime.fromMillisecondsSinceEpoch(
-              IsarNative.jsObjectGet(jsObj, r'dateAdded') as int,
-              isUtc: true)
-          .toLocal()
-      : DateTime.fromMillisecondsSinceEpoch(0);
-  object.dateLastSeen = IsarNative.jsObjectGet(jsObj, r'dateLastSeen') != null
-      ? DateTime.fromMillisecondsSinceEpoch(
-              IsarNative.jsObjectGet(jsObj, r'dateLastSeen') as int,
-              isUtc: true)
-          .toLocal()
-      : DateTime.fromMillisecondsSinceEpoch(0);
-  object.filePath = IsarNative.jsObjectGet(jsObj, r'filePath') ?? '';
-  object.height = IsarNative.jsObjectGet(jsObj, r'height') ??
-      (double.negativeInfinity as int);
-  object.id = IsarNative.jsObjectGet(jsObj, r'id');
-  object.name = IsarNative.jsObjectGet(jsObj, r'name');
-  object.rating =
-      IsarNative.jsObjectGet(jsObj, r'rating') ?? double.negativeInfinity;
-  object.width = IsarNative.jsObjectGet(jsObj, r'width') ??
-      (double.negativeInfinity as int);
-  _itemAttachLinks(collection, IsarNative.jsObjectGet(jsObj, r'id'), object);
-  return object;
+  /*final object = Item();object.dateAdded = IsarNative.jsObjectGet(jsObj, r'dateAdded') != null ? DateTime.fromMillisecondsSinceEpoch(IsarNative.jsObjectGet(jsObj, r'dateAdded') as int, isUtc: true).toLocal() : DateTime.fromMillisecondsSinceEpoch(0);object.dateLastSeen = IsarNative.jsObjectGet(jsObj, r'dateLastSeen') != null ? DateTime.fromMillisecondsSinceEpoch(IsarNative.jsObjectGet(jsObj, r'dateLastSeen') as int, isUtc: true).toLocal() : DateTime.fromMillisecondsSinceEpoch(0);object.filePath = IsarNative.jsObjectGet(jsObj, r'filePath') ?? '';object.height = IsarNative.jsObjectGet(jsObj, r'height') ?? (double.negativeInfinity as int);object.id = IsarNative.jsObjectGet(jsObj, r'id') ?? (double.negativeInfinity as int);object.name = IsarNative.jsObjectGet(jsObj, r'name') ;object.rating = IsarNative.jsObjectGet(jsObj, r'rating') ?? double.negativeInfinity;object.width = IsarNative.jsObjectGet(jsObj, r'width') ?? (double.negativeInfinity as int);*/
+  //return object;
+  throw UnimplementedError();
 }
 
 P _itemDeserializePropWeb<P>(Object jsObj, String propertyName) {
   switch (propertyName) {
-    case r'dateAdded':
-      return (IsarNative.jsObjectGet(jsObj, r'dateAdded') != null
-          ? DateTime.fromMillisecondsSinceEpoch(
-                  IsarNative.jsObjectGet(jsObj, r'dateAdded') as int,
-                  isUtc: true)
-              .toLocal()
-          : DateTime.fromMillisecondsSinceEpoch(0)) as P;
-    case r'dateLastSeen':
-      return (IsarNative.jsObjectGet(jsObj, r'dateLastSeen') != null
-          ? DateTime.fromMillisecondsSinceEpoch(
-                  IsarNative.jsObjectGet(jsObj, r'dateLastSeen') as int,
-                  isUtc: true)
-              .toLocal()
-          : DateTime.fromMillisecondsSinceEpoch(0)) as P;
-    case r'filePath':
-      return (IsarNative.jsObjectGet(jsObj, r'filePath') ?? '') as P;
-    case r'height':
-      return (IsarNative.jsObjectGet(jsObj, r'height') ??
-          (double.negativeInfinity as int)) as P;
-    case r'id':
-      return (IsarNative.jsObjectGet(jsObj, r'id')) as P;
-    case r'name':
-      return (IsarNative.jsObjectGet(jsObj, r'name')) as P;
-    case r'rating':
-      return (IsarNative.jsObjectGet(jsObj, r'rating') ??
-          double.negativeInfinity) as P;
-    case r'width':
-      return (IsarNative.jsObjectGet(jsObj, r'width') ??
-          (double.negativeInfinity as int)) as P;
     default:
       throw IsarError('Illegal propertyName');
   }
 }
 
-void _itemAttachLinks(IsarCollection<dynamic> col, int id, Item object) {
-  object.tags.attach(col, col.isar.tags, r'tags', id);
+Id _itemGetId(Item object) {
+  return object.id;
+}
+
+List<IsarLinkBase<dynamic>> _itemGetLinks(Item object) {
+  return [object.tags];
+}
+
+void _itemAttach(IsarCollection<dynamic> col, Id id, Item object) {
+  object.id = id;
+  object.tags.attach(col, col.isar.collection<Tag>(), r'tags', id);
 }
 
 extension ItemQueryWhereSort on QueryBuilder<Item, Item, QWhere> {
@@ -407,8 +380,8 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
 
   QueryBuilder<Item, Item, QAfterFilterCondition> filePathGreaterThan(
     String value, {
-    bool caseSensitive = true,
     bool include = false,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
@@ -422,8 +395,8 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
 
   QueryBuilder<Item, Item, QAfterFilterCondition> filePathLessThan(
     String value, {
-    bool caseSensitive = true,
     bool include = false,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
@@ -438,9 +411,9 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
   QueryBuilder<Item, Item, QAfterFilterCondition> filePathBetween(
     String lower,
     String upper, {
-    bool caseSensitive = true,
     bool includeLower = true,
     bool includeUpper = true,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
@@ -499,6 +472,24 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
         property: r'filePath',
         wildcard: pattern,
         caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> filePathIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'filePath',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> filePathIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'filePath',
+        value: '',
       ));
     });
   }
@@ -615,6 +606,14 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
     });
   }
 
+  QueryBuilder<Item, Item, QAfterFilterCondition> nameIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'name',
+      ));
+    });
+  }
+
   QueryBuilder<Item, Item, QAfterFilterCondition> nameEqualTo(
     String? value, {
     bool caseSensitive = true,
@@ -630,8 +629,8 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
 
   QueryBuilder<Item, Item, QAfterFilterCondition> nameGreaterThan(
     String? value, {
-    bool caseSensitive = true,
     bool include = false,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
@@ -645,8 +644,8 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
 
   QueryBuilder<Item, Item, QAfterFilterCondition> nameLessThan(
     String? value, {
-    bool caseSensitive = true,
     bool include = false,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
@@ -661,9 +660,9 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
   QueryBuilder<Item, Item, QAfterFilterCondition> nameBetween(
     String? lower,
     String? upper, {
-    bool caseSensitive = true,
     bool includeLower = true,
     bool includeUpper = true,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
@@ -725,34 +724,82 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Item, Item, QAfterFilterCondition> ratingGreaterThan(
-      double value) {
+  QueryBuilder<Item, Item, QAfterFilterCondition> nameIsEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'rating',
-        value: value,
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'name',
+        value: '',
       ));
     });
   }
 
-  QueryBuilder<Item, Item, QAfterFilterCondition> ratingLessThan(double value) {
+  QueryBuilder<Item, Item, QAfterFilterCondition> nameIsNotEmpty() {
     return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'name',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> ratingEqualTo(
+    double value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
         property: r'rating',
         value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> ratingGreaterThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'rating',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> ratingLessThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'rating',
+        value: value,
+        epsilon: epsilon,
       ));
     });
   }
 
   QueryBuilder<Item, Item, QAfterFilterCondition> ratingBetween(
-      double lower, double upper) {
+    double lower,
+    double upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
         property: r'rating',
         lower: lower,
-        includeLower: false,
+        includeLower: includeLower,
         upper: upper,
-        includeUpper: false,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
       ));
     });
   }
@@ -810,19 +857,66 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
   }
 }
 
+extension ItemQueryObject on QueryBuilder<Item, Item, QFilterCondition> {}
+
 extension ItemQueryLinks on QueryBuilder<Item, Item, QFilterCondition> {
   QueryBuilder<Item, Item, QAfterFilterCondition> tags(FilterQuery<Tag> q) {
     return QueryBuilder.apply(this, (query) {
-      return query.link(
-        query.collection.isar.tags,
-        q,
-        r'tags',
-      );
+      return query.link(q, r'tags');
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> tagsLengthEqualTo(
+      int length) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'tags', length, true, length, true);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> tagsIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'tags', 0, true, 0, true);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> tagsIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'tags', 0, false, 999999, true);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> tagsLengthLessThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'tags', 0, true, length, include);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> tagsLengthGreaterThan(
+    int length, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(r'tags', length, include, 999999, true);
+    });
+  }
+
+  QueryBuilder<Item, Item, QAfterFilterCondition> tagsLengthBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.linkLength(
+          r'tags', lower, includeLower, upper, includeUpper);
     });
   }
 }
 
-extension ItemQueryWhereSortBy on QueryBuilder<Item, Item, QSortBy> {
+extension ItemQuerySortBy on QueryBuilder<Item, Item, QSortBy> {
   QueryBuilder<Item, Item, QAfterSortBy> sortByDateAdded() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'dateAdded', Sort.asc);
@@ -908,7 +1002,7 @@ extension ItemQueryWhereSortBy on QueryBuilder<Item, Item, QSortBy> {
   }
 }
 
-extension ItemQueryWhereSortThenBy on QueryBuilder<Item, Item, QSortThenBy> {
+extension ItemQuerySortThenBy on QueryBuilder<Item, Item, QSortThenBy> {
   QueryBuilder<Item, Item, QAfterSortBy> thenByDateAdded() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'dateAdded', Sort.asc);

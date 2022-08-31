@@ -7,93 +7,96 @@ part of 'collection.dart';
 // **************************************************************************
 
 // coverage:ignore-file
-// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, avoid_js_rounded_ints, prefer_final_locals
 
 extension GetCollectionDataCollection on Isar {
-  IsarCollection<CollectionData> get collectionDatas => collection();
+  IsarCollection<CollectionData> get collectionDatas => this.collection();
 }
 
 const CollectionDataSchema = CollectionSchema(
   name: r'CollectionData',
-  schema:
-      r'{"name":"CollectionData","idName":"id","properties":[{"name":"baseDirectory","type":"String"},{"name":"dateCreated","type":"Long"},{"name":"dateLastOpened","type":"Long"},{"name":"itemCount","type":"Long"},{"name":"name","type":"String"},{"name":"tagCount","type":"Long"}],"indexes":[],"links":[]}',
-  idName: r'id',
-  propertyIds: {
-    r'baseDirectory': 0,
-    r'dateCreated': 1,
-    r'dateLastOpened': 2,
-    r'itemCount': 3,
-    r'name': 4,
-    r'tagCount': 5
+  id: 2450081689493535768,
+  properties: {
+    r'baseDirectory': PropertySchema(
+      id: 0,
+      name: r'baseDirectory',
+      type: IsarType.string,
+    ),
+    r'dateCreated': PropertySchema(
+      id: 1,
+      name: r'dateCreated',
+      type: IsarType.dateTime,
+    ),
+    r'dateLastOpened': PropertySchema(
+      id: 2,
+      name: r'dateLastOpened',
+      type: IsarType.dateTime,
+    ),
+    r'itemCount': PropertySchema(
+      id: 3,
+      name: r'itemCount',
+      type: IsarType.long,
+    ),
+    r'name': PropertySchema(
+      id: 4,
+      name: r'name',
+      type: IsarType.string,
+    ),
+    r'tagCount': PropertySchema(
+      id: 5,
+      name: r'tagCount',
+      type: IsarType.long,
+    )
   },
-  listProperties: {},
-  indexIds: {},
-  indexValueTypes: {},
-  linkIds: {},
-  backlinkLinkNames: {},
-  getId: _collectionDataGetId,
-  setId: _collectionDataSetId,
-  getLinks: _collectionDataGetLinks,
-  attachLinks: _collectionDataAttachLinks,
+  estimateSize: _collectionDataEstimateSize,
   serializeNative: _collectionDataSerializeNative,
   deserializeNative: _collectionDataDeserializeNative,
   deserializePropNative: _collectionDataDeserializePropNative,
   serializeWeb: _collectionDataSerializeWeb,
   deserializeWeb: _collectionDataDeserializeWeb,
   deserializePropWeb: _collectionDataDeserializePropWeb,
-  version: 4,
+  idName: r'id',
+  indexes: {},
+  links: {},
+  embeddedSchemas: {},
+  getId: _collectionDataGetId,
+  getLinks: _collectionDataGetLinks,
+  attach: _collectionDataAttach,
+  version: '3.0.0-dev.13',
 );
 
-int? _collectionDataGetId(CollectionData object) {
-  if (object.id == Isar.autoIncrement) {
-    return null;
-  } else {
-    return object.id;
-  }
+int _collectionDataEstimateSize(
+  CollectionData object,
+  List<int> offsets,
+  Map<Type, List<int>> allOffsets,
+) {
+  var bytesCount = offsets.last;
+  bytesCount += 3 + object.baseDirectory.length * 3;
+  bytesCount += 3 + object.name.length * 3;
+  return bytesCount;
 }
 
-void _collectionDataSetId(CollectionData object, int id) {
-  object.id = id;
-}
-
-List<IsarLinkBase<dynamic>> _collectionDataGetLinks(CollectionData object) {
-  return [];
-}
-
-void _collectionDataSerializeNative(
-    IsarCollection<CollectionData> collection,
-    IsarCObject cObj,
-    CollectionData object,
-    int staticSize,
-    List<int> offsets,
-    AdapterAlloc alloc) {
-  final baseDirectory$Bytes =
-      IsarBinaryWriter.utf8Encoder.convert(object.baseDirectory);
-  final name$Bytes = IsarBinaryWriter.utf8Encoder.convert(object.name);
-  final size = (staticSize +
-      3 +
-      (baseDirectory$Bytes.length) +
-      3 +
-      (name$Bytes.length)) as int;
-  cObj.buffer = alloc(size);
-  cObj.buffer_length = size;
-
-  final buffer = IsarNative.bufAsBytes(cObj.buffer, size);
-  final writer = IsarBinaryWriter(buffer, staticSize);
-  writer.writeHeader();
-  writer.writeByteList(offsets[0], baseDirectory$Bytes);
+int _collectionDataSerializeNative(
+  CollectionData object,
+  IsarBinaryWriter writer,
+  List<int> offsets,
+  Map<Type, List<int>> allOffsets,
+) {
+  writer.writeString(offsets[0], object.baseDirectory);
   writer.writeDateTime(offsets[1], object.dateCreated);
   writer.writeDateTime(offsets[2], object.dateLastOpened);
   writer.writeLong(offsets[3], object.itemCount);
-  writer.writeByteList(offsets[4], name$Bytes);
+  writer.writeString(offsets[4], object.name);
   writer.writeLong(offsets[5], object.tagCount);
+  return writer.usedBytes;
 }
 
 CollectionData _collectionDataDeserializeNative(
-    IsarCollection<CollectionData> collection,
-    int id,
-    IsarBinaryReader reader,
-    List<int> offsets) {
+  Id id,
+  IsarBinaryReader reader,
+  List<int> offsets,
+  Map<Type, List<int>> allOffsets,
+) {
   final object = CollectionData();
   object.baseDirectory = reader.readString(offsets[0]);
   object.dateCreated = reader.readDateTime(offsets[1]);
@@ -106,10 +109,12 @@ CollectionData _collectionDataDeserializeNative(
 }
 
 P _collectionDataDeserializePropNative<P>(
-    int id, IsarBinaryReader reader, int propertyIndex, int offset) {
-  switch (propertyIndex) {
-    case -1:
-      return id as P;
+  IsarBinaryReader reader,
+  int propertyId,
+  int offset,
+  Map<Type, List<int>> allOffsets,
+) {
+  switch (propertyId) {
     case 0:
       return (reader.readString(offset)) as P;
     case 1:
@@ -123,86 +128,41 @@ P _collectionDataDeserializePropNative<P>(
     case 5:
       return (reader.readLong(offset)) as P;
     default:
-      throw IsarError('Illegal propertyIndex');
+      throw IsarError('Unknown property with id $propertyId');
   }
 }
 
 Object _collectionDataSerializeWeb(
     IsarCollection<CollectionData> collection, CollectionData object) {
-  final jsObj = IsarNative.newJsObject();
-  IsarNative.jsObjectSet(jsObj, r'baseDirectory', object.baseDirectory);
-  IsarNative.jsObjectSet(
-      jsObj, r'dateCreated', object.dateCreated.toUtc().millisecondsSinceEpoch);
-  IsarNative.jsObjectSet(jsObj, r'dateLastOpened',
-      object.dateLastOpened.toUtc().millisecondsSinceEpoch);
-  IsarNative.jsObjectSet(jsObj, r'id', object.id);
-  IsarNative.jsObjectSet(jsObj, r'itemCount', object.itemCount);
-  IsarNative.jsObjectSet(jsObj, r'name', object.name);
-  IsarNative.jsObjectSet(jsObj, r'tagCount', object.tagCount);
-  return jsObj;
+  /*final jsObj = IsarNative.newJsObject();*/ throw UnimplementedError();
 }
 
 CollectionData _collectionDataDeserializeWeb(
     IsarCollection<CollectionData> collection, Object jsObj) {
-  final object = CollectionData();
-  object.baseDirectory = IsarNative.jsObjectGet(jsObj, r'baseDirectory') ?? '';
-  object.dateCreated = IsarNative.jsObjectGet(jsObj, r'dateCreated') != null
-      ? DateTime.fromMillisecondsSinceEpoch(
-              IsarNative.jsObjectGet(jsObj, r'dateCreated') as int,
-              isUtc: true)
-          .toLocal()
-      : DateTime.fromMillisecondsSinceEpoch(0);
-  object.dateLastOpened =
-      IsarNative.jsObjectGet(jsObj, r'dateLastOpened') != null
-          ? DateTime.fromMillisecondsSinceEpoch(
-                  IsarNative.jsObjectGet(jsObj, r'dateLastOpened') as int,
-                  isUtc: true)
-              .toLocal()
-          : DateTime.fromMillisecondsSinceEpoch(0);
-  object.id = IsarNative.jsObjectGet(jsObj, r'id');
-  object.itemCount = IsarNative.jsObjectGet(jsObj, r'itemCount') ??
-      (double.negativeInfinity as int);
-  object.name = IsarNative.jsObjectGet(jsObj, r'name') ?? '';
-  object.tagCount = IsarNative.jsObjectGet(jsObj, r'tagCount') ??
-      (double.negativeInfinity as int);
-  return object;
+  /*final object = CollectionData();object.baseDirectory = IsarNative.jsObjectGet(jsObj, r'baseDirectory') ?? '';object.dateCreated = IsarNative.jsObjectGet(jsObj, r'dateCreated') != null ? DateTime.fromMillisecondsSinceEpoch(IsarNative.jsObjectGet(jsObj, r'dateCreated') as int, isUtc: true).toLocal() : DateTime.fromMillisecondsSinceEpoch(0);object.dateLastOpened = IsarNative.jsObjectGet(jsObj, r'dateLastOpened') != null ? DateTime.fromMillisecondsSinceEpoch(IsarNative.jsObjectGet(jsObj, r'dateLastOpened') as int, isUtc: true).toLocal() : DateTime.fromMillisecondsSinceEpoch(0);object.id = IsarNative.jsObjectGet(jsObj, r'id') ?? (double.negativeInfinity as int);object.itemCount = IsarNative.jsObjectGet(jsObj, r'itemCount') ?? (double.negativeInfinity as int);object.name = IsarNative.jsObjectGet(jsObj, r'name') ?? '';object.tagCount = IsarNative.jsObjectGet(jsObj, r'tagCount') ?? (double.negativeInfinity as int);*/
+  //return object;
+  throw UnimplementedError();
 }
 
 P _collectionDataDeserializePropWeb<P>(Object jsObj, String propertyName) {
   switch (propertyName) {
-    case r'baseDirectory':
-      return (IsarNative.jsObjectGet(jsObj, r'baseDirectory') ?? '') as P;
-    case r'dateCreated':
-      return (IsarNative.jsObjectGet(jsObj, r'dateCreated') != null
-          ? DateTime.fromMillisecondsSinceEpoch(
-                  IsarNative.jsObjectGet(jsObj, r'dateCreated') as int,
-                  isUtc: true)
-              .toLocal()
-          : DateTime.fromMillisecondsSinceEpoch(0)) as P;
-    case r'dateLastOpened':
-      return (IsarNative.jsObjectGet(jsObj, r'dateLastOpened') != null
-          ? DateTime.fromMillisecondsSinceEpoch(
-                  IsarNative.jsObjectGet(jsObj, r'dateLastOpened') as int,
-                  isUtc: true)
-              .toLocal()
-          : DateTime.fromMillisecondsSinceEpoch(0)) as P;
-    case r'id':
-      return (IsarNative.jsObjectGet(jsObj, r'id')) as P;
-    case r'itemCount':
-      return (IsarNative.jsObjectGet(jsObj, r'itemCount') ??
-          (double.negativeInfinity as int)) as P;
-    case r'name':
-      return (IsarNative.jsObjectGet(jsObj, r'name') ?? '') as P;
-    case r'tagCount':
-      return (IsarNative.jsObjectGet(jsObj, r'tagCount') ??
-          (double.negativeInfinity as int)) as P;
     default:
       throw IsarError('Illegal propertyName');
   }
 }
 
-void _collectionDataAttachLinks(
-    IsarCollection<dynamic> col, int id, CollectionData object) {}
+Id _collectionDataGetId(CollectionData object) {
+  return object.id;
+}
+
+List<IsarLinkBase<dynamic>> _collectionDataGetLinks(CollectionData object) {
+  return [];
+}
+
+void _collectionDataAttach(
+    IsarCollection<dynamic> col, Id id, CollectionData object) {
+  object.id = id;
+}
 
 extension CollectionDataQueryWhereSort
     on QueryBuilder<CollectionData, CollectionData, QWhere> {
@@ -304,8 +264,8 @@ extension CollectionDataQueryFilter
   QueryBuilder<CollectionData, CollectionData, QAfterFilterCondition>
       baseDirectoryGreaterThan(
     String value, {
-    bool caseSensitive = true,
     bool include = false,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
@@ -320,8 +280,8 @@ extension CollectionDataQueryFilter
   QueryBuilder<CollectionData, CollectionData, QAfterFilterCondition>
       baseDirectoryLessThan(
     String value, {
-    bool caseSensitive = true,
     bool include = false,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
@@ -337,9 +297,9 @@ extension CollectionDataQueryFilter
       baseDirectoryBetween(
     String lower,
     String upper, {
-    bool caseSensitive = true,
     bool includeLower = true,
     bool includeUpper = true,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
@@ -399,6 +359,26 @@ extension CollectionDataQueryFilter
         property: r'baseDirectory',
         wildcard: pattern,
         caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<CollectionData, CollectionData, QAfterFilterCondition>
+      baseDirectoryIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'baseDirectory',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<CollectionData, CollectionData, QAfterFilterCondition>
+      baseDirectoryIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'baseDirectory',
+        value: '',
       ));
     });
   }
@@ -643,8 +623,8 @@ extension CollectionDataQueryFilter
   QueryBuilder<CollectionData, CollectionData, QAfterFilterCondition>
       nameGreaterThan(
     String value, {
-    bool caseSensitive = true,
     bool include = false,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.greaterThan(
@@ -659,8 +639,8 @@ extension CollectionDataQueryFilter
   QueryBuilder<CollectionData, CollectionData, QAfterFilterCondition>
       nameLessThan(
     String value, {
-    bool caseSensitive = true,
     bool include = false,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.lessThan(
@@ -676,9 +656,9 @@ extension CollectionDataQueryFilter
       nameBetween(
     String lower,
     String upper, {
-    bool caseSensitive = true,
     bool includeLower = true,
     bool includeUpper = true,
+    bool caseSensitive = true,
   }) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.between(
@@ -743,6 +723,26 @@ extension CollectionDataQueryFilter
   }
 
   QueryBuilder<CollectionData, CollectionData, QAfterFilterCondition>
+      nameIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'name',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<CollectionData, CollectionData, QAfterFilterCondition>
+      nameIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'name',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<CollectionData, CollectionData, QAfterFilterCondition>
       tagCountEqualTo(int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -799,10 +799,13 @@ extension CollectionDataQueryFilter
   }
 }
 
+extension CollectionDataQueryObject
+    on QueryBuilder<CollectionData, CollectionData, QFilterCondition> {}
+
 extension CollectionDataQueryLinks
     on QueryBuilder<CollectionData, CollectionData, QFilterCondition> {}
 
-extension CollectionDataQueryWhereSortBy
+extension CollectionDataQuerySortBy
     on QueryBuilder<CollectionData, CollectionData, QSortBy> {
   QueryBuilder<CollectionData, CollectionData, QAfterSortBy>
       sortByBaseDirectory() {
@@ -885,7 +888,7 @@ extension CollectionDataQueryWhereSortBy
   }
 }
 
-extension CollectionDataQueryWhereSortThenBy
+extension CollectionDataQuerySortThenBy
     on QueryBuilder<CollectionData, CollectionData, QSortThenBy> {
   QueryBuilder<CollectionData, CollectionData, QAfterSortBy>
       thenByBaseDirectory() {
