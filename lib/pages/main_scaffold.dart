@@ -8,7 +8,7 @@ class ScaffoldMain extends StatelessWidget{
   final ScrollController? scrollController;
   final List<Widget> actions;
   final bool constraintBodyOnXLargeScreens;
-  final int appbarType;
+  final AppbarType appbarType;
 
   const ScaffoldMain({
     Key? key,
@@ -17,7 +17,7 @@ class ScaffoldMain extends StatelessWidget{
     this.scrollController,
     this.actions = const[],
     this.constraintBodyOnXLargeScreens = false,
-    this.appbarType = ScaffoldFromZero.appbarTypeQuickReturn,
+    this.appbarType = AppbarType.quickReturn,
   })  : super(key: key);
 
   @override

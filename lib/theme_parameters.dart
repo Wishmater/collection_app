@@ -102,17 +102,4 @@ class ThemeParameters extends ThemeParametersFromZero{
     ),
   );
 
-
-  static Color getCharactersColor(context){
-    return Theme.of(context).brightness==Brightness.light ? darkCharactersColor : lightCharactersColor;
-  }
-  static Color get lightCharactersColor => Colors.green.shade300;
-  static Color get darkCharactersColor => Colors.green.shade900;
-  static Color getOriginsColor(context){
-    return Theme.of(context).brightness==Brightness.light ? darkOriginsColor : lightOriginsColor;
-  }
-  static Color get lightOriginsColor => Colors.orange.shade300;
-  static Color get darkOriginsColor => Colors.orange.shade900;
-
-
 }

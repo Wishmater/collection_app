@@ -94,7 +94,7 @@ class PageSplashState extends ConsumerState<PageSplash> {
                                     AppbarFromZero(
                                       title: const Text('Collections'),
                                       backgroundColor: Theme.of(context).cardColor,
-                                      elevation: 8 * state.scrollPercentage,
+                                      elevation: 8.0 * state.scrollPercentage,
                                       actions: [
                                         ActionFromZero(
                                           title: 'New Collection',

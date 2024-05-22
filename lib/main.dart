@@ -69,9 +69,8 @@ class MyApp extends StatelessWidget {
   MyApp({Key? key}) : super(key: key);
 
   final _router = GoRouter(
-    urlPathStrategy: UrlPathStrategy.path,
     // debugLogDiagnostics: true,
-    redirect: (state) {
+    redirect: (context, state) async {
       if ((!initialized) && state.location!='/') {
         // ensure to always go through splash screen
         return '/?redirect=${state.subloc}';
@@ -121,7 +120,7 @@ class MyApp extends StatelessWidget {
             builder: (context, child) {
               return FromZeroAppContentWrapper(
                 goRouter: _router,
-                child: child,
+                child: child!,
               );
             },
           );

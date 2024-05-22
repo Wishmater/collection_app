@@ -40,7 +40,7 @@ class PageHomeState extends ConsumerState<PageHome> {
     final tabBarScrollController = ScrollController();
     // TODO 2 make windowBar only appear on hover (make it an option in ScaffoldFromZero)
     return ScaffoldMain(
-      appbarType: ScaffoldFromZero.appbarTypeNone,
+      appbarType: AppbarType.none,
       body: ApiProviderBuilder<CollectionData>(
         provider: CollectionProvider.openCollection,
         dataBuilder: (context, collection) {
