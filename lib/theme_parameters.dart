@@ -11,8 +11,12 @@ class ThemeParameters extends ThemeParametersFromZero{
   @override
   ThemeData get defaultLightTheme => ThemeData(
     canvasColor: Colors.grey.shade300,
-    primarySwatch: Colors.indigo,
-    accentColor: Colors.cyanAccent,
+    // primarySwatch: Colors.indigo,
+    // accentColor: Colors.cyanAccent,
+    colorScheme: ColorScheme.fromSwatch(
+      primarySwatch: Colors.indigo,
+      accentColor: Colors.cyanAccent,
+    ),
     hoverColor: Colors.cyanAccent.withOpacity(0.1),
     highlightColor: Colors.cyanAccent.withOpacity(0.1),
     splashColor: Colors.cyanAccent.withOpacity(0.25),
@@ -38,21 +42,27 @@ class ThemeParameters extends ThemeParametersFromZero{
       ),
     ),
     scrollbarTheme: ScrollbarThemeData(
-      isAlwaysShown: PlatformExtended.isDesktop,
-      showTrackOnHover: true,
       crossAxisMargin: 0,
       mainAxisMargin: 0,
       minThumbLength: 128,
       interactive: true,
+      trackVisibility: MaterialStateProperty.resolveWith((states) {
+        return states.contains(MaterialState.hovered);
+      }),
+      thumbVisibility: PlatformExtended.isDesktop
+          ? const MaterialStatePropertyAll(true)
+          : null,
+      trackColor: MaterialStateProperty.resolveWith((states) {
+        return const Color.fromRGBO(255, 255, 255, 0.4);
+      }),
       thumbColor: MaterialStateProperty.resolveWith((states) {
-        Color color = Colors.grey.shade800;
         if (states.contains(MaterialState.dragged)) {
-          return color.withOpacity(0.90);
+          return const Color.fromRGBO(101, 101, 101, 1); // 0.6
         }
         if (states.contains(MaterialState.hovered)) {
-          return color.withOpacity(0.80);
+          return const Color.fromRGBO(127, 127, 127, 1); // 0.5
         }
-        return color.withOpacity(0.70);
+        return const Color.fromRGBO(153, 153, 153, 1); // 0.4
       }),
     ),
   );
@@ -60,17 +70,21 @@ class ThemeParameters extends ThemeParametersFromZero{
   @override
   ThemeData get defaultDarkTheme => ThemeData(
     brightness: Brightness.dark,
-    primarySwatch: Colors.blue, // TODO 1 use Tamamo colors: blue, pink, orange/yellow
-    accentColor: Colors.cyanAccent,
+    // primarySwatch: Colors.blue,
+    // accentColor: Colors.cyanAccent,
+    // primarySwatch: Colors.indigo,
+    // accentColor: Colors.cyanAccent,
+    colorScheme: ColorScheme.fromSwatch(
+      primarySwatch: Colors.indigo,
+      accentColor: Colors.cyanAccent,
+      brightness: Brightness.dark,
+    ),
     hoverColor: Colors.cyanAccent.withOpacity(0.1),
     highlightColor: Colors.cyanAccent.withOpacity(0.1),
     splashColor: Colors.cyanAccent.withOpacity(0.25),
 //    secondaryHeaderColor: Color.fromRGBO(180, 143, 107, 1),
     errorColor: Colors.red.shade500,
     visualDensity: VisualDensity.compact,
-    cardTheme: CardTheme(
-      // TODO 1 think of a clever and unique card theme
-    ),
     tooltipTheme: TooltipThemeData(
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.9),
@@ -83,21 +97,27 @@ class ThemeParameters extends ThemeParametersFromZero{
       ),
     ),
     scrollbarTheme: ScrollbarThemeData(
-      isAlwaysShown: PlatformExtended.isDesktop,
-      showTrackOnHover: true,
       crossAxisMargin: 0,
       mainAxisMargin: 0,
       minThumbLength: 128,
       interactive: true,
+      trackVisibility: MaterialStateProperty.resolveWith((states) {
+        return states.contains(MaterialState.hovered);
+      }),
+      thumbVisibility: PlatformExtended.isDesktop
+          ? const MaterialStatePropertyAll(true)
+          : null,
+      trackColor: MaterialStateProperty.resolveWith((states) {
+        return const Color.fromRGBO(255, 255, 255, 0.1);
+      }),
       thumbColor: MaterialStateProperty.resolveWith((states) {
-        Color color = Colors.grey.shade300;
         if (states.contains(MaterialState.dragged)) {
-          return color.withOpacity(0.90);
+          return const Color.fromRGBO(153, 153, 153, 1); // 0.4
         }
         if (states.contains(MaterialState.hovered)) {
-          return color.withOpacity(0.80);
+          return const Color.fromRGBO(127, 127, 127, 1); // 0.5
         }
-        return color.withOpacity(0.70);
+        return const Color.fromRGBO(101, 101, 101, 1); // 0.6
       }),
     ),
   );

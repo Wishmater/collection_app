@@ -5,11 +5,10 @@ import 'package:collection_app/providers/collection_provider.dart';
 import 'package:collection_app/router.dart';
 import 'package:collection_app/theme_parameters.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart';
+import 'package:flutter_font_icons/flutter_font_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
-import 'package:from_zero_ui/util/my_sliver_sticky_header.dart';
-import 'package:from_zero_ui/util/my_sticky_header.dart';
+import 'package:from_zero_ui/util/copied_flutter_widgets/my_sliver_sticky_header.dart';
 import 'package:go_router/go_router.dart';
 
 

@@ -71,9 +71,9 @@ class MyApp extends StatelessWidget {
   final _router = GoRouter(
     // debugLogDiagnostics: true,
     redirect: (context, state) async {
-      if ((!initialized) && state.location!='/') {
+      if ((!initialized) && state.matchedLocation!='/') {
         // ensure to always go through splash screen
-        return '/?redirect=${state.subloc}';
+        return '/?redirect=${state.matchedLocation}';
       }
       // no need to redirect at all
       return null;

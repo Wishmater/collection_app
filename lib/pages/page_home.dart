@@ -180,7 +180,7 @@ class PageHomeState extends ConsumerState<PageHome> {
                                       builder: (context, selectedItem, child) {
                                         if (selectedItem==items[index]) {
                                           return Container(
-                                            color: Theme.of(context).accentColor.withOpacity(0.2),
+                                            color: Theme.of(context).colorScheme.secondary.withOpacity(0.2),
                                           );
                                         } else {
                                           return const SizedBox.shrink();
