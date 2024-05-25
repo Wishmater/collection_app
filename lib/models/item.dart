@@ -6,7 +6,7 @@ part 'item.g.dart';
 @Collection()
 class Item {
 
-  Id id = isarAutoIncrementId;
+  Id id = Isar.autoIncrement;
 
   late String? name;
 

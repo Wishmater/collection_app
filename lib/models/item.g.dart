@@ -7,7 +7,7 @@ part of 'item.dart';
 // **************************************************************************
 
 // coverage:ignore-file
-// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, avoid_js_rounded_ints, prefer_final_locals
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
 
 extension GetItemCollection on Isar {
   IsarCollection<Item> get items => this.collection();
@@ -54,12 +54,9 @@ const ItemSchema = CollectionSchema(
     )
   },
   estimateSize: _itemEstimateSize,
-  serializeNative: _itemSerializeNative,
-  deserializeNative: _itemDeserializeNative,
-  deserializePropNative: _itemDeserializePropNative,
-  serializeWeb: _itemSerializeWeb,
-  deserializeWeb: _itemDeserializeWeb,
-  deserializePropWeb: _itemDeserializePropWeb,
+  serialize: _itemSerialize,
+  deserialize: _itemDeserialize,
+  deserializeProp: _itemDeserializeProp,
   idName: r'id',
   indexes: {},
   links: {
@@ -67,14 +64,14 @@ const ItemSchema = CollectionSchema(
       id: -1444298628167129272,
       name: r'tags',
       target: r'Tag',
-      isSingle: false,
+      single: false,
     )
   },
   embeddedSchemas: {},
   getId: _itemGetId,
   getLinks: _itemGetLinks,
   attach: _itemAttach,
-  version: '3.0.0-dev.13',
+  version: '3.1.0+1',
 );
 
 int _itemEstimateSize(
@@ -93,9 +90,9 @@ int _itemEstimateSize(
   return bytesCount;
 }
 
-int _itemSerializeNative(
+void _itemSerialize(
   Item object,
-  IsarBinaryWriter writer,
+  IsarWriter writer,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
@@ -106,12 +103,11 @@ int _itemSerializeNative(
   writer.writeString(offsets[4], object.name);
   writer.writeDouble(offsets[5], object.rating);
   writer.writeLong(offsets[6], object.width);
-  return writer.usedBytes;
 }
 
-Item _itemDeserializeNative(
+Item _itemDeserialize(
   Id id,
-  IsarBinaryReader reader,
+  IsarReader reader,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
@@ -127,8 +123,8 @@ Item _itemDeserializeNative(
   return object;
 }
 
-P _itemDeserializePropNative<P>(
-  IsarBinaryReader reader,
+P _itemDeserializeProp<P>(
+  IsarReader reader,
   int propertyId,
   int offset,
   Map<Type, List<int>> allOffsets,
@@ -150,23 +146,6 @@ P _itemDeserializePropNative<P>(
       return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
-  }
-}
-
-Object _itemSerializeWeb(IsarCollection<Item> collection, Item object) {
-  /*final jsObj = IsarNative.newJsObject();*/ throw UnimplementedError();
-}
-
-Item _itemDeserializeWeb(IsarCollection<Item> collection, Object jsObj) {
-  /*final object = Item();object.dateAdded = IsarNative.jsObjectGet(jsObj, r'dateAdded') != null ? DateTime.fromMillisecondsSinceEpoch(IsarNative.jsObjectGet(jsObj, r'dateAdded') as int, isUtc: true).toLocal() : DateTime.fromMillisecondsSinceEpoch(0);object.dateLastSeen = IsarNative.jsObjectGet(jsObj, r'dateLastSeen') != null ? DateTime.fromMillisecondsSinceEpoch(IsarNative.jsObjectGet(jsObj, r'dateLastSeen') as int, isUtc: true).toLocal() : DateTime.fromMillisecondsSinceEpoch(0);object.filePath = IsarNative.jsObjectGet(jsObj, r'filePath') ?? '';object.height = IsarNative.jsObjectGet(jsObj, r'height') ?? (double.negativeInfinity as int);object.id = IsarNative.jsObjectGet(jsObj, r'id') ?? (double.negativeInfinity as int);object.name = IsarNative.jsObjectGet(jsObj, r'name') ;object.rating = IsarNative.jsObjectGet(jsObj, r'rating') ?? double.negativeInfinity;object.width = IsarNative.jsObjectGet(jsObj, r'width') ?? (double.negativeInfinity as int);*/
-  //return object;
-  throw UnimplementedError();
-}
-
-P _itemDeserializePropWeb<P>(Object jsObj, String propertyName) {
-  switch (propertyName) {
-    default:
-      throw IsarError('Illegal propertyName');
   }
 }
 
@@ -192,7 +171,7 @@ extension ItemQueryWhereSort on QueryBuilder<Item, Item, QWhere> {
 }
 
 extension ItemQueryWhere on QueryBuilder<Item, Item, QWhereClause> {
-  QueryBuilder<Item, Item, QAfterWhereClause> idEqualTo(int id) {
+  QueryBuilder<Item, Item, QAfterWhereClause> idEqualTo(Id id) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IdWhereClause.between(
         lower: id,
@@ -201,7 +180,7 @@ extension ItemQueryWhere on QueryBuilder<Item, Item, QWhereClause> {
     });
   }
 
-  QueryBuilder<Item, Item, QAfterWhereClause> idNotEqualTo(int id) {
+  QueryBuilder<Item, Item, QAfterWhereClause> idNotEqualTo(Id id) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
@@ -223,7 +202,7 @@ extension ItemQueryWhere on QueryBuilder<Item, Item, QWhereClause> {
     });
   }
 
-  QueryBuilder<Item, Item, QAfterWhereClause> idGreaterThan(int id,
+  QueryBuilder<Item, Item, QAfterWhereClause> idGreaterThan(Id id,
       {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
@@ -232,7 +211,7 @@ extension ItemQueryWhere on QueryBuilder<Item, Item, QWhereClause> {
     });
   }
 
-  QueryBuilder<Item, Item, QAfterWhereClause> idLessThan(int id,
+  QueryBuilder<Item, Item, QAfterWhereClause> idLessThan(Id id,
       {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
@@ -242,8 +221,8 @@ extension ItemQueryWhere on QueryBuilder<Item, Item, QWhereClause> {
   }
 
   QueryBuilder<Item, Item, QAfterWhereClause> idBetween(
-    int lowerId,
-    int upperId, {
+    Id lowerId,
+    Id upperId, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
@@ -546,7 +525,7 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Item, Item, QAfterFilterCondition> idEqualTo(int value) {
+  QueryBuilder<Item, Item, QAfterFilterCondition> idEqualTo(Id value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'id',
@@ -556,7 +535,7 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
   }
 
   QueryBuilder<Item, Item, QAfterFilterCondition> idGreaterThan(
-    int value, {
+    Id value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -569,7 +548,7 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
   }
 
   QueryBuilder<Item, Item, QAfterFilterCondition> idLessThan(
-    int value, {
+    Id value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -582,8 +561,8 @@ extension ItemQueryFilter on QueryBuilder<Item, Item, QFilterCondition> {
   }
 
   QueryBuilder<Item, Item, QAfterFilterCondition> idBetween(
-    int lower,
-    int upper, {
+    Id lower,
+    Id upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {

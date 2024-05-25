@@ -7,7 +7,7 @@ part of 'tag.dart';
 // **************************************************************************
 
 // coverage:ignore-file
-// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, avoid_js_rounded_ints, prefer_final_locals
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
 
 extension GetTagCollection on Isar {
   IsarCollection<Tag> get tags => this.collection();
@@ -34,12 +34,9 @@ const TagSchema = CollectionSchema(
     )
   },
   estimateSize: _tagEstimateSize,
-  serializeNative: _tagSerializeNative,
-  deserializeNative: _tagDeserializeNative,
-  deserializePropNative: _tagDeserializePropNative,
-  serializeWeb: _tagSerializeWeb,
-  deserializeWeb: _tagDeserializeWeb,
-  deserializePropWeb: _tagDeserializePropWeb,
+  serialize: _tagSerialize,
+  deserialize: _tagDeserialize,
+  deserializeProp: _tagDeserializeProp,
   idName: r'id',
   indexes: {},
   links: {
@@ -47,20 +44,20 @@ const TagSchema = CollectionSchema(
       id: -3515075751954170283,
       name: r'parentTag',
       target: r'Tag',
-      isSingle: true,
+      single: true,
     ),
     r'childrenTags': LinkSchema(
       id: -5315015940420698418,
       name: r'childrenTags',
       target: r'Tag',
-      isSingle: false,
+      single: false,
       linkName: r'parentTag',
     ),
     r'items': LinkSchema(
       id: -4594045520067971683,
       name: r'items',
       target: r'Item',
-      isSingle: false,
+      single: false,
       linkName: r'tags',
     )
   },
@@ -68,7 +65,7 @@ const TagSchema = CollectionSchema(
   getId: _tagGetId,
   getLinks: _tagGetLinks,
   attach: _tagAttach,
-  version: '3.0.0-dev.13',
+  version: '3.1.0+1',
 );
 
 int _tagEstimateSize(
@@ -81,21 +78,20 @@ int _tagEstimateSize(
   return bytesCount;
 }
 
-int _tagSerializeNative(
+void _tagSerialize(
   Tag object,
-  IsarBinaryWriter writer,
+  IsarWriter writer,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
   writer.writeDateTime(offsets[0], object.dateCreated);
   writer.writeLong(offsets[1], object.itemCount);
   writer.writeString(offsets[2], object.name);
-  return writer.usedBytes;
 }
 
-Tag _tagDeserializeNative(
+Tag _tagDeserialize(
   Id id,
-  IsarBinaryReader reader,
+  IsarReader reader,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
@@ -107,8 +103,8 @@ Tag _tagDeserializeNative(
   return object;
 }
 
-P _tagDeserializePropNative<P>(
-  IsarBinaryReader reader,
+P _tagDeserializeProp<P>(
+  IsarReader reader,
   int propertyId,
   int offset,
   Map<Type, List<int>> allOffsets,
@@ -122,23 +118,6 @@ P _tagDeserializePropNative<P>(
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
-  }
-}
-
-Object _tagSerializeWeb(IsarCollection<Tag> collection, Tag object) {
-  /*final jsObj = IsarNative.newJsObject();*/ throw UnimplementedError();
-}
-
-Tag _tagDeserializeWeb(IsarCollection<Tag> collection, Object jsObj) {
-  /*final object = Tag();object.dateCreated = IsarNative.jsObjectGet(jsObj, r'dateCreated') != null ? DateTime.fromMillisecondsSinceEpoch(IsarNative.jsObjectGet(jsObj, r'dateCreated') as int, isUtc: true).toLocal() : DateTime.fromMillisecondsSinceEpoch(0);object.id = IsarNative.jsObjectGet(jsObj, r'id') ?? (double.negativeInfinity as int);object.itemCount = IsarNative.jsObjectGet(jsObj, r'itemCount') ?? (double.negativeInfinity as int);object.name = IsarNative.jsObjectGet(jsObj, r'name') ?? '';*/
-  //return object;
-  throw UnimplementedError();
-}
-
-P _tagDeserializePropWeb<P>(Object jsObj, String propertyName) {
-  switch (propertyName) {
-    default:
-      throw IsarError('Illegal propertyName');
   }
 }
 
@@ -167,7 +146,7 @@ extension TagQueryWhereSort on QueryBuilder<Tag, Tag, QWhere> {
 }
 
 extension TagQueryWhere on QueryBuilder<Tag, Tag, QWhereClause> {
-  QueryBuilder<Tag, Tag, QAfterWhereClause> idEqualTo(int id) {
+  QueryBuilder<Tag, Tag, QAfterWhereClause> idEqualTo(Id id) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IdWhereClause.between(
         lower: id,
@@ -176,7 +155,7 @@ extension TagQueryWhere on QueryBuilder<Tag, Tag, QWhereClause> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterWhereClause> idNotEqualTo(int id) {
+  QueryBuilder<Tag, Tag, QAfterWhereClause> idNotEqualTo(Id id) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
@@ -198,7 +177,7 @@ extension TagQueryWhere on QueryBuilder<Tag, Tag, QWhereClause> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterWhereClause> idGreaterThan(int id,
+  QueryBuilder<Tag, Tag, QAfterWhereClause> idGreaterThan(Id id,
       {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
@@ -207,7 +186,7 @@ extension TagQueryWhere on QueryBuilder<Tag, Tag, QWhereClause> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterWhereClause> idLessThan(int id,
+  QueryBuilder<Tag, Tag, QAfterWhereClause> idLessThan(Id id,
       {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
@@ -217,8 +196,8 @@ extension TagQueryWhere on QueryBuilder<Tag, Tag, QWhereClause> {
   }
 
   QueryBuilder<Tag, Tag, QAfterWhereClause> idBetween(
-    int lowerId,
-    int upperId, {
+    Id lowerId,
+    Id upperId, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
@@ -287,7 +266,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
     });
   }
 
-  QueryBuilder<Tag, Tag, QAfterFilterCondition> idEqualTo(int value) {
+  QueryBuilder<Tag, Tag, QAfterFilterCondition> idEqualTo(Id value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'id',
@@ -297,7 +276,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
   }
 
   QueryBuilder<Tag, Tag, QAfterFilterCondition> idGreaterThan(
-    int value, {
+    Id value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -310,7 +289,7 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
   }
 
   QueryBuilder<Tag, Tag, QAfterFilterCondition> idLessThan(
-    int value, {
+    Id value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -323,8 +302,8 @@ extension TagQueryFilter on QueryBuilder<Tag, Tag, QFilterCondition> {
   }
 
   QueryBuilder<Tag, Tag, QAfterFilterCondition> idBetween(
-    int lower,
-    int upper, {
+    Id lower,
+    Id upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {

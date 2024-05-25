@@ -7,7 +7,7 @@ part of 'collection.dart';
 // **************************************************************************
 
 // coverage:ignore-file
-// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, avoid_js_rounded_ints, prefer_final_locals
+// ignore_for_file: duplicate_ignore, non_constant_identifier_names, constant_identifier_names, invalid_use_of_protected_member, unnecessary_cast, prefer_const_constructors, lines_longer_than_80_chars, require_trailing_commas, inference_failure_on_function_invocation, unnecessary_parenthesis, unnecessary_raw_strings, unnecessary_null_checks, join_return_with_assignment, prefer_final_locals, avoid_js_rounded_ints, avoid_positional_boolean_parameters, always_specify_types
 
 extension GetCollectionDataCollection on Isar {
   IsarCollection<CollectionData> get collectionDatas => this.collection();
@@ -49,12 +49,9 @@ const CollectionDataSchema = CollectionSchema(
     )
   },
   estimateSize: _collectionDataEstimateSize,
-  serializeNative: _collectionDataSerializeNative,
-  deserializeNative: _collectionDataDeserializeNative,
-  deserializePropNative: _collectionDataDeserializePropNative,
-  serializeWeb: _collectionDataSerializeWeb,
-  deserializeWeb: _collectionDataDeserializeWeb,
-  deserializePropWeb: _collectionDataDeserializePropWeb,
+  serialize: _collectionDataSerialize,
+  deserialize: _collectionDataDeserialize,
+  deserializeProp: _collectionDataDeserializeProp,
   idName: r'id',
   indexes: {},
   links: {},
@@ -62,7 +59,7 @@ const CollectionDataSchema = CollectionSchema(
   getId: _collectionDataGetId,
   getLinks: _collectionDataGetLinks,
   attach: _collectionDataAttach,
-  version: '3.0.0-dev.13',
+  version: '3.1.0+1',
 );
 
 int _collectionDataEstimateSize(
@@ -76,9 +73,9 @@ int _collectionDataEstimateSize(
   return bytesCount;
 }
 
-int _collectionDataSerializeNative(
+void _collectionDataSerialize(
   CollectionData object,
-  IsarBinaryWriter writer,
+  IsarWriter writer,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
@@ -88,12 +85,11 @@ int _collectionDataSerializeNative(
   writer.writeLong(offsets[3], object.itemCount);
   writer.writeString(offsets[4], object.name);
   writer.writeLong(offsets[5], object.tagCount);
-  return writer.usedBytes;
 }
 
-CollectionData _collectionDataDeserializeNative(
+CollectionData _collectionDataDeserialize(
   Id id,
-  IsarBinaryReader reader,
+  IsarReader reader,
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
@@ -108,8 +104,8 @@ CollectionData _collectionDataDeserializeNative(
   return object;
 }
 
-P _collectionDataDeserializePropNative<P>(
-  IsarBinaryReader reader,
+P _collectionDataDeserializeProp<P>(
+  IsarReader reader,
   int propertyId,
   int offset,
   Map<Type, List<int>> allOffsets,
@@ -129,25 +125,6 @@ P _collectionDataDeserializePropNative<P>(
       return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
-  }
-}
-
-Object _collectionDataSerializeWeb(
-    IsarCollection<CollectionData> collection, CollectionData object) {
-  /*final jsObj = IsarNative.newJsObject();*/ throw UnimplementedError();
-}
-
-CollectionData _collectionDataDeserializeWeb(
-    IsarCollection<CollectionData> collection, Object jsObj) {
-  /*final object = CollectionData();object.baseDirectory = IsarNative.jsObjectGet(jsObj, r'baseDirectory') ?? '';object.dateCreated = IsarNative.jsObjectGet(jsObj, r'dateCreated') != null ? DateTime.fromMillisecondsSinceEpoch(IsarNative.jsObjectGet(jsObj, r'dateCreated') as int, isUtc: true).toLocal() : DateTime.fromMillisecondsSinceEpoch(0);object.dateLastOpened = IsarNative.jsObjectGet(jsObj, r'dateLastOpened') != null ? DateTime.fromMillisecondsSinceEpoch(IsarNative.jsObjectGet(jsObj, r'dateLastOpened') as int, isUtc: true).toLocal() : DateTime.fromMillisecondsSinceEpoch(0);object.id = IsarNative.jsObjectGet(jsObj, r'id') ?? (double.negativeInfinity as int);object.itemCount = IsarNative.jsObjectGet(jsObj, r'itemCount') ?? (double.negativeInfinity as int);object.name = IsarNative.jsObjectGet(jsObj, r'name') ?? '';object.tagCount = IsarNative.jsObjectGet(jsObj, r'tagCount') ?? (double.negativeInfinity as int);*/
-  //return object;
-  throw UnimplementedError();
-}
-
-P _collectionDataDeserializePropWeb<P>(Object jsObj, String propertyName) {
-  switch (propertyName) {
-    default:
-      throw IsarError('Illegal propertyName');
   }
 }
 
@@ -176,7 +153,7 @@ extension CollectionDataQueryWhereSort
 extension CollectionDataQueryWhere
     on QueryBuilder<CollectionData, CollectionData, QWhereClause> {
   QueryBuilder<CollectionData, CollectionData, QAfterWhereClause> idEqualTo(
-      int id) {
+      Id id) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(IdWhereClause.between(
         lower: id,
@@ -186,7 +163,7 @@ extension CollectionDataQueryWhere
   }
 
   QueryBuilder<CollectionData, CollectionData, QAfterWhereClause> idNotEqualTo(
-      int id) {
+      Id id) {
     return QueryBuilder.apply(this, (query) {
       if (query.whereSort == Sort.asc) {
         return query
@@ -209,7 +186,7 @@ extension CollectionDataQueryWhere
   }
 
   QueryBuilder<CollectionData, CollectionData, QAfterWhereClause> idGreaterThan(
-      int id,
+      Id id,
       {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
@@ -219,7 +196,7 @@ extension CollectionDataQueryWhere
   }
 
   QueryBuilder<CollectionData, CollectionData, QAfterWhereClause> idLessThan(
-      int id,
+      Id id,
       {bool include = false}) {
     return QueryBuilder.apply(this, (query) {
       return query.addWhereClause(
@@ -229,8 +206,8 @@ extension CollectionDataQueryWhere
   }
 
   QueryBuilder<CollectionData, CollectionData, QAfterWhereClause> idBetween(
-    int lowerId,
-    int upperId, {
+    Id lowerId,
+    Id upperId, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {
@@ -496,7 +473,7 @@ extension CollectionDataQueryFilter
   }
 
   QueryBuilder<CollectionData, CollectionData, QAfterFilterCondition> idEqualTo(
-      int value) {
+      Id value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'id',
@@ -507,7 +484,7 @@ extension CollectionDataQueryFilter
 
   QueryBuilder<CollectionData, CollectionData, QAfterFilterCondition>
       idGreaterThan(
-    int value, {
+    Id value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -521,7 +498,7 @@ extension CollectionDataQueryFilter
 
   QueryBuilder<CollectionData, CollectionData, QAfterFilterCondition>
       idLessThan(
-    int value, {
+    Id value, {
     bool include = false,
   }) {
     return QueryBuilder.apply(this, (query) {
@@ -534,8 +511,8 @@ extension CollectionDataQueryFilter
   }
 
   QueryBuilder<CollectionData, CollectionData, QAfterFilterCondition> idBetween(
-    int lower,
-    int upper, {
+    Id lower,
+    Id upper, {
     bool includeLower = true,
     bool includeUpper = true,
   }) {

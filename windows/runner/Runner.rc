@@ -93,7 +93,7 @@ BEGIN
             VALUE "FileDescription", "collection_app" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "collection_app" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2022 com.fromzero. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2024 com.fromzero. All rights reserved." "\0"
             VALUE "OriginalFilename", "collection_app.exe" "\0"
             VALUE "ProductName", "collection_app" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"

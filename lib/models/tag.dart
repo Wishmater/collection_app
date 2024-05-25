@@ -6,7 +6,7 @@ part 'tag.g.dart';
 @Collection()
 class Tag {
 
-  Id id = isarAutoIncrementId;
+  Id id = Isar.autoIncrement;
 
   late String name;
 

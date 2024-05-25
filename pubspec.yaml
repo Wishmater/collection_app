@@ -6,7 +6,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 0.0.1+1
 
 environment:
-  sdk: ">=2.17.5 <3.0.0"
+  sdk: "^3.0.0"
 
 
 dependencies:
@@ -55,7 +55,7 @@ dev_dependencies:
 
 
 dependency_overrides:
-  win32: ^5.0.6 # force older plugins (bitsdojo_window 0.1.5) to use a newer version, required by other plugins (file_picker>=5.3.2)
+  win32: 5.0.6 # force older plugins (bitsdojo_window 0.1.5) to use a newer version, required by other plugins (file_picker>=5.3.2)
   http: ^1.0.0 # dcli depends on http 0.13.5 for some reason
 
 
