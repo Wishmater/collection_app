@@ -1,23 +1,26 @@
 import 'package:collection_app/models/item.dart';
-import 'package:isar/isar.dart';
-part 'collection.g.dart';
 
 
-@Collection()
-class CollectionData {
+class Collection {
 
-  Id id = Isar.autoIncrement;
+  String name;
+  DateTime added;
+  DateTime? lastSeen;
+  DateTime? lastModified;
+  String? baseDirectory;
+  List<Item> items;
 
-  late String name;
+  Collection({
+    this.name = 'New Collection',
+    DateTime? added,
+    this.lastSeen,
+    this.lastModified,
+    this.baseDirectory,
+    List<Item>? items,
+  })  : added = added ?? DateTime.now(),
+        items = items ?? [];
 
-  late String baseDirectory;
-
-  late DateTime dateCreated;
-
-  late DateTime dateLastOpened;
-
-  late int itemCount;
-
-  late int tagCount;
+  @override
+  String toString() => '(Collection: $name)';
 
 }

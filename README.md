@@ -1,6 +1,6 @@
 # collection_app
 
-An app to manage collections of images or other file types, with advanced tagging and rating systems.
+File collection manager app, initially for images, but could expand to other file types.
 
 ## Getting Started
 

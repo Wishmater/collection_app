@@ -1,44 +1,31 @@
 import 'package:collection_app/models/collection.dart';
-import 'package:collection_app/providers/_isar_provider.dart';
+import 'package:collection_app/services/collection_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:from_zero_ui/from_zero_ui.dart';
-import 'package:hive/hive.dart';
-import 'package:isar/isar.dart';
 
 
 abstract class CollectionProvider {
 
 
-  static final all = ApiProvider<List<CollectionData>>((ref) {
-    return ApiState(ref, (apiState) async {
-      final collections = await apiState.watch(IsarProvider.collections);
-      return await collections.collectionDatas.where().findAll();
-    });
-  },
-    cacheTime: const Duration(days: 999999999999),
-  );
+  // PROVIDERS
+
+  static final all = StateProvider((ref) {
+    return collectionService.getAllCollections();
+  });
+
+  static final one = StateProviderFamily((ref, String name) {
+    return collectionService.getAllCollections().firstWhere((e) => e.name==name);
+  });
 
 
-  static final openCollection = ApiProvider<CollectionData>((ref) {
-    return ApiState(ref, (apiState) async {
-      final selected = ref.watch(IsarProvider.selectedCollectionId)!;
-      final isar = await apiState.watch(IsarProvider.collections);
-      return (await isar.collectionDatas.get(selected))!;
-    });
-  },
-    cacheTime: const Duration(days: 999999999999),
-  );
+  // MUTATIONS
 
-
-  static ApiState<CollectionData> save(WidgetRef ref, CollectionData model) {
-    return ApiState.noProvider((apiState) async {
-      final collections = await ref.watch(IsarProvider.collections.future);
-      await collections.writeTxn(() async {
-        model.id = await collections.collectionDatas.put(model);
-      });
-      return model;
-    });
+  void addCollection(WidgetRef ref, Collection collection, {
+    bool checkIfAlreadyExists = true,
+  }) {
+    collectionService.addCollection(collection,
+      checkIfAlreadyExists: checkIfAlreadyExists,
+    );
+    ref.invalidate(all);
   }
-
 
 }

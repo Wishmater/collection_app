@@ -1,5 +1,5 @@
 name: collection_app
-description: An app to manage collections of images or other file types, with advanced tagging and rating systems.
+description: File collection manager app, initially for images, but could expand to other file types.
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
@@ -15,47 +15,55 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   from_zero_ui:
-    path: ../../from_zero_ui/
+    path: ../from_zero_ui/
 
   # * Language Extensions
+  intl: ^0.18.1
   dartx: ^1.2.0
+  string_similarity: ^2.0.0
 
   # * State Management
   go_router: 10.0.0
-  flutter_riverpod: ^2.0.0-dev.9
+  flutter_riverpod:
+    2.0.0-dev.9 # can't update until cacheTime is re-added, lots of potential bugs to be fixed with this update
+  # when updating, also try https://pub.dev/packages/riverpod_lint and https://pub.dev/packages/riverpod_generator
   hive: ^2.2.3
   hive_flutter: ^1.1.0
-  isar: ^3.0.0-dev.13
-  isar_flutter_libs: ^3.0.0-dev.13
-  built_collection: ^5.1.1
-  built_value: ^8.4.0
 
   # * Widgets / UI
   flutter_font_icons: ^2.2.7
   animations: ^2.0.7
-  multi_value_listenable_builder: ^0.0.2
+  auto_size_text: ^3.0.0
   sliver_tools: ^0.2.12
-  preload_page_view: ^0.2.0
+  multi_value_listenable_builder: ^0.0.2
+  crop_your_image: ^0.7.5
 
   # * Plugins
   url_launcher: ^6.1.12
-  open_file: ^3.2.1
-  path_provider: ^2.0.11
-  file_picker: ^5.5.0
+#  image_picker: ^1.0.2
+  device_info_plus: ^9.0.3
+  bitsdojo_window: ^0.1.5 # ideally, we would do all window-related stuff with window_manager, and remove this dependency here
+  window_manager: ^0.3.5
+
+  # * Specific Utility
+  dio: ^5.3.2
+  dio_smart_retry: ^5.0.0
+  mlog:
+    git:
+      url: https://github.com/ross96D/mlog
+      ref: b51918901ed00faf02c80b6dd18ce1bbe2c321f5
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  build_runner: ^2.1.11
-  isar_generator: ^3.0.0-dev.8
   flutter_lints: ^2.0.3
   flutter_launcher_icons: ^0.13.1 # to run:  flutter pub run flutter_launcher_icons:main
   flutter_native_splash: ^2.3.2 # to run:  flutter pub run flutter_native_splash:create
 
 
 dependency_overrides:
-  win32: 5.0.6 # force older plugins (bitsdojo_window 0.1.5) to use a newer version, required by other plugins (file_picker>=5.3.2)
+  win32: ^5.0.6 # force older plugins (bitsdojo_window 0.1.5) to use a newer version, required by other plugins (file_picker>=5.3.2)
   http: ^1.0.0 # dcli depends on http 0.13.5 for some reason
 
 

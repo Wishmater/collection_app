@@ -1,95 +1,108 @@
 import 'package:collection_app/models/tag.dart';
-import 'package:collection_app/providers/_isar_provider.dart';
+import 'package:collection_app/services/tag_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:from_zero_ui/from_zero_ui.dart';
-import 'package:isar/isar.dart';
 
 
 abstract class TagProvider {
 
 
-  static final all = ApiProvider<List<Tag>>((ref) {
-    return ApiState(ref, (apiState) async {
-      final collection = await apiState.watch(IsarProvider.openCollection);
-      return await collection.tags.where().findAll();
-    });
-  },
-    cacheTime: const Duration(days: 999999999999),
-  );
+  // PROVIDERS
+
+  static final all = StateProvider((ref) {
+    return tagService.getAllTags();
+  });
+
+  static final roots = StateProvider((ref) {
+    return ref.watch(all).where((e) => e.parentTag==null);
+  });
+
+  static final one = StateProviderFamily((ref, String name) {
+    return tagService.getAllTags().firstWhere((e) => e.name==name);
+  });
 
 
-  static final roots = ApiProvider<List<Tag>>((ref) {
-    return ApiState(ref, (apiState) async {
-      final collection = await apiState.watch(IsarProvider.openCollection);
-      return await collection.tags.filter().parentTagIsNull().findAll();
-    });
-  },
-    cacheTime: const Duration(days: 999999999999),
-  );
+  // MUTATIONS
 
-
-  static final one = ApiProviderFamily<Tag, int>((ref, id) {
-    return ApiState(ref, (apiState) async {
-      final collection = await apiState.watch(IsarProvider.openCollection);
-      return (await collection.tags.where().idEqualTo(id).findFirst())!;
-    });
-  },
-    cacheTime: const Duration(days: 999999999999),
-  );
-
-
-  static final children = ApiProviderFamily<List<Tag>, int>((ref, id) {
-    return ApiState(ref, (apiState) async {
-      final tag = await apiState.watch(one.call(id));
-      await tag.childrenTags.load();
-      return tag.childrenTags.toList();
-    });
-  },
-    cacheTime: const Duration(days: 999999999999),
-  );
-
-
-  static final childrenCount = ApiProviderFamily<int, int>((ref, id) {
-    return ApiState(ref, (apiState) async {
-      final tag = await apiState.watch(one.call(id));
-      return tag.childrenTags.count();
-    });
-  },
-    cacheTime: const Duration(days: 999999999999),
-  );
-
-
-  static final hasChildren = ApiProviderFamily<bool, int>((ref, id) {
-    return ApiState(ref, (apiState) async {
-      final count = await apiState.watch(childrenCount.call(id));
-      return count > 0;
-    });
-  },
-    cacheTime: const Duration(days: 999999999999),
-  );
-
-
-  static ApiState<Tag> save(WidgetRef ref, Tag model) {
-    return ApiState.noProvider((apiState) async {
-      final collection = await ref.read(IsarProvider.openCollection.future);
-      await collection.writeTxn(() async {
-        model.id = await collection.tags.put(model);
-        await model.parentTag.save();
-      });
-      return model;
-    });
+  bool addTag(WidgetRef ref, Tag tag, {
+    bool checkIfAlreadyExists = true,
+  }) {
+    final added = tagService.addTag(tag,
+      checkIfAlreadyExists: checkIfAlreadyExists,
+    );
+    if (added) {
+      ref.invalidate(all);
+      if (tag.parentTag!=null) {
+        ref.invalidate(one.call(tag.parentTag!.name)); // TODO 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
+      }
+      for (final e in tag.childTags) {
+        ref.invalidate(one.call(e.name)); // TODO 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
+      }
+      for (final e in tag.secondaryParentTags) {
+        ref.invalidate(one.call(e.name)); // TODO 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
+      }
+      for (final e in tag.secondaryChildTags) {
+        ref.invalidate(one.call(e.name)); // TODO 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
+      }
+    }
+    return added;
   }
 
+  bool addChild(WidgetRef ref, Tag parent, Tag child, {
+    bool checkIfAlreadyExists = true,
+  }) {
+    final added = tagService.addChild(parent, child,
+      checkIfAlreadyExists: checkIfAlreadyExists,
+    );
+    if (added) {
+      ref.invalidate(one.call(parent.name)); // TODO 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
+      ref.invalidate(one.call(child.name)); // TODO 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
+    }
+    return added;
+  }
 
-  static ApiState<bool> delete(WidgetRef ref, Tag model) {
-    return ApiState.noProvider((apiState) async {
-      final collection = await ref.read(IsarProvider.openCollection.future);
-      bool result = false;
-      await collection.writeTxn(() async {
-        result = await collection.tags.delete(model.id);
-      });
-      return result;
-    });
+  bool addChildren(WidgetRef ref, Tag parent, Iterable<Tag> children, {
+    bool checkIfAlreadyExists = true,
+  }) {
+    final added = tagService.addChildren(parent, children,
+      checkIfAlreadyExists: checkIfAlreadyExists,
+    );
+    if (added) {
+      ref.invalidate(one.call(parent.name)); // TODO 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
+      for (final e in children) {
+        ref.invalidate(one.call(e.name)); // TODO 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
+      }
+    }
+    return added;
+  }
+
+  bool addSecondaryChild(WidgetRef ref, Tag parent, Tag child, {
+    bool checkIfAlreadyExists = true,
+  }) {
+    final added = tagService.addSecondaryChild(parent, child,
+      checkIfAlreadyExists: checkIfAlreadyExists,
+    );
+    if (added) {
+      ref.invalidate(one.call(parent.name)); // TODO 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
+      ref.invalidate(one.call(child.name)); // TODO 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
+    }
+    return added;
+  }
+
+  bool addSecondaryChildren(WidgetRef ref, Iterable<Tag> parents, Iterable<Tag> children, {
+    bool checkIfAlreadyExists = true,
+  }) {
+    final added = tagService.addSecondaryChildren(parents, children,
+      checkIfAlreadyExists: checkIfAlreadyExists,
+    );
+    if (added) {
+      for (final e in parents) {
+        ref.invalidate(one.call(e.name)); // TODO 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
+      }
+      for (final e in children) {
+        ref.invalidate(one.call(e.name)); // TODO 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
+      }
+    }
+    return added;
   }
 
 

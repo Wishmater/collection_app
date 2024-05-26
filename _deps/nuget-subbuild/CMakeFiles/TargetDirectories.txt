@@ -1,3 +1,0 @@
-C:/Workspaces/collection_app_old/collection_app/build/windows/_deps/nuget-subbuild/CMakeFiles/nuget-populate.dir
-C:/Workspaces/collection_app_old/collection_app/build/windows/_deps/nuget-subbuild/CMakeFiles/ALL_BUILD.dir
-C:/Workspaces/collection_app_old/collection_app/build/windows/_deps/nuget-subbuild/CMakeFiles/ZERO_CHECK.dir

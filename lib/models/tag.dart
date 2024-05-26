@@ -1,55 +1,34 @@
-import 'package:collection_app/models/item.dart';
-import 'package:isar/isar.dart';
-part 'tag.g.dart';
 
 
-@Collection()
 class Tag {
 
-  Id id = Isar.autoIncrement;
-
-  late String name;
-
-  late DateTime dateCreated;
-
-  late int itemCount;
-
-  final parentTag = IsarLink<Tag>(); // TODO 1 TEST is this nullable
-
-  @Backlink(to: 'parentTag')
-  final childrenTags = IsarLinks<Tag>();
-
-  @Backlink(to: 'tags')
-  final items = IsarLinks<Item>();
-
-}
-
-
-
-class DirectoryTag implements Tag {
-
-  @override
   String name;
+  DateTime added;
+  DateTime? lastSeen;
+  DateTime? lastModified;
+  Tag? parentTag; // TODO 1 validate that there are no cycles in this graph of tags
+  List<Tag> childTags;
+  List<Tag> secondaryParentTags;
+  List<Tag> secondaryChildTags;
+  List<String> aliases;
 
-  DirectoryTag(this.name);
+  Tag({
+    this.name = '',
+    DateTime? added,
+    DateTime? lastModified,
+    this.parentTag,
+    List<Tag>? childTags,
+    List<Tag>? secondaryParentTags,
+    List<Tag>? secondaryChildTags,
+    List<String>? aliases,
+  })  : added = added ?? DateTime.now(),
+        lastModified = lastModified ?? DateTime.now(),
+        childTags = childTags==null ? [] : List.from(childTags),
+        secondaryParentTags = secondaryParentTags==null ? [] : List.from(secondaryParentTags),
+        secondaryChildTags = secondaryChildTags==null ? [] : List.from(secondaryChildTags),
+        aliases = aliases==null ? [] : List.from(aliases);
 
   @override
-  Id get id => name.hashCode;
-  @override
-  set id(Id _) => throw UnimplementedError();
-  @override
-  DateTime get dateCreated => throw UnimplementedError();
-  @override
-  set dateCreated(DateTime _) => throw UnimplementedError();
-  @override
-  int get itemCount => throw UnimplementedError();
-  @override
-  set itemCount(int _) => throw UnimplementedError();
-  @override
-  IsarLink<Tag> get parentTag => throw UnimplementedError();
-  @override
-  IsarLinks<Tag> get childrenTags => throw UnimplementedError();
-  @override
-  IsarLinks<Item> get items => throw UnimplementedError();
+  String toString() => '(Tag: $name)';
 
 }

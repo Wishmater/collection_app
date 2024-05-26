@@ -1,35 +1,35 @@
+import 'package:collection_app/models/collection.dart';
 import 'package:collection_app/models/item.dart';
-import 'package:collection_app/models/tag.dart';
-import 'package:collection_app/providers/_isar_provider.dart';
-import 'package:from_zero_ui/from_zero_ui.dart';
-import 'package:isar/isar.dart';
+import 'package:collection_app/providers/collection_provider.dart';
+import 'package:collection_app/services/item_service.dart';
+import 'package:dartx/dartx.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 
 abstract class ItemProvider {
 
 
-  static final all = ApiProvider<List<Item>>((ref) {
-    return ApiState(ref, (apiState) async {
-      final collection = await apiState.watch(IsarProvider.openCollection);
-      return await collection.items.where().findAll();
-    });
-  },
-    cacheTime: const Duration(days: 999999999999),
-  );
+  // PROVIDERS
+
+  /// expensive, prefer to search per-collection ideally
+  static final all = StateProvider((ref) {
+    return ref.watch(CollectionProvider.all).flatMap((e) => e.items);
+  });
 
 
-  static final withTags = ApiProviderFamily<List<Item>, Iterable<Tag>>((ref, tags) {
-    return ApiState(ref, (apiState) async {
-      final collection = await apiState.watch(IsarProvider.openCollection);
-      final query = collection.items
-          .where()
-          .filter()
-          .tags((q) => q.anyOf<Tag, Tag>(tags, (q, tag) => q.idEqualTo(tag.id)));
-      return await query.findAll();
-    });
-  },
-    disposeDelay: const Duration(seconds: 10),
-  );
+  // MUTATIONS
 
+  bool addItem(WidgetRef ref, Collection collection, Item item, {
+    bool checkIfAlreadyExists = true,
+  }) {
+    final added = itemService.addItem(collection, item,
+      checkIfAlreadyExists: checkIfAlreadyExists,
+    );
+    if (added) {
+      ref.invalidate(all);
+      ref.invalidate(CollectionProvider.one.call(collection.name));
+    }
+    return added;
+  }
 
 }

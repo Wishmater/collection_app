@@ -1,130 +1,122 @@
-import 'dart:io';
-
-import 'package:collection_app/pages/page_not_found.dart';
-import 'package:collection_app/providers/_isar_provider.dart';
-import 'package:collection_app/router.dart';
-import 'package:collection_app/theme_parameters.dart';
-import 'package:flutter/foundation.dart';
+import 'package:collection_app/models/item.dart';
+import 'package:collection_app/models/tag.dart';
+import 'package:collection_app/scripts/import_prnhb_channels.dart';
+import 'package:collection_app/services/collection_service.dart';
+import 'package:collection_app/services/item_service.dart';
+import 'package:collection_app/services/tag_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
-import 'package:bitsdojo_window/bitsdojo_window.dart';
-import 'package:go_router/go_router.dart';
-import 'package:hive/hive.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 
-const appDirectorySubDir = 'Collections';
-
-
-void main() async {
-
-  // init from_zero_ui stuff
-  await initHive(appDirectorySubDir);
-  themeParametersProvider = ChangeNotifierProvider((ref) {
-    return ThemeParameters();
-  });
-  fromZeroThemeParametersProvider = themeParametersProvider;
-
-  // TODO 3 setup error handling/reporting
-  runApp(MyApp());
-
-  // initialize bitsdojo_window on desktop
-  if (PlatformExtended.appWindow!=null) {
-    if (kReleaseMode) {
-      try {
-        doWhenWindowReady(() {
-          try {
-            appWindow.minSize = const Size(512, 512);
-            appWindow.size = const Size(1280, 720);
-            appWindow.alignment = Alignment.center;
-            appWindow.maximize();
-            appWindow.show();
-          } catch (e, st) {
-            _reportWindowError(e, st);
-          }
-        });
-      } catch (e, st) {
-        _reportWindowError(e, st);
-      }
-    } else {
-      doWhenWindowReady(() {
-        appWindow.show();
-      });
-    }
-  }
-
+void main() {
+  importPrnhbChannels();
+  runApp(const MyApp());
 }
-_reportWindowError(e, st) {
-  File logFile = File('log_window.txt')..createSync(recursive: true);
-  final logFileWrite = logFile.openWrite();
-  logFileWrite.writeln('FATAL ERROR WHILE SHOWING WINDOW');
-  logFileWrite.writeln(e.toString());
-  logFileWrite.writeln(st.toString());
-}
-
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
 
-  MyApp({Key? key}) : super(key: key);
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      themeMode: ThemeMode.dark,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.deepPurple,
+        ),
+        useMaterial3: true,
+      ),
+      darkTheme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.deepPurple,
+          brightness: Brightness.dark,
+        ),
+        useMaterial3: true,
+      ),
+      home: const TempExploreWidget(),
+    );
+  }
+}
 
-  final _router = GoRouter(
-    // debugLogDiagnostics: true,
-    redirect: (context, state) async {
-      if ((!initialized) && state.matchedLocation!='/') {
-        // ensure to always go through splash screen
-        return '/?redirect=${state.matchedLocation}';
-      }
-      // no need to redirect at all
-      return null;
-    },
-    errorBuilder: (context, state) {
-      return OnlyOnActiveBuilder(
-        state: state,
-        route: RouteNotFound(),
-        builder: (context, state) {
-          return const PageNotFound();
-        },
-      );
-    },
-    routes: GoRouteFromZero.getCleanRoutes(buildRoutes()),
-  );
+
+class TempExploreWidget extends StatefulWidget {
+
+  const TempExploreWidget({super.key});
 
   @override
-  Widget build(context) {
-    return ProviderScope(
-      child: Consumer(
-        builder: (context, ref, child) {
-          final themeParameters = ref.watch(themeParametersProvider);
-          return MaterialApp.router(
-            routeInformationParser: _router.routeInformationParser,
-            routerDelegate: _router.routerDelegate,
-            routeInformationProvider: _router.routeInformationProvider,
-            title: 'Collections',
-            debugShowCheckedModeBanner: false,
-            locale: themeParameters.appLocale,
-            // supportedLocales: List.from(themeParameters.supportedLocales)..remove(null),
-            supportedLocales: const [Locale('en')],
-            localizationsDelegates: const [
-              // AppLocalizations.delegate,
-              FromZeroLocalizations.delegate,
-              ...GlobalMaterialLocalizations.delegates,
-            ],
-            shortcuts: {
-              ...WidgetsApp.defaultShortcuts,
-              ...fromZeroDefaultShortcuts,
-            },
-            themeMode: themeParameters.themeMode,
-            theme: themeParameters.lightTheme,
-            darkTheme: themeParameters.darkTheme,
-            builder: (context, child) {
-              return FromZeroAppContentWrapper(
-                goRouter: _router,
-                child: child!,
-              );
-            },
-          );
-        },
+  State<TempExploreWidget> createState() => _TempExploreWidgetState();
+
+}
+
+class _TempExploreWidgetState extends State<TempExploreWidget> {
+
+  final ValueNotifier<Tag?> selectedTag = ValueNotifier(null);
+
+  @override
+  Widget build(BuildContext context) {
+    final leftScrollController = ScrollController();
+    final rightScrollController = ScrollController();
+    return Scaffold(
+      body: Row(
+        children: [
+          Expanded(
+            child: ScrollbarFromZero(
+              controller: leftScrollController,
+              child: ListView.builder(
+                controller: leftScrollController,
+                itemCount: tagService.getAllTags().length,
+                itemBuilder: (context, index) {
+                  final tag = tagService.getAllTags()[index];
+                  return ListTile(
+                    title: Text(tag.name),
+                    subtitle: Text('${tag.parentTag} -- ${tag.secondaryParentTags.map((e) => e.name).join('; ')}'),
+                    onTap: () {
+                      selectedTag.value = tag;
+                    },
+                  );
+                },
+              ),
+            ),
+          ),
+          const SizedBox(width: 32,),
+          Expanded(
+            child: ValueListenableBuilder(
+              valueListenable: selectedTag,
+              builder: (context, selectedTag, child) {
+                final items = selectedTag==null
+                    ? itemService.getAllItems().toList()
+                    : itemService.getItemsWithTag(selectedTag);
+                return ScrollbarFromZero(
+                  controller: rightScrollController,
+                  child: ListView.builder(
+                    controller: rightScrollController,
+                    itemCount: items.length,
+                    itemBuilder: (context, index) {
+                      final item = items[index];
+                      var text = item.tags.map((e) => e.name).join('; ');
+                      if (item.explorePriority!=null) text = '[${item.explorePriority}] $text';
+                      if (item.rating!=null) text = '(${item.rating}) $text';
+                      return ListTile(
+                        title: Text(item.name),
+                        subtitle: Text(text),
+                        onTap: () {
+                          // maybe show item details ?
+                          final filePath = item.getAbsoluteFilePathForItem(collectionService.getAllCollections().first);
+                          if (filePath!=null) {
+                            launch(filePath);
+                          }
+                        },
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
