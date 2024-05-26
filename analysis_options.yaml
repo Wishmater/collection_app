@@ -2,6 +2,9 @@ include: package:flutter_lints/flutter.yaml
 
 analyzer:
 
+  plugins:
+    - custom_lint
+
 
   language:
     strict-inference: true
@@ -54,6 +57,14 @@ analyzer:
     always_put_required_named_parameters_first: info
     avoid_positional_boolean_parameters: info
     use_if_null_to_convert_nulls_to_bools: info
+
+
+custom_lint:
+  rules:
+    - custom_import_restrictions:
+      package:collection_app/widgets:
+        - "package:collection_app/services"
+        - "package:flutter/cupertino"
 
 
 linter:

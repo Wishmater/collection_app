@@ -58,6 +58,9 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^2.0.3
+  custom_lint:
+  restrict_imports_linter:
+    path: ../restrict_imports_linter/
   flutter_launcher_icons: ^0.13.1 # to run:  flutter pub run flutter_launcher_icons:main
   flutter_native_splash: ^2.3.2 # to run:  flutter pub run flutter_native_splash:create
 

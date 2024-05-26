@@ -1,0 +1,101 @@
+import 'package:collection_app/providers/app_state_provider.dart';
+import 'package:collection_app/widgets/tags_explorer.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:from_zero_ui/from_zero_ui.dart';
+
+
+class MainPage extends StatelessWidget {
+
+  const MainPage({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      // appbarType: AppbarType.none,
+      // constraintBodyOnXLargeScreens: false,
+      body: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Consumer(
+            builder: (context, ref, child) {
+              final tagsColumnWidth = ref.watch(AppStateProvider.tagsColumnWidth);
+              return SizedBox(
+                width: tagsColumnWidth,
+                child: Stack(
+                  children: [
+                    const TagsExplorer(),
+                    Positioned(
+                      top: 0, bottom: 0, right: 0, width: 1,
+                      child: ColoredBox(
+                        color: Theme.of(context).dividerColor,
+                      ),
+                    ),
+                    Positioned(
+                      top: 0, bottom: 0, right: 0, width: 8,
+                      child: MouseRegion(
+                        cursor: SystemMouseCursors.resizeColumn,
+                        child: GestureDetector(
+                          onPanUpdate: (details) {
+                            if (details.delta.dx!=0) {
+                              ref.read(AppStateProvider.tagsColumnWidth.notifier).add(details.delta.dx);
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+          Consumer(
+            builder: (context, ref, child) {
+              final showItemViewInMainPage = ref.watch(AppStateProvider.showItemViewInMainPage);
+              if (!showItemViewInMainPage) {
+                return const SizedBox.shrink();
+              }
+              final openItem = ref.watch(AppStateProvider.openItem);
+              if (openItem==null) {
+                return const Expanded(child: SizedBox.shrink(),);
+              }
+              return Expanded(
+                child: Text('Open Item: $openItem'),
+              );
+            },
+          ),
+          Consumer(
+            builder: (context, ref, child) {
+              final itemsColumnWidth = ref.watch(AppStateProvider.itemsColumnWidth);
+              return SizedBox(
+                width: itemsColumnWidth,
+                child: Stack(
+                  children: [
+                    Text('items'),
+                    Consumer(
+                      builder: (context, ref, child) {
+                        final showItemViewInMainPage = ref.watch(AppStateProvider.showItemViewInMainPage);
+                        if (!showItemViewInMainPage) {
+                          return const SizedBox.shrink();
+                        }
+                        return Positioned(
+                          top: 0, bottom: 0, left: 0, width: 1,
+                          child: ColoredBox(
+                            color: Theme.of(context).dividerColor,
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+}

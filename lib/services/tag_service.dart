@@ -56,12 +56,21 @@ class TagService {
     bool checkIfAlreadyExists = true,
   }) {
     if (checkIfAlreadyExists) {
-      if (parent.childTags.contains(child)) return false;
-      if (child.parentTag==parent) return false;
+      bool done = false;
+      if (!parent.childTags.contains(child)) {
+        parent.childTags.add(child);
+        done = true;
+      }
+      if (child.parentTag!=parent) {
+        child.parentTag = parent;
+        done = true;
+      }
+      return done;
+    } else {
+      parent.childTags.add(child);
+      child.parentTag = parent;
+      return true;
     }
-    parent.childTags.add(child);
-    child.parentTag = parent;
-    return true;
   }
 
   bool addChildren(Tag parent, Iterable<Tag> children, {
@@ -86,12 +95,21 @@ class TagService {
     bool checkIfAlreadyExists = true,
   }) {
     if (checkIfAlreadyExists) {
-      if (parent.secondaryChildTags.contains(child)) return false;
-      if (child.secondaryParentTags.contains(parent)) return false;
+      bool done = false;
+      if (!parent.secondaryChildTags.contains(child)) {
+        parent.secondaryChildTags.add(child);
+        done = true;
+      }
+      if (!child.secondaryParentTags.contains(parent)) {
+        child.secondaryParentTags.add(parent);
+        done = true;
+      }
+      return done;
+    } else {
+      parent.secondaryChildTags.add(child);
+      child.secondaryParentTags.add(parent);
+      return true;
     }
-    parent.secondaryChildTags.add(child);
-    child.secondaryParentTags.add(parent);
-    return true;
   }
 
   bool addSecondaryChildren(Iterable<Tag> parents, Iterable<Tag> children, {

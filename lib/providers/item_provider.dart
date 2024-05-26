@@ -27,7 +27,7 @@ abstract class ItemProvider {
     );
     if (added) {
       ref.invalidate(all);
-      ref.invalidate(CollectionProvider.one.call(collection.name));
+      ref.invalidate(CollectionProvider.one.call(collection.name)); // TODO 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
     }
     return added;
   }

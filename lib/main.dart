@@ -4,7 +4,9 @@ import 'package:collection_app/scripts/import_prnhb_channels.dart';
 import 'package:collection_app/services/collection_service.dart';
 import 'package:collection_app/services/item_service.dart';
 import 'package:collection_app/services/tag_service.dart';
+import 'package:collection_app/widgets/main_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -20,23 +22,26 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      themeMode: ThemeMode.dark,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple,
+    return ProviderScope(
+      child: MaterialApp(
+        title: 'Collections',
+        themeMode: ThemeMode.dark,
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: Colors.deepPurple,
+          ),
+          useMaterial3: true,
         ),
-        useMaterial3: true,
-      ),
-      darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple,
-          brightness: Brightness.dark,
+        darkTheme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
+            brightness: Brightness.dark,
+            seedColor: Colors.deepPurple,
+          ),
+          useMaterial3: true,
         ),
-        useMaterial3: true,
+        home: const MainPage(),
       ),
-      home: const TempExploreWidget(),
     );
   }
 }
