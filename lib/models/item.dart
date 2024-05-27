@@ -15,6 +15,8 @@ class Item {
   int? explorePriority;
   int? rating;
 
+  late Collection collection; /// reverse link
+
   Item({
     this.name = '',
     DateTime? added,
@@ -24,13 +26,19 @@ class Item {
     List<Tag>? tags,
     this.explorePriority,
     this.rating,
+    Collection? collection,
   })  : added = added ?? DateTime.now(),
-        tags = tags ?? [];
+        tags = tags ?? []
+  {
+    if (collection!=null) {
+      this.collection = collection;
+    }
+  }
 
   @override
   String toString() => '(Item: $name)';
 
-  String? getAbsoluteFilePathForItem(Collection collection) {
+  String? getAbsoluteFilePathForItem() {
     if (filePath==null) return null;
     if (collection.baseDirectory==null) return filePath;
     return p.join(collection.baseDirectory!, filePath);

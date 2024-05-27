@@ -18,17 +18,23 @@ void importPrnhbChannels() {
     name: 'Prnhb Channels',
     baseDirectory: rootFolder.absolute.path,
   );
-  collectionService.addCollection(collection);
+  collectionService.addCollection(collection,
+    checkIfAlreadyExists: false,
+  );
   final rootTagCreator = Tag(
     added: addedDatetime,
     name: 'Creator',
   );
-  tagService.addTag(rootTagCreator);
+  tagService.addTag(rootTagCreator,
+    checkIfAlreadyExists: false,
+  );
   final rootTagContent = Tag(
     added: addedDatetime,
     name: 'Content Tag',
   );
-  tagService.addTag(rootTagContent);
+  tagService.addTag(rootTagContent,
+    checkIfAlreadyExists: false,
+  );
   for (final directChild in directChildren) {
     if (directChild is! Directory) continue;
     StringBuffer creatorBuffer = StringBuffer('');
@@ -66,7 +72,9 @@ void importPrnhbChannels() {
       parentTag: rootTagCreator,
       secondaryParentTags: creatorTags,
     );
-    tagService.addTag(creator);
+    tagService.addTag(creator,
+      checkIfAlreadyExists: false,
+    );
     _processSubfolder(directChild, [creator],
       collection: collection,
       addedDatetime: addedDatetime,
@@ -131,13 +139,15 @@ void _processSubfolder(Directory folder, List<Tag> tags, {
       }
       final newItem = Item(
         added: addedDatetime,
-        name: name,
+        name: name.trim(),
         filePath: childRelativePath,
         tags: tags,
         explorePriority: priority,
         rating: rating,
       );
-      itemService.addItem(collection, newItem);
+      itemService.addItem(collection, newItem,
+        checkIfAlreadyExists: false,
+      );
     }
   }
 }

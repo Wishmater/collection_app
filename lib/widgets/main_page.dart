@@ -1,4 +1,5 @@
 import 'package:collection_app/providers/app_state_provider.dart';
+import 'package:collection_app/widgets/item_cards_explorer.dart';
 import 'package:collection_app/widgets/tags_explorer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -69,28 +70,30 @@ class MainPage extends StatelessWidget {
           Consumer(
             builder: (context, ref, child) {
               final itemsColumnWidth = ref.watch(AppStateProvider.itemsColumnWidth);
-              return SizedBox(
-                width: itemsColumnWidth,
-                child: Stack(
-                  children: [
-                    Text('items'),
-                    Consumer(
-                      builder: (context, ref, child) {
-                        final showItemViewInMainPage = ref.watch(AppStateProvider.showItemViewInMainPage);
-                        if (!showItemViewInMainPage) {
-                          return const SizedBox.shrink();
-                        }
-                        return Positioned(
-                          top: 0, bottom: 0, left: 0, width: 1,
-                          child: ColoredBox(
-                            color: Theme.of(context).dividerColor,
-                          ),
-                        );
-                      },
+              final showItemViewInMainPage = ref.watch(AppStateProvider.showItemViewInMainPage);
+              Widget result = Stack(
+                children: [
+                  const ItemCardsExplorer(),
+                  if (showItemViewInMainPage)
+                    Positioned(
+                      top: 0, bottom: 0, left: 0, width: 1,
+                      child: ColoredBox(
+                        color: Theme.of(context).dividerColor,
+                      ),
                     ),
-                  ],
-                ),
+                ],
               );
+              if (showItemViewInMainPage) {
+                result = SizedBox(
+                  width: itemsColumnWidth,
+                  child: result,
+                );
+              } else {
+                result = Expanded(
+                  child: result,
+                );
+              }
+              return result;
             },
           ),
         ],

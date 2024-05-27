@@ -27,15 +27,16 @@ class MyApp extends StatelessWidget {
         title: 'Collections',
         themeMode: ThemeMode.dark,
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.deepPurple,
-          ),
-          useMaterial3: true,
-        ),
         darkTheme: ThemeData(
           colorScheme: ColorScheme.fromSeed(
             brightness: Brightness.dark,
+            seedColor: Colors.deepPurple,
+            background: Colors.black,
+          ),
+          useMaterial3: true,
+        ),
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(
             seedColor: Colors.deepPurple,
           ),
           useMaterial3: true,
@@ -44,86 +45,4 @@ class MyApp extends StatelessWidget {
       ),
     );
   }
-}
-
-
-class TempExploreWidget extends StatefulWidget {
-
-  const TempExploreWidget({super.key});
-
-  @override
-  State<TempExploreWidget> createState() => _TempExploreWidgetState();
-
-}
-
-class _TempExploreWidgetState extends State<TempExploreWidget> {
-
-  final ValueNotifier<Tag?> selectedTag = ValueNotifier(null);
-
-  @override
-  Widget build(BuildContext context) {
-    final leftScrollController = ScrollController();
-    final rightScrollController = ScrollController();
-    return Scaffold(
-      body: Row(
-        children: [
-          Expanded(
-            child: ScrollbarFromZero(
-              controller: leftScrollController,
-              child: ListView.builder(
-                controller: leftScrollController,
-                itemCount: tagService.getAllTags().length,
-                itemBuilder: (context, index) {
-                  final tag = tagService.getAllTags()[index];
-                  return ListTile(
-                    title: Text(tag.name),
-                    subtitle: Text('${tag.parentTag} -- ${tag.secondaryParentTags.map((e) => e.name).join('; ')}'),
-                    onTap: () {
-                      selectedTag.value = tag;
-                    },
-                  );
-                },
-              ),
-            ),
-          ),
-          const SizedBox(width: 32,),
-          Expanded(
-            child: ValueListenableBuilder(
-              valueListenable: selectedTag,
-              builder: (context, selectedTag, child) {
-                final items = selectedTag==null
-                    ? itemService.getAllItems().toList()
-                    : itemService.getItemsWithTag(selectedTag);
-                return ScrollbarFromZero(
-                  controller: rightScrollController,
-                  child: ListView.builder(
-                    controller: rightScrollController,
-                    itemCount: items.length,
-                    itemBuilder: (context, index) {
-                      final item = items[index];
-                      var text = item.tags.map((e) => e.name).join('; ');
-                      if (item.explorePriority!=null) text = '[${item.explorePriority}] $text';
-                      if (item.rating!=null) text = '(${item.rating}) $text';
-                      return ListTile(
-                        title: Text(item.name),
-                        subtitle: Text(text),
-                        onTap: () {
-                          // maybe show item details ?
-                          final filePath = item.getAbsoluteFilePathForItem(collectionService.getAllCollections().first);
-                          if (filePath!=null) {
-                            launch(filePath);
-                          }
-                        },
-                      );
-                    },
-                  ),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
 }

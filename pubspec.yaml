@@ -37,6 +37,7 @@ dependencies:
   sliver_tools: ^0.2.12
   multi_value_listenable_builder: ^0.0.2
   crop_your_image: ^0.7.5
+  flutter_staggered_grid_view: ^0.7.0
 
   # * Plugins
   url_launcher: ^6.1.12
@@ -44,6 +45,7 @@ dependencies:
   device_info_plus: ^9.0.3
   bitsdojo_window: ^0.1.5 # ideally, we would do all window-related stuff with window_manager, and remove this dependency here
   window_manager: ^0.3.5
+  video_player_win:
 
   # * Specific Utility
   dio: ^5.3.2

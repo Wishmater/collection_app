@@ -17,13 +17,16 @@ class TagsExplorer extends ConsumerWidget {
     // TODO 2 performance this probably needs to be done with slivers in order to be performant
     final rootTags = ref.watch(TagProvider.roots);
     final scrollController = ScrollController();
-    return SingleChildScrollView(
+    return ScrollbarFromZero(
       controller: scrollController,
-      child: Column(
-        children: [
-          for (final e in rootTags)
-            TabExplorerItem(tag: e,),
-        ],
+      child: SingleChildScrollView(
+        controller: scrollController,
+        child: Column(
+          children: [
+            for (final e in rootTags)
+              TabExplorerItem(tag: e,),
+          ],
+        ),
       ),
     );
   }
@@ -47,8 +50,6 @@ class TabExplorerItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    print (tag);
-    print (tag.childTags);
     // TODO 1 we need a good way to listen changes in the tag without having to have the provider rebuild
     return ExpansionTileFromZero(
       actionPadding: EdgeInsets.only(left: 10 + childrenSeparation * indentCount),
@@ -57,6 +58,7 @@ class TabExplorerItem extends ConsumerWidget {
         builder: (context, ref, child) {
           // TODO 3 prevent animation when selecting button from repeating
           final selectedTag = ref.watch(AppStateProvider.selectedTag);
+          // TODO 1 show secondary parent tags
           return DrawerMenuButtonFromZero(
             contentPadding: EdgeInsets.only(left: childrenSeparation * indentCount),
             selected: selectedTag==tag,

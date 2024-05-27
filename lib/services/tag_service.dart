@@ -28,7 +28,9 @@ class TagService {
     var result = getTagByName(tag.name);
     if (result==null) {
       result = tag;
-      addTag(result);
+      addTag(result,
+        checkIfAlreadyExists: false,
+      );
     }
     return result;
   }

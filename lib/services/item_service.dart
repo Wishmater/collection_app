@@ -38,12 +38,22 @@ class ItemService {
   bool addItem(Collection collection, Item item, {
     bool checkIfAlreadyExists = true,
   }) {
-    // TODO 1 how to uniquely identify an item ??
-    // if (checkIfAlreadyExists && getAllItems().any((e) => e.name==item.name)) {
-    //   return false;
-    // }
-    collection.items.add(item);
-    return true;
+    if (checkIfAlreadyExists) {
+      bool done = false;
+      if (true) { // TODO 1 how to uniquely identify an item ??
+        collection.items.add(item);
+        done = true;
+      }
+      if (item.collection!=collection) {
+        item.collection = collection;
+        done = true;
+      }
+      return done;
+    } else {
+      collection.items.add(item);
+      item.collection = collection;
+      return true;
+    }
   }
 
 }
