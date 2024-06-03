@@ -1,6 +1,7 @@
 import 'package:collection_app/providers/app_state_provider.dart';
 import 'package:collection_app/widgets/item_cards_explorer.dart';
 import 'package:collection_app/widgets/tags_explorer.dart';
+import 'package:dartx/dartx_io.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
@@ -14,6 +15,8 @@ class MainPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+    final screenWidthThird = screenWidth / 3;
     return Scaffold(
       // appbarType: AppbarType.none,
       // constraintBodyOnXLargeScreens: false,
@@ -22,7 +25,8 @@ class MainPage extends StatelessWidget {
         children: [
           Consumer(
             builder: (context, ref, child) {
-              final tagsColumnWidth = ref.watch(AppStateProvider.tagsColumnWidth);
+              double tagsColumnWidth = ref.watch(AppStateProvider.tagsColumnWidth)
+                  .coerceAtMost(screenWidthThird);
               return SizedBox(
                 width: tagsColumnWidth,
                 child: Stack(
@@ -41,7 +45,10 @@ class MainPage extends StatelessWidget {
                         child: GestureDetector(
                           onPanUpdate: (details) {
                             if (details.delta.dx!=0) {
-                              ref.read(AppStateProvider.tagsColumnWidth.notifier).add(details.delta.dx);
+                              tagsColumnWidth = (tagsColumnWidth + details.delta.dx)
+                                  .clamp(AppStateProvider.mainPageMinColumnWidth, screenWidthThird);
+                              ref.read(AppStateProvider.tagsColumnWidth.notifier)
+                                  .setState(tagsColumnWidth);
                             }
                           },
                         ),
@@ -69,7 +76,8 @@ class MainPage extends StatelessWidget {
           ),
           Consumer(
             builder: (context, ref, child) {
-              final itemsColumnWidth = ref.watch(AppStateProvider.itemsColumnWidth);
+              final itemsColumnWidth = ref.watch(AppStateProvider.itemsColumnWidth)
+                  .coerceAtMost(screenWidthThird);
               final showItemViewInMainPage = ref.watch(AppStateProvider.showItemViewInMainPage);
               Widget result = Stack(
                 children: [

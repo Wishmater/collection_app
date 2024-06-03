@@ -9,14 +9,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 abstract class AppStateProvider {
 
+  static const mainPageMinColumnWidth = 256.0;
+
+
   static final tagsColumnWidth = StateNotifierProvider<LimitingNumStateNotifier<double>, double>((ref) {
-    return LimitingNumStateNotifier<double>(330, min: 256);
+    return LimitingNumStateNotifier<double>(330, min: mainPageMinColumnWidth);
   });
 
   static final showItemViewInMainPage = StateProvider((ref) => false);
 
   static final itemsColumnWidth = StateNotifierProvider<LimitingNumStateNotifier<double>, double>((ref) {
-    return LimitingNumStateNotifier<double>(330, min: 256);
+    return LimitingNumStateNotifier<double>(330, min: mainPageMinColumnWidth);
   });
 
   static final selectedTag = StateProvider<Tag?>((ref) => null);
