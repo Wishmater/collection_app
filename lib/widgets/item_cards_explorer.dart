@@ -1,4 +1,6 @@
+import 'dart:io';
 import 'package:collection_app/providers/app_state_provider.dart';
+import 'package:collection_app/widgets/item_thumbnail/video_cached_thumbnail.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
@@ -29,15 +31,19 @@ class ItemCardsExplorer extends ConsumerWidget {
         mainAxisSpacing: spacing,
         itemBuilder: (context, index) {
           final item = items[index];
+          Widget thumbnail;
+          thumbnail = VideoCachedThumbnail(
+            item: item,
+          );
           return InkWell(
             onTap: () {
               ref.read(AppStateProvider.selectedItem.state).state = item;
             },
             onDoubleTap: () {
+              final filePath = item.getAbsoluteFilePath();
               ref.read(AppStateProvider.selectedItem.state).state = item;
               ref.read(AppStateProvider.openItem.state).state = item;
               if (!ref.read(AppStateProvider.showItemViewInMainPage)) {
-                final filePath = item.getAbsoluteFilePathForItem();
                 if (filePath!=null) {
                   launch(filePath);
                 }
@@ -48,7 +54,7 @@ class ItemCardsExplorer extends ConsumerWidget {
               children: [
                 AspectRatio(
                   aspectRatio: 16/9,
-                  child: Placeholder(), // TODO 1 show video preview
+                  child: thumbnail,
                 ),
                 Text(item.name),
                 // TODO 1 show tags
@@ -66,22 +72,4 @@ class ItemCardsExplorer extends ConsumerWidget {
 
 
 
-class VideoThumbnail extends StatefulWidget {
 
-  const VideoThumbnail({
-    super.key,
-  });
-
-  @override
-  State<VideoThumbnail> createState() => _VideoThumbnailState();
-
-}
-
-class _VideoThumbnailState extends State<VideoThumbnail> {
-
-  @override
-  Widget build(BuildContext context) {
-    return const Placeholder();
-  }
-
-}

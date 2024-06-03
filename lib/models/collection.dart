@@ -1,4 +1,5 @@
 import 'package:collection_app/models/item.dart';
+import 'package:path/path.dart' as p;
 
 
 class Collection {
@@ -22,5 +23,11 @@ class Collection {
 
   @override
   String toString() => '(Collection: $name)';
+
+
+  String? getAbsoluteFilePathForThumbnailsFolder() {
+    if (baseDirectory==null) return null;
+    return p.join(baseDirectory!, '.collection_thumbnails');
+  }
 
 }

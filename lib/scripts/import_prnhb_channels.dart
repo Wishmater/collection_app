@@ -37,6 +37,7 @@ void importPrnhbChannels() {
   );
   for (final directChild in directChildren) {
     if (directChild is! Directory) continue;
+    if (directChild.name=='.collection_thumbnails') continue;
     StringBuffer creatorBuffer = StringBuffer('');
     StringBuffer tagBuffer = StringBuffer('');
     bool insideParenthesis = false;

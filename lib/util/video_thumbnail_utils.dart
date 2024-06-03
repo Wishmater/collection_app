@@ -1,0 +1,60 @@
+import 'dart:io';
+import 'package:collection_app/models/collection.dart';
+import 'package:collection_app/models/item.dart';
+import 'package:mlog/mlog.dart';
+
+
+abstract class VideoThumbnailUtils {
+
+  static Future<Directory?> ensureThumbnailFolderCreated(Collection collection) async {
+    final folderPath = collection.getAbsoluteFilePathForThumbnailsFolder();
+    if (folderPath==null) return null;
+    final thumbnailsFolder = Directory(folderPath);
+    if (!thumbnailsFolder.existsSync()) {
+      await thumbnailsFolder.create(recursive: true);
+    }
+    return thumbnailsFolder;
+  }
+
+  static Future<File?> ensureThumbnailCreated(Item item) async {
+    final thumbnailsFolder = await ensureThumbnailFolderCreated(item.collection);
+    if (thumbnailsFolder==null) return null;
+    final path = item.getAbsoluteFilePathForThumbnail();
+    if (path==null) return null;
+    final thumbnail = File(path);
+    if (!thumbnail.existsSync()) {
+      return createThumbnail(item, thumbnail: thumbnail);
+    }
+    return thumbnail;
+  }
+
+  static Future<File?> createThumbnail(Item item, {
+    File? thumbnail,
+  }) async {
+    if (thumbnail==null) {
+      final path = item.getAbsoluteFilePath();
+      if (path==null) return null;
+      thumbnail = File(path);
+    }
+    final thumbnailParentFolder = thumbnail.parent;
+    if (!thumbnailParentFolder.existsSync()) {
+      await thumbnailParentFolder.create(recursive: true);
+    }
+    final itemPath = item.getAbsoluteFilePath();
+    if (itemPath==null) return null;
+    mlog(LgLvl.info, 'Creating thumbnail for: $itemPath');
+    final result = await Process.run('ffmpeg', [
+      '-ss', '00:00:10.000',
+      '-i', itemPath,
+      '-vf', 'scale=320:180:force_original_aspect_ratio=decrease',
+      '-vframes', '1',
+      thumbnail.absolute.path,
+    ],);
+    if (result.exitCode!=0) {
+      mlog(LgLvl.error, 'Error while creating thumbnail for: $itemPath\n${result.stderr}');
+      return null;
+    }
+    return thumbnail;
+  }
+
+}

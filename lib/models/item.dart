@@ -38,10 +38,17 @@ class Item {
   @override
   String toString() => '(Item: $name)';
 
-  String? getAbsoluteFilePathForItem() {
+  String? getAbsoluteFilePath() {
     if (filePath==null) return null;
     if (collection.baseDirectory==null) return filePath;
     return p.join(collection.baseDirectory!, filePath);
+  }
+
+  String? getAbsoluteFilePathForThumbnail() {
+    if (filePath==null || collection.baseDirectory==null) return null;
+    String result = p.join(collection.baseDirectory!, '.collection_thumbnails', filePath);
+    result = p.setExtension(result, '.jpg');
+    return result;
   }
 
 }
