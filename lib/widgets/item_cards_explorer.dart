@@ -40,39 +40,62 @@ class ItemCardsExplorer extends ConsumerWidget {
           thumbnail = VideoCachedThumbnail(
             item: item,
           );
-          return MultiTapListener(
-            onDoubleTap: () {
-              final filePath = item.getAbsoluteFilePath();
-              ref.read(AppStateProvider.selectedItem.state).state = item;
-              ref.read(AppStateProvider.openItem.state).state = item;
-              if (!ref.read(AppStateProvider.showItemViewInMainPage)) {
-                if (filePath!=null) {
-                  launch(filePath);
+          return ContextMenuFromZero(
+            actions: [
+              ActionFromZero(
+                title: 'Open',
+                icon: const Icon(Icons.file_open),
+                onTap: (context) {
+                  final filePath = item.getAbsoluteFilePath();
+                  if (filePath!=null) {
+                    launch(filePath);
+                  }
+                },
+              ),
+              ActionFromZero(
+                title: 'Open in explorer',
+                icon: const Icon(Icons.folder),
+                onTap: (context) {
+                  final filePath = item.getAbsoluteFilePath();
+                  if (filePath!=null) {
+                    launch(File(filePath).parent.absolute.path);
+                  }
+                },
+              ),
+            ],
+            child: MultiTapListener(
+              onDoubleTap: () {
+                final filePath = item.getAbsoluteFilePath();
+                ref.read(AppStateProvider.openItem.state).state = item;
+                if (!ref.read(AppStateProvider.showItemViewInMainPage)) {
+                  if (filePath!=null) {
+                    launch(filePath);
+                  }
                 }
-              }
-            },
-            child: InkWell(
-              borderRadius: const BorderRadius.all(Radius.circular(6)),
-              onTap: () {
-                ref.read(AppStateProvider.selectedItem.state).state = item;
               },
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: horizontalSpacing/2,
-                  vertical: verticalSpacing/2,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    AspectRatio(
-                      aspectRatio: 16/9,
-                      child: thumbnail,
-                    ),
-                    Text(item.name),
-                    // TODO 1 show tags
-                    // TODO 1 show explore priority
-                    // TODO 1 show rating
-                  ],
+              child: InkWell(
+                borderRadius: const BorderRadius.all(Radius.circular(6)),
+                onTap: () {
+                  ref.read(AppStateProvider.selectedItem.state).state = item;
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: horizontalSpacing/2,
+                    vertical: verticalSpacing/2,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      AspectRatio(
+                        aspectRatio: 16/9,
+                        child: thumbnail,
+                      ),
+                      Text(item.name),
+                      // TODO 1 show tags
+                      // TODO 1 show explore priority
+                      // TODO 1 show rating
+                    ],
+                  ),
                 ),
               ),
             ),

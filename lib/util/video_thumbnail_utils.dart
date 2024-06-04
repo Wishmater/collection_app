@@ -28,6 +28,7 @@ abstract class VideoThumbnailUtils {
     return thumbnail;
   }
 
+
   static Future<File?> createThumbnail(Item item, {
     File? thumbnail,
   }) async {
