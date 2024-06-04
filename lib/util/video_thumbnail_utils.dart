@@ -47,6 +47,9 @@ abstract class VideoThumbnailUtils {
     // using ffmpeg directly to create thumbnails
     // assumes ffmpeg is installed and set as an env variable, will crash otherwise
     // good flutter implementations not really found... https://pub.dev/packages/thumblr
+    // we could also try a flutter wrapper for ffmpeg:
+    //   - https://github.com/arthenica/ffmpeg-kit/issues/8
+    //   - https://pub.dev/packages/ffmpeg_helper
     final result = await Process.run('ffmpeg', [
       '-ss', '00:00:10.000',
       '-i', itemPath,

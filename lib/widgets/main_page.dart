@@ -1,4 +1,5 @@
 import 'package:collection_app/providers/app_state_provider.dart';
+import 'package:collection_app/widgets/filters_widget.dart';
 import 'package:collection_app/widgets/item_cards_explorer.dart';
 import 'package:collection_app/widgets/tags_explorer.dart';
 import 'package:dartx/dartx_io.dart';
@@ -31,7 +32,12 @@ class MainPage extends StatelessWidget {
                 width: tagsColumnWidth,
                 child: Stack(
                   children: [
-                    const TagsExplorer(),
+                    const Column(
+                      children: [
+                        FiltersWidget(),
+                        Expanded(child: TagsExplorer()),
+                      ],
+                    ),
                     Positioned(
                       top: 0, bottom: 0, right: 0, width: 1,
                       child: ColoredBox(
