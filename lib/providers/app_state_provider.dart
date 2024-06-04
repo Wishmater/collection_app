@@ -36,6 +36,12 @@ abstract class AppStateProvider {
 
   static final filterExcludingCollections = StateProvider((ref) => <Collection>[]);
 
+  static final filterRatingMin = StateProvider<int?>((ref) => null);
+  static final filterRatingMax = StateProvider<int?>((ref) => null);
+
+  static final filterExplorePriorityMin = StateProvider<int?>((ref) => null);
+  static final filterExplorePriorityMax = StateProvider<int?>((ref) => null);
+
   static final itemsWithCurrentFilters = StateProvider((ref) {
     final filterIncludingCollections = ref.watch(AppStateProvider.filterIncludingCollections);
     final List<Collection> collections = filterIncludingCollections.isNotEmpty
@@ -50,12 +56,28 @@ abstract class AppStateProvider {
     }
     final List<Item> result = collections.flatMap((e) => e.items).toList();
     final filterIncludingTags = ref.watch(AppStateProvider.filterIncludingTags);
+    final filterExcludingTags = ref.watch(AppStateProvider.filterExcludingTags);
+    final filterRatingMin = ref.watch(AppStateProvider.filterRatingMin);
+    final filterRatingMax = ref.watch(AppStateProvider.filterRatingMax);
+    final filterExplorePriorityMin = ref.watch(AppStateProvider.filterExplorePriorityMin);
+    final filterExplorePriorityMax = ref.watch(AppStateProvider.filterExplorePriorityMax);
     if (filterIncludingTags.isNotEmpty) {
       result.removeWhere((e) => !e.tags.containsAll(filterIncludingTags));
     }
-    final filterExcludingTags = ref.watch(AppStateProvider.filterExcludingTags);
     if (filterExcludingTags.isNotEmpty) {
       result.removeWhere((e) => e.tags.containsAll(filterExcludingTags));
+    }
+    if (filterRatingMin!=null) {
+      result.removeWhere((e) => e.rating!=null && e.rating! < filterRatingMin);
+    }
+    if (filterRatingMax!=null) {
+      result.removeWhere((e) => e.rating!=null && e.rating! > filterRatingMax);
+    }
+    if (filterExplorePriorityMin!=null) {
+      result.removeWhere((e) => e.explorePriority!=null && e.explorePriority! < filterExplorePriorityMin);
+    }
+    if (filterExplorePriorityMax!=null) {
+      result.removeWhere((e) => e.explorePriority!=null && e.explorePriority! > filterExplorePriorityMax);
     }
     return result;
   });
