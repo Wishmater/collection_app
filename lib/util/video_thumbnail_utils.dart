@@ -43,6 +43,9 @@ abstract class VideoThumbnailUtils {
     final itemPath = item.getAbsoluteFilePath();
     if (itemPath==null) return null;
     mlog(LgLvl.info, 'Creating thumbnail for: $itemPath');
+    // using ffmpeg directly to create thumbnails
+    // assumes ffmpeg is installed and set as an env variable, will crash otherwise
+    // good flutter implementations not really found... https://pub.dev/packages/thumblr
     final result = await Process.run('ffmpeg', [
       '-ss', '00:00:10.000',
       '-i', itemPath,
