@@ -6,7 +6,6 @@ import 'package:collection_app/router.dart';
 import 'package:collection_app/scripts/import_prnhb_channels.dart';
 import 'package:collection_app/theme_parameters.dart';
 import 'package:collection_app/util/logging.dart';
-import 'package:collection_app/widgets/main_page.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';

@@ -87,7 +87,9 @@ class MainPage extends StatelessWidget {
               final showItemViewInMainPage = ref.watch(AppStateProvider.showItemViewInMainPage);
               Widget result = Stack(
                 children: [
-                  const ItemCardsExplorer(),
+                  const ItemCardsExplorer(
+                    isMainScrollbar: true,
+                  ),
                   if (showItemViewInMainPage)
                     Positioned(
                       top: 0, bottom: 0, left: 0, width: 1,

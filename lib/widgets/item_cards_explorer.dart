@@ -13,8 +13,10 @@ class ItemCardsExplorer extends ConsumerWidget {
 
   static const verticalSpacing = 15.0;
   static const horizontalSpacing = 20.0;
+  final bool isMainScrollbar;
 
   const ItemCardsExplorer({
+    this.isMainScrollbar = false,
     super.key,
   });
 
@@ -24,6 +26,7 @@ class ItemCardsExplorer extends ConsumerWidget {
     final items = ref.watch(AppStateProvider.itemsWithCurrentFilters);
     return ScrollbarFromZero(
       controller: scrollController,
+      mainScrollbar: isMainScrollbar,
       child: AlignedGridView.extent(
         controller: scrollController,
         itemCount: items.length,

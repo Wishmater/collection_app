@@ -12,7 +12,7 @@ class Tag {
   List<Tag> secondaryChildTags;
   List<String> aliases;
 
-  // TODO 1 validate that there are no cycles in the graph of tags
+  // TODO 1 validate (assert?) that there are no cycles in the graph of tags
   Tag({
     this.name = '',
     DateTime? added,
