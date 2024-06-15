@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:mlog/mlog.dart';
 import 'package:video_player_win/video_player_win.dart';
 import 'package:video_player_platform_interface/video_player_platform_interface.dart';
@@ -28,9 +29,9 @@ class _VideoLiveThumbnailState extends State<VideoLiveThumbnail> {
   void initState() {
     super.initState();
     controller = WinVideoPlayerController.file(File(widget.filePath));
-    mlog (LgLvl.fine, 'Initializing video live thumbnail  --  ${widget.filePath}');
+    log (LgLvl.fine, 'Initializing video live thumbnail  --  ${widget.filePath}');
     controller.videoEventStream.listen((event) {
-      mlog (LgLvl.info, '${event.eventType}  --  ${widget.filePath}');
+      log (LgLvl.info, '${event.eventType}  --  ${widget.filePath}');
       switch (event.eventType) {
         case VideoEventType.initialized:
           setState(() {

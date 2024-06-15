@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:collection_app/models/collection.dart';
 import 'package:collection_app/models/item.dart';
+import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:mlog/mlog.dart';
 
 
@@ -43,7 +44,7 @@ abstract class VideoThumbnailUtils {
     }
     final itemPath = item.getAbsoluteFilePath();
     if (itemPath==null) return null;
-    mlog(LgLvl.info, 'Creating thumbnail for: $itemPath');
+    log(LgLvl.info, 'Creating thumbnail for: $itemPath');
     // using ffmpeg directly to create thumbnails
     // assumes ffmpeg is installed and set as an env variable, will crash otherwise
     // good flutter implementations not really found... https://pub.dev/packages/thumblr
@@ -58,7 +59,7 @@ abstract class VideoThumbnailUtils {
       thumbnail.absolute.path,
     ],);
     if (result.exitCode!=0) {
-      mlog(LgLvl.error, 'Error while creating thumbnail for: $itemPath\n${result.stderr}');
+      log(LgLvl.error, 'Error while creating thumbnail for: $itemPath\n${result.stderr}');
       return null;
     }
     return thumbnail;
