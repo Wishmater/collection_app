@@ -18,9 +18,9 @@ class MainPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.sizeOf(context).width;
     final screenWidthThird = screenWidth / 3;
-    return Scaffold(
-      // appbarType: AppbarType.none,
-      // constraintBodyOnXLargeScreens: false,
+    return ScaffoldFromZero(
+      appbarType: AppbarType.none,
+      constraintBodyOnXLargeScreens: false,
       body: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

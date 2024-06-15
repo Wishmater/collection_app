@@ -1,48 +1,214 @@
-import 'package:collection_app/models/item.dart';
-import 'package:collection_app/models/tag.dart';
+import 'dart:async';
+import 'dart:io';
+
+import 'package:bitsdojo_window/bitsdojo_window.dart';
+import 'package:collection_app/router.dart';
 import 'package:collection_app/scripts/import_prnhb_channels.dart';
-import 'package:collection_app/services/collection_service.dart';
-import 'package:collection_app/services/item_service.dart';
-import 'package:collection_app/services/tag_service.dart';
+import 'package:collection_app/theme_parameters.dart';
+import 'package:collection_app/util/logging.dart';
 import 'package:collection_app/widgets/main_page.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:from_zero_ui/util/web_initial_config/web_initial_config.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hive/hive.dart';
+import 'package:mlog/mlog.dart';
 
 
-void main() {
-  importPrnhbChannels();
-  runApp(const MyApp());
+void main() async {
+
+  importPrnhbChannels(); // TODO 1 remove this from main once we have persisted data
+
+  await initLogging();
+  // TODO 2 implement proper handling of flutter errors in mlog
+  if (kReleaseMode) {
+    FlutterError.onError = (FlutterErrorDetails details) {
+      log(LgLvl.error, 'FLUTTER ERROR CAUGHT BY LOGGER',
+        e: details.exception,
+        st: details.stack,
+        details: details,
+      );
+    };
+  }
+  runZonedGuarded(startApp,
+        (dynamic error, StackTrace stackTrace) {
+      log(LgLvl.error, 'TOP LEVEL RUN ZONE GUARDED ERROR',
+        e: error,
+        st: stackTrace,
+      );
+    },
+  );
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+Future<void> initLogging() async {
+  LogOptions.instance.relevantStackTraceLineOffset = 2;
+  if (kReleaseMode){
+    try {
+      initLoggingDebug();
+      // await initLoggingRelease(); // TODO 3 implement release logging, maybe create a package with MPG stuff
+    } catch (_) {
+      //TODO ??? how to report that I can't report ???
+      initLoggingDebug();
+    }
+  } else {
+    initLoggingDebug();
+  }
+  LogOptions.instance.setLevel(LgLvl.fine);
+  LogOptions.instance.addTypes({
+    FzLgType.routing: LgLvl.info,
+    FzLgType.appUpdate: LgLvl.info,
+    FzLgType.dao: LgLvl.info,
+    LgType.script: LgLvl.finer,
+  });
+}
 
-  // This widget is the root of your application.
+void initLoggingDebug() {
+  log = (LgLvl level, Object? msg, {
+    Object? type,
+    Object? e,
+    StackTrace? st,
+    int extraTraceLineOffset = 0,
+    FlutterErrorDetails? details,
+  }) {
+    if (level.value > LogOptions.instance.getLvlForType(type).value) {
+      return;
+    }
+    final message = defaultLogGetString(level, msg,
+      e: e,
+      st: st,
+      extraTraceLineOffset: extraTraceLineOffset,
+      type: type,
+      details: details,
+    );
+    if (message!=null) {
+      if (PlatformExtended.isAndroid) {
+        // TODO 2 better logging handling in Android
+        // in android, stdout.writeln doesn't show in dev console
+        print(message); // ignore: avoid_print
+      } else {
+        stdout.writeln(message);
+      }
+    }
+  };
+}
+
+/// this method needs to be called inside the final flutter zone
+Future<void> startApp() async {
+  initAppConfigWebSensitive();
+  FromZeroAppContentWrapper.windowsProcessName = 'collection_app.exe';
+  FromZeroAppContentWrapper.appNameForCloseConfirmation = 'Collection App';
+  // WindowBar.logoImageAssetsPath = 'assets/images/logo.png'; // TODO 2 re-add when we get a logo
+  await initHive(kReleaseMode ? 'collection_app' : 'collection_app_debug');
+  PlatformExtended.customDownloadsDirectory = Hive.box('settings').get('download_folder');
+  themeParametersProvider = ChangeNotifierProvider((ref) {
+    return ThemeParameters();
+  });
+  fromZeroThemeParametersProvider = themeParametersProvider;
+  RendererBinding.instance.deferFirstFrame();
+  runApp(const ProviderScope(
+    child: App(),
+  ),);
+  if (!kIsWeb && Platform.isWindows) {
+    if (kReleaseMode) {
+      try {
+        doWhenWindowReady(() {
+          try {
+            appWindow.minSize = const Size(512, 512);
+            appWindow.size = const Size(1280, 720);
+            appWindow.alignment = Alignment.center;
+            appWindow.maximize();
+            appWindow.show();
+          } catch (e, st) {
+            _reportWindowError(e, st);
+          }
+        });
+      } catch (e, st) {
+        _reportWindowError(e, st);
+      }
+    } else {
+      doWhenWindowReady(() {
+        appWindow.minSize = const Size(512, 512);
+        appWindow.show();
+      });
+    }
+  }
+}
+void _reportWindowError(Object e, StackTrace st) {
+  File logFile = File('cutrans_3.0_log_window.txt')..createSync(recursive: true);
+  final logFileWrite = logFile.openWrite();
+  logFileWrite.writeln('FATAL ERROR WHILE SHOWING WINDOW');
+  logFileWrite.writeln(e.toString());
+  logFileWrite.writeln(st.toString());
+}
+
+
+
+class App extends StatefulWidget {
+
+  const App({super.key});
+
+  @override
+  State<App> createState() => _AppState();
+
+}
+
+class _AppState extends State<App> {
+
+  late final GoRouter router = GoRouter(
+    initialLocation: '/splash',
+    // debugLogDiagnostics: true,
+    routes: GoRouteFromZero.getCleanRoutes(buildRoutes()),
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    RendererBinding.instance.allowFirstFrame();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ProviderScope(
-      child: MaterialApp(
-        title: 'Collections',
-        themeMode: ThemeMode.dark,
-        debugShowCheckedModeBanner: false,
-        darkTheme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            brightness: Brightness.dark,
-            seedColor: Colors.deepPurple,
-            background: Colors.black,
-          ),
-          useMaterial3: true,
-        ),
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: Colors.deepPurple,
-          ),
-          useMaterial3: true,
-        ),
-        home: const MainPage(),
+      child: Consumer(
+        builder: (context, ref, child) {
+          final themeParameters = ref.watch(themeParametersProvider);
+          return MaterialApp.router(
+            title: 'Collection App',
+            routerConfig: router,
+            debugShowCheckedModeBanner: false,
+            supportedLocales: const [
+              Locale('en'),
+            ],
+            localizationsDelegates: const [
+              ...GlobalMaterialLocalizations.delegates,
+              FromZeroLocalizations.delegate,
+//              AppLocalizations.delegate,
+            ],
+            shortcuts: {
+              ...WidgetsApp.defaultShortcuts,
+              ...fromZeroDefaultShortcuts,
+            },
+            actions: {
+              ...WidgetsApp.defaultActions,
+            },
+            themeMode: ThemeMode.dark,
+            // themeMode: themeParameters.themeMode,
+            theme: themeParameters.lightTheme,
+            darkTheme: themeParameters.darkTheme,
+            builder: (context, child) {
+              return FromZeroAppContentWrapper(
+                goRouter: router,
+                child: child!,
+              );
+            },
+          );
+        },
       ),
     );
   }
+
 }

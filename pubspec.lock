@@ -674,8 +674,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: b51918901ed00faf02c80b6dd18ce1bbe2c321f5
-      resolved-ref: b51918901ed00faf02c80b6dd18ce1bbe2c321f5
+      ref: f82cb53d7c47b3e17beffd29a468512a75b75f04
+      resolved-ref: f82cb53d7c47b3e17beffd29a468512a75b75f04
       url: "https://github.com/ross96D/mlog"
     source: git
     version: "1.0.0"

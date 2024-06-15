@@ -5,7 +5,10 @@ import 'package:collection_app/models/tag.dart';
 import 'package:collection_app/services/collection_service.dart';
 import 'package:collection_app/services/item_service.dart';
 import 'package:collection_app/services/tag_service.dart';
+import 'package:collection_app/util/logging.dart';
 import 'package:dartx/dartx_io.dart';
+import 'package:from_zero_ui/from_zero_ui.dart';
+import 'package:mlog/mlog.dart';
 import 'package:path/path.dart' as p;
 
 
@@ -124,7 +127,10 @@ void _processSubfolder(Directory folder, List<Tag> tags, {
     } else {
       const allowedExtensions = ['.mkv', '.mp4', '.mpg', '.mpeg', '.avi'];
       if (!allowedExtensions.contains(childExtension)) {
-        print ('Warning: Unallowed extension found: $childExtension -- $childAbsolutePath');
+        log (LgLvl.warning,
+          'Unallowed extension found: $childExtension -- $childAbsolutePath',
+          type: LgType.script,
+        );
         continue;
       }
       final childRelativePath = p.relative(childAbsolutePath, from: collection.baseDirectory);
