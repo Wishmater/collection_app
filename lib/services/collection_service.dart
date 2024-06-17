@@ -21,25 +21,31 @@ class CollectionService {
 
   bool addCollection(Collection collection, {
     bool checkIfAlreadyExists = true,
+    bool saveToDb = true,
   }) {
     if (checkIfAlreadyExists && _all.contains(collection)) {
       return false;
     }
     _all.add(collection);
     DbHelper.openDbForCollection(collection).then((_) {
-      DbHelper.saveCollection(collection);
+      if (saveToDb) {
+        DbHelper.saveCollection(collection);
+      }
     });
     return true;
   }
 
   bool addTagToCollection(Collection collection, Tag tag, {
     bool checkIfAlreadyExists = true,
+    bool saveToDb = true,
   }) {
     if (checkIfAlreadyExists && collection.tags.contains(tag)) {
       return false;
     }
     collection.tags.add(tag);
-    DbHelper.saveTagToCollection(tag, collection);
+    if (saveToDb) {
+      DbHelper.saveTagToCollection(tag, collection);
+    }
     return true;
   }
 

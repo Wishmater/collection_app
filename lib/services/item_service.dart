@@ -38,6 +38,7 @@ class ItemService {
 
   bool addItem(Collection collection, Item item, {
     bool checkIfAlreadyExists = true,
+    bool saveToDb = true,
   }) {
     bool done = false;
     if (checkIfAlreadyExists) {
@@ -56,9 +57,13 @@ class ItemService {
     }
     if (done) {
       for (final tag in item.tags) {
-        collectionService.addTagToCollection(collection, tag);
+        collectionService.addTagToCollection(collection, tag,
+          saveToDb: saveToDb,
+        );
       }
-      DbHelper.saveItem(item);
+      if (saveToDb) {
+        DbHelper.saveItem(item);
+      }
     }
     return done;
   }

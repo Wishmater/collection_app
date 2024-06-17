@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:collection_app/models/collection.dart';
 import 'package:collection_app/router.dart';
 import 'package:collection_app/scripts/import_prnhb_channels.dart';
+import 'package:collection_app/services/collection_service.dart';
 import 'package:collection_app/util/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -33,14 +34,19 @@ class PageSplashState extends ConsumerState<PageSplash> {
   Future<void> init() async {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async{
       sqfliteFfiInit();
-      await importPrnhbChannels(); // TODO 1 remove this from main once we have persisted data
+
+      // await importPrnhbChannels(); // TODO 1 remove this from main once we have persisted data
 
       final rootFolder = Directory(r'D:\Polnareff\prnhb\!channels');
       final collection = Collection(
         name: 'Prnhb Channels',
         baseDirectory: rootFolder.absolute.path,
       );
-      await DbHelper.openDbForCollection(collection);
+      collectionService.addCollection(collection,
+        checkIfAlreadyExists: false,
+        saveToDb: false,
+      );
+      await DbHelper.waitForAllDbOperationsToFinish();
 
       RouteMain().go(context);
     });

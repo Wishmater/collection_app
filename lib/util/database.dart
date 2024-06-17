@@ -4,6 +4,8 @@ import 'package:collection_app/models/collection.dart';
 import 'package:collection_app/models/item.dart';
 import 'package:collection_app/models/tag.dart';
 import 'package:collection_app/services/collection_service.dart';
+import 'package:collection_app/services/item_service.dart';
+import 'package:collection_app/services/tag_service.dart';
 import 'package:collection_app/util/logging.dart';
 import 'package:dartx/dartx_io.dart';
 import 'package:flutter/material.dart'; // for ValueNotifier :)
@@ -21,7 +23,7 @@ abstract class DbHelper {
   // TODO 1 when exiting the app, show an "are you sure message if there are DB operations pending"
   static final Map<Collection, Database> _openDatabases = {};
   static final Map<Collection, int> _nextItemId = {};
-  static final datetimeFormat = DateFormat('YYYY-MM-DD hh:mm:ss');
+  static final datetimeFormat = DateFormat('yyyy-MM-dd hh:mm:ss');
   static int getNextItemIdForCollection(Collection collection) {
     final id = _nextItemId[collection]!;
     _nextItemId[collection] = id + 1;
@@ -29,12 +31,15 @@ abstract class DbHelper {
   }
 
 
+
+  // SCAFFOLDING / INTERNAL DB UTILITY, USUALLY NOT CALLED FROM OUTSIDE THIS FILE
+
   static Map<String, bool> activeDbOperations = {};
   static ValueNotifier<int> activeDbOperationsCount = ValueNotifier(0);
   static ValueNotifier<int> activeDbOperationsBlockingCount = ValueNotifier(0);
   static void _onActiveOperationChanges() {
     activeDbOperationsCount.value = activeDbOperations.length;
-    activeDbOperationsCount.value = activeDbOperations.count((e) => e.value);
+    activeDbOperationsBlockingCount.value = activeDbOperations.count((e) => e.value);
   }
   
   static Future<void> waitForAllDbOperationsToFinish() async {
@@ -133,6 +138,9 @@ abstract class DbHelper {
   }
 
 
+
+  // DATABASE OPERATIONS AND MUTATIONS, USUALLY CALLED FROM SERVICES
+
   static Future<void> openDbForCollection(Collection collection, {
     String? dbPath,
   }) async {
@@ -167,14 +175,13 @@ abstract class DbHelper {
     if (exists) {
       activeDbOperations[operationId] = false;
       _onActiveOperationChanges();
-      _loadDataFromDb(collection, db);
+      await _loadDataFromDb(collection, db);
     } else {
       _nextItemId[collection] = 1;
     }
     activeDbOperations.remove(operationId);
     _onActiveOperationChanges();
   }
-
 
   static Future<void> saveCollection(Collection collection) async {
     return _executeDbOperation<void>(collection, (db, operationId) async {
@@ -193,7 +200,6 @@ abstract class DbHelper {
       ''', [...args, ...args],);
     });
   }
-
 
   static Future<void> saveTagToAllCollections(Tag tag) async {
     bool done = false;
@@ -252,7 +258,6 @@ abstract class DbHelper {
     });
   }
 
-
   static Future<void> saveItem(Item item) async {
     return _executeDbOperation<void>(item.collection, (db, operationId) async {
       return db.transaction<void>((txn) async {
@@ -291,11 +296,104 @@ abstract class DbHelper {
   }
 
 
+
+  // DATA LOADING AND SCHEMA MIGRATIONS, SHOULD ONLY BE CALLED ONCE ON APP STARTUP
+
   static Future<void> _loadDataFromDb(Collection collection, Database db) async {
-
-    _nextItemId[collection] = 1; // update with highest item id
+    // LOAD COLLECTION
+    final collectionQuery = await db.rawQuery(/*language=SQLite*/ '''
+      select * from collection
+    ''');
+    collection.name = collectionQuery[0]['name']! as String;
+    collection.added = datetimeFormat.parse(collectionQuery[0]['added']! as String);
+    collection.lastSeen = datetimeFormat.tryParse(collectionQuery[0]['lastSeen'] as String?);
+    collection.lastModified = datetimeFormat.tryParse(collectionQuery[0]['lastModified'] as String?);
+    collection.baseDirectory = collectionQuery[0]['baseDirectory'] as String?;
+    // LOAD TAGS
+    // TODO 2 PERFORMANCE play around more with json_group_array, to reduce query count
+    final tagQuery = await db.rawQuery(/*language=SQLite*/ '''
+      select tag.*
+              -- json_group_array(tA.alias) as aliases, 
+              -- json_group_array(tSC.parentTagName) as parents
+      from tag
+      -- left join tagAliases tA on tag.name = tA.tagName
+      -- left join tagSecondaryChildren tSC on tag.name = tSC.childTagName
+    ''');
+    // first pass to add basic tag data
+    final tags = <String, Tag>{};
+    for (final query in tagQuery) {
+      final tagName = query['name']! as String;
+      final aliasesQuery = await db.rawQuery(/*language=SQLite*/ '''
+        select alias 
+        from tagAliases
+        where tagName = ?
+      ''', [tagName],);
+      final tag = Tag(
+        name: tagName,
+        added: datetimeFormat.parse(query['added']! as String),
+        lastSeen: datetimeFormat.tryParse(query['lastSeen'] as String?),
+        lastModified: datetimeFormat.tryParse(query['lastModified'] as String?),
+        aliases: aliasesQuery.map((e) => e['alias']! as String).toList(),
+      );
+      tags[tag.name] = tag;
+    }
+    // second pass to add relations to other tags
+    for (final query in tagQuery) {
+      final tag = tags[query['name']! as String]!;
+      tag.parentTag = tags[query['parentTagName'] as String?];
+      final secondaryParentsQuery = await db.rawQuery(/*language=SQLite*/ '''
+        select parentTagName 
+        from tagSecondaryChildren
+        where childTagName = ?
+      ''', [tag.name],);
+      for (final query in secondaryParentsQuery) {
+        tag.secondaryParentTags.add(tags[query['parentTagName']! as String]!);
+      }
+    }
+    // final pass to add them to collection via service, which includes filling all reverse links info
+    for (final tag in tags.values) {
+      tagService.addTag(tag, collection,
+        checkIfAlreadyExists: false,
+        saveToDb: false,
+      );
+    }
+    // LOAD ITEMS
+    // TODO 2 PERFORMANCE play around more with json_group_array, to reduce query count
+    final itemQuery = await db.rawQuery(/*language=SQLite*/ '''
+      select item.*
+              -- json_group_array(iT.tagName) as tags
+      from item
+      -- left join itemTags iT on item.id = iT.itemId
+    ''');
+    _nextItemId[collection] = 1;
+    for (final query in itemQuery) {
+      final itemId = query['id']! as int;
+      final secondaryParentsQuery = await db.rawQuery(/*language=SQLite*/ '''
+        select tagName 
+        from itemTags
+        where itemId = ?
+      ''', [itemId],);
+      final item = Item(
+        collection: collection,
+        id: itemId,
+        name: query['name']! as String,
+        added: datetimeFormat.parse(query['added']! as String),
+        lastSeen: datetimeFormat.tryParse(query['lastSeen'] as String?),
+        lastModified: datetimeFormat.tryParse(query['lastModified'] as String?),
+        filePath: query['filePath'] as String?,
+        explorePriority: query['explorePriority'] as int?,
+        rating: query['rating'] as int?,
+        tags: secondaryParentsQuery.map((e) => tags[e['tagName']! as String]!).toList(),
+      );
+      if (_nextItemId[collection]! <= item.id) {
+        _nextItemId[collection] = item.id + 1;
+      }
+      itemService.addItem(collection, item,
+        checkIfAlreadyExists: false,
+        saveToDb: false,
+      );
+    }
   }
-
 
   static Future<void> _applySchemaMigration(Database db, int oldVersion, int newVersion) async {
     if (oldVersion<1 && newVersion>=1) {
@@ -352,9 +450,13 @@ abstract class DbHelper {
 }
 
 
-extension DateTryFormat on DateFormat {
+extension DateFormatTry on DateFormat {
   String? tryFormat(DateTime? dateTime) {
     if (dateTime==null) return null;
     return format(dateTime);
+  }
+  DateTime? tryParse(String? string) {
+    if (string==null) return null;
+    return parse(string);
   }
 }

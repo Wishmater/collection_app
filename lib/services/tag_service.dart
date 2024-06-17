@@ -43,6 +43,7 @@ class TagService {
 
   bool addTag(Tag tag, Collection collection, {
     bool checkIfAlreadyExists = true,
+    bool saveToDb = true,
   }) {
     if (checkIfAlreadyExists && _all.contains(tag)) {
       return false;
@@ -53,13 +54,19 @@ class TagService {
         saveToDb: false,
       );
     }
-    addChildren(tag, tag.childTags);
+    addChildren(tag, tag.childTags,
+      saveToDb: saveToDb,
+    );
     addSecondaryChildren(tag.secondaryParentTags, [tag],
       saveToDb: false,
     );
     // TODO 2 PERFORMANCE, we could just save the new relations directly and call this with saveToDb: false
-    addSecondaryChildren([tag], tag.secondaryChildTags);
-    collectionService.addTagToCollection(collection, tag);
+    addSecondaryChildren([tag], tag.secondaryChildTags,
+      saveToDb: saveToDb,
+    );
+    collectionService.addTagToCollection(collection, tag,
+      saveToDb: saveToDb,
+    );
     return true;
   }
 
