@@ -1,12 +1,13 @@
 import 'package:collection_app/models/collection.dart';
-import 'package:collection_app/models/item.dart';
+import 'package:collection_app/models/tag.dart';
+import 'package:collection_app/util/database.dart';
 
 
 final collectionService = CollectionService();
 
 class CollectionService {
 
-  final List<Collection> _all = [];
+  final List<Collection> _all = []; // TODO 2 PERFORMANCE maybe create a map from ID(name) to collection for faster search
 
 
   // GETS
@@ -21,10 +22,24 @@ class CollectionService {
   bool addCollection(Collection collection, {
     bool checkIfAlreadyExists = true,
   }) {
-    if (checkIfAlreadyExists && _all.any((e) => e.name==collection.name)) {
+    if (checkIfAlreadyExists && _all.contains(collection)) {
       return false;
     }
     _all.add(collection);
+    DbHelper.openDbForCollection(collection).then((_) {
+      DbHelper.saveCollection(collection);
+    });
+    return true;
+  }
+
+  bool addTagToCollection(Collection collection, Tag tag, {
+    bool checkIfAlreadyExists = true,
+  }) {
+    if (checkIfAlreadyExists && collection.tags.contains(tag)) {
+      return false;
+    }
+    collection.tags.add(tag);
+    DbHelper.saveTagToCollection(tag, collection);
     return true;
   }
 

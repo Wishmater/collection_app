@@ -1,7 +1,8 @@
 
 
 enum LgType {
-  script('script', '[SCRIPT]');
+  script('script', '[SCRIPT]'),
+  db('database', '[DB]');
 
   final String name;
   final String print;

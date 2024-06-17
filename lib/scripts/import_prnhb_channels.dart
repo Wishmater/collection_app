@@ -5,6 +5,7 @@ import 'package:collection_app/models/tag.dart';
 import 'package:collection_app/services/collection_service.dart';
 import 'package:collection_app/services/item_service.dart';
 import 'package:collection_app/services/tag_service.dart';
+import 'package:collection_app/util/database.dart';
 import 'package:collection_app/util/logging.dart';
 import 'package:dartx/dartx_io.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
@@ -12,7 +13,7 @@ import 'package:mlog/mlog.dart';
 import 'package:path/path.dart' as p;
 
 
-void importPrnhbChannels() {
+Future<void> importPrnhbChannels() async {
   final addedDatetime = DateTime.now();
   final rootFolder = Directory(r'D:\Polnareff\prnhb\!channels');
   final directChildren = rootFolder.listSync();
@@ -24,23 +25,24 @@ void importPrnhbChannels() {
   collectionService.addCollection(collection,
     checkIfAlreadyExists: false,
   );
+  await DbHelper.waitForAllDbOperationsToFinish();
   final rootTagCreator = Tag(
     added: addedDatetime,
     name: 'Creator',
   );
-  tagService.addTag(rootTagCreator,
+  tagService.addTag(rootTagCreator, collection,
     checkIfAlreadyExists: false,
   );
   final rootTagContent = Tag(
     added: addedDatetime,
     name: 'Content Tag',
   );
-  tagService.addTag(rootTagContent,
+  tagService.addTag(rootTagContent, collection,
     checkIfAlreadyExists: false,
   );
   for (final directChild in directChildren) {
     if (directChild is! Directory) continue;
-    if (directChild.name=='.collection_thumbnails') continue;
+    if (directChild.name=='.collection_app') continue;
     StringBuffer creatorBuffer = StringBuffer('');
     StringBuffer tagBuffer = StringBuffer('');
     bool insideParenthesis = false;
@@ -52,7 +54,7 @@ void importPrnhbChannels() {
           final newTag = tagService.getTagByNameOrCreate(Tag(
             name: newTagName,
             parentTag: rootTagContent,
-          ),);
+          ), collection,);
           creatorTags.add(newTag);
           tagBuffer.clear();
           if (char==')') {
@@ -76,7 +78,7 @@ void importPrnhbChannels() {
       parentTag: rootTagCreator,
       secondaryParentTags: creatorTags,
     );
-    tagService.addTag(creator,
+    tagService.addTag(creator, collection,
       checkIfAlreadyExists: false,
     );
     _processSubfolder(directChild, [creator],
@@ -85,6 +87,16 @@ void importPrnhbChannels() {
       rootTagContent: rootTagContent,
     );
   }
+  log(LgLvl.info,
+    'Successfully finished Prnhb Channels import process. Discovered:'
+        '\n    ${collection.tags.length} Tags'
+        '\n    ${collection.items.length} Items'
+        '\ndb saving will be executed in the background...',
+    type: LgType.script,
+  );
+  // TODO 2 PERFORMANCE it would be WAY more performant to not add the save operations individually, and instead save the entire collection as a single batch at the end
+  // await DbHelper.waitForAllDbOperationsToFinish(); // we don't actually need to await this, the app can keep working and execute all DB operations in the background
+  return;
 }
 
 
@@ -116,7 +128,7 @@ void _processSubfolder(Directory folder, List<Tag> tags, {
         addedTag = tagService.getTagByNameOrCreate(Tag(
           name: childName,
           parentTag: rootTagContent,
-        ),);
+        ), collection,);
       }
       _processSubfolder(child, [...tags, if (addedTag!=null) addedTag],
         addedDatetime: addedDatetime,
@@ -145,6 +157,7 @@ void _processSubfolder(Directory folder, List<Tag> tags, {
         if (rating!=null) name = name.substring(4);
       }
       final newItem = Item(
+        collection: collection,
         added: addedDatetime,
         name: name.trim(),
         filePath: childRelativePath,

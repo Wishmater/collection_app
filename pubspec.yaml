@@ -29,6 +29,7 @@ dependencies:
   # when updating, also try https://pub.dev/packages/riverpod_lint and https://pub.dev/packages/riverpod_generator
   hive: ^2.2.3
   hive_flutter: ^1.1.0
+  sqflite: 2.3.2
 
   # * Widgets / UI
   flutter_font_icons: ^2.2.7
@@ -50,6 +51,7 @@ dependencies:
   # * Specific Utility
   dio: ^5.3.2
   dio_smart_retry: ^5.0.0
+  uuid: 4.1.0
   mlog:
     git:
       url: https://github.com/ross96D/mlog
@@ -65,6 +67,7 @@ dev_dependencies:
     path: ../restrict_imports_linter/
   flutter_launcher_icons: ^0.13.1 # to run:  flutter pub run flutter_launcher_icons:main
   flutter_native_splash: ^2.3.2 # to run:  flutter pub run flutter_native_splash:create
+  sqflite_common_ffi: 2.3.0
 
 
 dependency_overrides:

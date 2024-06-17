@@ -1,3 +1,4 @@
+import 'package:collection_app/models/collection.dart';
 import 'package:collection_app/models/tag.dart';
 import 'package:collection_app/services/tag_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,10 +24,10 @@ abstract class TagProvider {
 
   // MUTATIONS
 
-  bool addTag(WidgetRef ref, Tag tag, {
+  bool addTag(WidgetRef ref, Tag tag, Collection collection, {
     bool checkIfAlreadyExists = true,
   }) {
-    final added = tagService.addTag(tag,
+    final added = tagService.addTag(tag, collection,
       checkIfAlreadyExists: checkIfAlreadyExists,
     );
     if (added) {

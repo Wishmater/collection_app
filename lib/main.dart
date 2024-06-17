@@ -6,6 +6,7 @@ import 'package:collection_app/router.dart';
 import 'package:collection_app/scripts/import_prnhb_channels.dart';
 import 'package:collection_app/theme_parameters.dart';
 import 'package:collection_app/util/logging.dart';
+import 'package:collection_app/widgets/utils/db_process_indicator_overlay.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -19,9 +20,6 @@ import 'package:mlog/mlog.dart';
 
 
 void main() async {
-
-  importPrnhbChannels(); // TODO 1 remove this from main once we have persisted data
-
   await initLogging();
   // TODO 2 implement proper handling of flutter errors in mlog
   if (kReleaseMode) {
@@ -62,6 +60,7 @@ Future<void> initLogging() async {
     FzLgType.appUpdate: LgLvl.info,
     FzLgType.dao: LgLvl.info,
     LgType.script: LgLvl.finer,
+    LgType.db: LgLvl.info,
   });
 }
 
@@ -157,9 +156,11 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
 
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey();
   late final GoRouter router = GoRouter(
     initialLocation: '/splash',
     // debugLogDiagnostics: true,
+    navigatorKey: navigatorKey,
     routes: GoRouteFromZero.getCleanRoutes(buildRoutes()),
   );
 
@@ -201,7 +202,9 @@ class _AppState extends State<App> {
             builder: (context, child) {
               return FromZeroAppContentWrapper(
                 goRouter: router,
-                child: child!,
+                child: DbProcessIndicatorOverlay(
+                  child: child!,
+                ),
               );
             },
           );

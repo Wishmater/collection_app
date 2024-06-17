@@ -2,6 +2,7 @@ import 'package:collection_app/models/collection.dart';
 import 'package:collection_app/models/item.dart';
 import 'package:collection_app/models/tag.dart';
 import 'package:collection_app/services/collection_service.dart';
+import 'package:collection_app/util/database.dart';
 import 'package:dartx/dartx.dart';
 
 
@@ -29,7 +30,7 @@ class ItemService {
     Collection? collection,
   }) {
     final items = collection?.items ?? getAllItems();
-    return items.where((item) => tags.all((tag) => item.tags.any((e) => e==tag))).toList();
+    return items.where((item) => tags.all((tag) => item.tags.contains(tag))).toList();
   }
 
 
@@ -38,9 +39,9 @@ class ItemService {
   bool addItem(Collection collection, Item item, {
     bool checkIfAlreadyExists = true,
   }) {
+    bool done = false;
     if (checkIfAlreadyExists) {
-      bool done = false;
-      if (true) { // TODO 1 how to uniquely identify an item ??
+      if (!collection.items.contains(item)) {
         collection.items.add(item);
         done = true;
       }
@@ -48,12 +49,18 @@ class ItemService {
         item.collection = collection;
         done = true;
       }
-      return done;
     } else {
       collection.items.add(item);
       item.collection = collection;
-      return true;
+      done = true;
     }
+    if (done) {
+      for (final tag in item.tags) {
+        collectionService.addTagToCollection(collection, tag);
+      }
+      DbHelper.saveItem(item);
+    }
+    return done;
   }
 
 }
