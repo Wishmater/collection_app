@@ -36,31 +36,51 @@ class ItemService {
 
   // MUTATIONS
 
-  bool addItem(Collection collection, Item item, {
+  bool addItem(Item item, {
     bool checkIfAlreadyExists = true,
     bool saveToDb = true,
   }) {
     bool done = false;
     if (checkIfAlreadyExists) {
-      if (!collection.items.contains(item)) {
-        collection.items.add(item);
-        done = true;
-      }
-      if (item.collection!=collection) {
-        item.collection = collection;
+      if (!item.collection.items.contains(item)) {
+        item.collection.items.add(item);
         done = true;
       }
     } else {
-      collection.items.add(item);
-      item.collection = collection;
+      item.collection.items.add(item);
       done = true;
     }
     if (done) {
       for (final tag in item.tags) {
-        collectionService.addTagToCollection(collection, tag,
+        collectionService.addTagToCollection(item.collection, tag,
           saveToDb: saveToDb,
         );
       }
+      if (saveToDb) {
+        DbHelper.saveItem(item);
+      }
+    }
+    return done;
+  }
+
+  bool addTagToItem(Item item, Tag tag, {
+    bool checkIfAlreadyExists = true,
+    bool saveToDb = true,
+  }) {
+    bool done = false;
+    if (checkIfAlreadyExists) {
+      if (!item.tags.contains(tag)) {
+        item.tags.add(tag);
+        done = true;
+      }
+    } else {
+      item.tags.add(tag);
+      done = true;
+    }
+    if (done) {
+      collectionService.addTagToCollection(item.collection, tag,
+        saveToDb: saveToDb,
+      );
       if (saveToDb) {
         DbHelper.saveItem(item);
       }

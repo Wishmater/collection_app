@@ -1,14 +1,13 @@
 import 'dart:io';
 
 import 'package:collection_app/models/collection.dart';
+import 'package:collection_app/providers/collection_provider.dart';
 import 'package:collection_app/router.dart';
 import 'package:collection_app/scripts/import_prnhb_channels.dart';
-import 'package:collection_app/services/collection_service.dart';
 import 'package:collection_app/util/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
-import 'package:sqflite_common/sqlite_api.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 
@@ -35,18 +34,19 @@ class PageSplashState extends ConsumerState<PageSplash> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async{
       sqfliteFfiInit();
 
-      // await importPrnhbChannels(); // TODO 1 remove this from main once we have persisted data
+      // TODO 1 streamline main initialization once we have persisted data
 
-      final rootFolder = Directory(r'D:\Polnareff\prnhb\!channels');
-      final collection = Collection(
-        name: 'Prnhb Channels',
-        baseDirectory: rootFolder.absolute.path,
-      );
-      collectionService.addCollection(collection,
-        checkIfAlreadyExists: false,
-        saveToDb: false,
-      );
-      await DbHelper.waitForAllDbOperationsToFinish();
+      await importPrnhbChannels();
+
+      // final collection = Collection(
+      //   name: 'Prnhb',
+      //   baseDirectory: r'D:\Polnareff\prnhb',
+      // );
+      // CollectionProvider.addCollection(ref, collection,
+      //   checkIfAlreadyExists: false,
+      //   saveToDb: false,
+      // );
+      // await DbHelper.waitForAllDbOperationsToFinish();
 
       RouteMain().go(context);
     });

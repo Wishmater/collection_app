@@ -19,11 +19,13 @@ abstract class CollectionProvider {
 
   // MUTATIONS
 
-  void addCollection(WidgetRef ref, Collection collection, {
+  static void addCollection(WidgetRef ref, Collection collection, {
     bool checkIfAlreadyExists = true,
+    bool saveToDb = true,
   }) {
     collectionService.addCollection(collection,
       checkIfAlreadyExists: checkIfAlreadyExists,
+      saveToDb: false,
     );
     ref.invalidate(all);
   }

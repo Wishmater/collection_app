@@ -388,7 +388,7 @@ abstract class DbHelper {
       if (_nextItemId[collection]! <= item.id) {
         _nextItemId[collection] = item.id + 1;
       }
-      itemService.addItem(collection, item,
+      itemService.addItem(item,
         checkIfAlreadyExists: false,
         saveToDb: false,
       );

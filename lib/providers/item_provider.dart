@@ -19,15 +19,15 @@ abstract class ItemProvider {
 
   // MUTATIONS
 
-  bool addItem(WidgetRef ref, Collection collection, Item item, {
+  bool addItem(WidgetRef ref, Item item, {
     bool checkIfAlreadyExists = true,
   }) {
-    final added = itemService.addItem(collection, item,
+    final added = itemService.addItem(item,
       checkIfAlreadyExists: checkIfAlreadyExists,
     );
     if (added) {
       ref.invalidate(all);
-      ref.invalidate(CollectionProvider.one.call(collection.name)); // TODO 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
+      ref.invalidate(CollectionProvider.one.call(item.collection.name)); // TODO 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
     }
     return added;
   }

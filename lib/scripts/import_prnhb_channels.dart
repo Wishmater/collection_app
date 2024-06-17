@@ -11,17 +11,25 @@ import 'package:dartx/dartx_io.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:mlog/mlog.dart';
 import 'package:path/path.dart' as p;
+import 'package:resolve_windows_shortcut/resolve_windows_shortcut.dart';
 
 
-Future<void> importPrnhbChannels() async {
+Future<void> importPrnhbChannels({
+  bool clearDb = true,
+}) async {
   final addedDatetime = DateTime.now();
-  final rootFolder = Directory(r'D:\Polnareff\prnhb\!channels');
-  final directChildren = rootFolder.listSync();
+  final rootFolder = Directory(r'D:\Polnareff\prnhb');
   final collection = Collection(
     added: addedDatetime,
-    name: 'Prnhb Channels',
+    name: 'Prnhb',
     baseDirectory: rootFolder.absolute.path,
   );
+  if (clearDb) {
+    final file = File(collection.getAbsoluteFilePathForDatabase()!);
+    if (file.existsSync()) {
+      file.deleteSync();
+    }
+  }
   collectionService.addCollection(collection,
     checkIfAlreadyExists: false,
   );
@@ -40,52 +48,36 @@ Future<void> importPrnhbChannels() async {
   tagService.addTag(rootTagContent, collection,
     checkIfAlreadyExists: false,
   );
-  for (final directChild in directChildren) {
-    if (directChild is! Directory) continue;
-    if (directChild.name=='.collection_app') continue;
-    StringBuffer creatorBuffer = StringBuffer('');
-    StringBuffer tagBuffer = StringBuffer('');
-    bool insideParenthesis = false;
-    List<Tag> creatorTags = [];
-    for (final char in directChild.nameWithoutExtension.trim().characters) {
-      if (insideParenthesis) {
-        if (char==')' || char==',') {
-          final newTagName = tagBuffer.toString().trim();
-          final newTag = tagService.getTagByNameOrCreate(Tag(
-            name: newTagName,
-            parentTag: rootTagContent,
-          ), collection,);
-          creatorTags.add(newTag);
-          tagBuffer.clear();
-          if (char==')') {
-            insideParenthesis = false;
-          }
-        } else {
-          tagBuffer.write(char);
-        }
-      } else {
-        if (char=='(') {
-          insideParenthesis = true;
-        } else {
-          creatorBuffer.write(char);
-        }
+  final unknownShortcutTag = Tag(
+    added: addedDatetime,
+    name: '!!! ATTENTION shortcut in unknown place during import',
+  );
+  tagService.addTag(unknownShortcutTag, collection,
+    checkIfAlreadyExists: false,
+  );
+  final Map<String, List<Tag>> addTagsToPathsAtTheEnd = {};
+  _processFolder(rootFolder, [],
+    collection: collection,
+    addedDatetime: addedDatetime,
+    rootTagCreator: rootTagCreator,
+    rootTagContent: rootTagContent,
+    unknownShortcutTag: unknownShortcutTag,
+    addTagsToPathsAtTheEnd: addTagsToPathsAtTheEnd,
+  );
+  for (final entry in addTagsToPathsAtTheEnd.entries) {
+    final item = collection.items.firstOrNullWhere((e) => e.filePath==entry.key);
+    if (item==null) {
+      log(LgLvl.info,
+        'Broken shortcut found to path: ${entry.key}'
+            '\n    The following tags were assigned to it: ${entry.value.map((e) => e.name)}',
+        type: LgType.script,
+      );
+    } else {
+      // TODO 2 PERFORMANCE it will be faster if there was a way to add all items at once :)
+      for (final tag in entry.value) {
+        itemService.addTagToItem(item, tag);
       }
     }
-    final creatorName = creatorBuffer.toString().trim();
-    final creator = Tag(
-      added: addedDatetime,
-      name: creatorName,
-      parentTag: rootTagCreator,
-      secondaryParentTags: creatorTags,
-    );
-    tagService.addTag(creator, collection,
-      checkIfAlreadyExists: false,
-    );
-    _processSubfolder(directChild, [creator],
-      collection: collection,
-      addedDatetime: addedDatetime,
-      rootTagContent: rootTagContent,
-    );
   }
   log(LgLvl.info,
     'Successfully finished Prnhb Channels import process. Discovered:'
@@ -100,10 +92,13 @@ Future<void> importPrnhbChannels() async {
 }
 
 
-void _processSubfolder(Directory folder, List<Tag> tags, {
+void _processFolder(Directory folder, List<Tag> tags, {
   required Collection collection,
   required Tag rootTagContent,
+  required Tag rootTagCreator,
+  required Tag unknownShortcutTag,
   required DateTime addedDatetime,
+  required Map<String, List<Tag>> addTagsToPathsAtTheEnd,
   int? priority,
 }) {
   final children = folder.listSync();
@@ -111,31 +106,87 @@ void _processSubfolder(Directory folder, List<Tag> tags, {
     final childName = child.nameWithoutExtension.trim();
     final childExtension = child.extension;
     final childAbsolutePath = child.absolute.path.trim();
+    if (childName=='.collection_app') continue;
     if (child is Directory) {
+      final parentName = child.parent.nameWithoutExtension.trim();
       int? childPriority;
       Tag? addedTag;
-      if (childName=='rated') {
-        // nothing
-      } else if (childName=='!') {
-        childPriority = 0;
-      } else if (childName=='New folder' || childName=='Nueva carpeta') {
-        childPriority = 1;
-      } else if (childName=='New folder (2)' || childName=='Nueva carpeta (2)') {
-        childPriority = 2;
-      } else if (childName=='New folder (3)' || childName=='Nueva carpeta (3)') {
-        childPriority = 3;
+      if (parentName=='!channels') {
+        StringBuffer creatorBuffer = StringBuffer('');
+        StringBuffer tagBuffer = StringBuffer('');
+        bool insideParenthesis = false;
+        List<Tag> creatorTags = [];
+        for (final char in childName.characters) {
+          if (insideParenthesis) {
+            if (char==')' || char==',') {
+              final newTagName = tagBuffer.toString().trim();
+              final newTag = tagService.getTagByNameOrCreate(Tag(
+                name: newTagName,
+                parentTag: rootTagContent,
+              ), collection,);
+              creatorTags.add(newTag);
+              tagBuffer.clear();
+              if (char==')') {
+                insideParenthesis = false;
+              }
+            } else {
+              tagBuffer.write(char);
+            }
+          } else {
+            if (char=='(') {
+              insideParenthesis = true;
+            } else {
+              creatorBuffer.write(char);
+            }
+          }
+        }
+        final creatorName = creatorBuffer.toString().trim();
+        final creator = Tag(
+          added: addedDatetime,
+          name: creatorName,
+          parentTag: rootTagCreator,
+          secondaryParentTags: creatorTags,
+        );
+        tagService.addTag(creator, collection,
+          checkIfAlreadyExists: false,
+        );
+        addedTag = creator;
       } else {
-        addedTag = tagService.getTagByNameOrCreate(Tag(
-          name: childName,
-          parentTag: rootTagContent,
-        ), collection,);
+        if (childName=='rated') {
+          // do nothing
+        } else if (childName=='!') {
+          childPriority = 0;
+        } else if (childName=='New folder' || childName=='Nueva carpeta') {
+          childPriority = 1;
+        } else if (childName=='New folder (2)' || childName=='Nueva carpeta (2)') {
+          childPriority = 2;
+        } else if (childName=='New folder (3)' || childName=='Nueva carpeta (3)') {
+          childPriority = 3;
+        } else {
+          addedTag = tagService.getTagByNameOrCreate(Tag(
+            name: childName,
+            parentTag: rootTagContent,
+          ), collection,);
+        }
       }
-      _processSubfolder(child, [...tags, if (addedTag!=null) addedTag],
+      _processFolder(child, [...tags, if (addedTag!=null) addedTag],
         addedDatetime: addedDatetime,
         collection: collection,
+        rootTagCreator: rootTagCreator,
         rootTagContent: rootTagContent,
         priority: childPriority ?? priority,
+        unknownShortcutTag: unknownShortcutTag,
+        addTagsToPathsAtTheEnd: addTagsToPathsAtTheEnd,
       );
+    } else if (childExtension=='.lnk') {
+      // do nothing with shortcuts inside channels
+      final resolvedShortcutPath = (child as File).resolveIfShortcutSync();
+      log (LgLvl.finer,
+        'Resolved shortcut path for file: $childAbsolutePath\n    $resolvedShortcutPath',
+        type: LgType.script,
+      );
+      addTagsToPathsAtTheEnd[resolvedShortcutPath] ??= [];
+      addTagsToPathsAtTheEnd[resolvedShortcutPath]!.add(unknownShortcutTag);
     } else {
       const allowedExtensions = ['.mkv', '.mp4', '.mpg', '.mpeg', '.avi'];
       if (!allowedExtensions.contains(childExtension)) {
@@ -165,7 +216,7 @@ void _processSubfolder(Directory folder, List<Tag> tags, {
         explorePriority: priority,
         rating: rating,
       );
-      itemService.addItem(collection, newItem,
+      itemService.addItem(newItem,
         checkIfAlreadyExists: false,
       );
     }
