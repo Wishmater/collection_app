@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:collection_app/models/collection.dart';
 import 'package:collection_app/models/item.dart';
@@ -181,6 +182,23 @@ abstract class DbHelper {
     }
     activeDbOperations.remove(operationId);
     _onActiveOperationChanges();
+  }
+
+  static Future<void> closeDbForCollection(Collection collection) async {
+    if (_openDatabases.containsKey(collection)) {
+      await _openDatabases[collection]!.close();
+      _openDatabases.remove(collection);
+    }
+  }
+
+  static Future<void> deleteDbForCollection(Collection collection, {
+    String? dbPath,
+  }) async {
+    await closeDbForCollection(collection);
+    final file = File(dbPath ?? collection.getAbsoluteFilePathForDatabase()!);
+    if (file.existsSync()) {
+      file.deleteSync();
+    }
   }
 
   static Future<void> saveCollection(Collection collection) async {

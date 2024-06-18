@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:collection_app/models/collection.dart';
 import 'package:collection_app/providers/collection_provider.dart';
 import 'package:collection_app/router.dart';
-import 'package:collection_app/scripts/import_prnhb_channels.dart';
 import 'package:collection_app/util/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -36,17 +35,17 @@ class PageSplashState extends ConsumerState<PageSplash> {
 
       // TODO 1 streamline main initialization once we have persisted data
 
-      await importPrnhbChannels();
+      // await importPrnhb();
 
-      // final collection = Collection(
-      //   name: 'Prnhb',
-      //   baseDirectory: r'D:\Polnareff\prnhb',
-      // );
-      // CollectionProvider.addCollection(ref, collection,
-      //   checkIfAlreadyExists: false,
-      //   saveToDb: false,
-      // );
-      // await DbHelper.waitForAllDbOperationsToFinish();
+      final collection = Collection(
+        name: 'Prnhb',
+        baseDirectory: r'D:\Polnareff\prnhb',
+      );
+      CollectionProvider.addCollection(ref, collection,
+        checkIfAlreadyExists: false,
+        saveToDb: false,
+      );
+      await DbHelper.waitForAllDbOperationsToFinish();
 
       RouteMain().go(context);
     });

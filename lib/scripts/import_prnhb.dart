@@ -14,7 +14,7 @@ import 'package:path/path.dart' as p;
 import 'package:resolve_windows_shortcut/resolve_windows_shortcut.dart';
 
 
-Future<void> importPrnhbChannels({
+Future<void> importPrnhb({
   bool clearDb = true,
 }) async {
   final addedDatetime = DateTime.now();
@@ -25,10 +25,7 @@ Future<void> importPrnhbChannels({
     baseDirectory: rootFolder.absolute.path,
   );
   if (clearDb) {
-    final file = File(collection.getAbsoluteFilePathForDatabase()!);
-    if (file.existsSync()) {
-      file.deleteSync();
-    }
+    await DbHelper.deleteDbForCollection(collection);
   }
   collectionService.addCollection(collection,
     checkIfAlreadyExists: false,

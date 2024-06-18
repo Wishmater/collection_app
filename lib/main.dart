@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:collection_app/router.dart';
-import 'package:collection_app/scripts/import_prnhb_channels.dart';
 import 'package:collection_app/theme_parameters.dart';
 import 'package:collection_app/util/logging.dart';
 import 'package:collection_app/widgets/utils/db_process_indicator_overlay.dart';
