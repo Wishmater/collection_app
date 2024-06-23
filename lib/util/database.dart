@@ -152,10 +152,22 @@ abstract class DbHelper {
     if (dbPath==null) {
       throw Exception("Collection path is null, and no custom database provided, so we don't know where to save the sqlite db :(");
     }
-    final exists = await databaseFactoryFfi.databaseExists(dbPath);
+    final dbFile = File(dbPath);
+    final collectionDataRoot = dbFile.parent;
+    if (!collectionDataRoot.existsSync()) {
+      await collectionDataRoot.create();
+      if (PlatformExtended.isWindows) {
+        await Process.run('attrib', ['+h', collectionDataRoot.absolute.path]); // hide folder
+      }
+    }
+    final dbExists = await databaseFactoryFfi.databaseExists(dbPath);
     final db = await databaseFactoryFfi.openDatabase(dbPath,
       options: OpenDatabaseOptions(
         version: _dbVersion,
+        onConfigure: (db) async {
+          // Add support for cascade delete
+          await db.execute("PRAGMA foreign_keys = ON");
+        },
         onCreate: (db, version) async {
           log(LgLvl.info,
             'Creating db for collection ${collection.name} at $dbPath',
@@ -173,7 +185,7 @@ abstract class DbHelper {
       ),
     );
     _openDatabases[collection] = db;
-    if (exists) {
+    if (dbExists) {
       activeDbOperations[operationId] = false;
       _onActiveOperationChanges();
       await _loadDataFromDb(collection, db);
