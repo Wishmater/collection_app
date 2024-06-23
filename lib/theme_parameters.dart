@@ -163,6 +163,8 @@ class ThemeParameters extends ThemeParametersFromZero {
   static const darkBackgroundColor = Color.fromRGBO(0, 0, 0, 1);
   static const darkForegroundColor = Color.fromRGBO(20, 20, 28, 1);
   static final darkDividerColor = Colors.grey.shade800;
+  static final darkIconColor = Colors.grey.shade400;
+  static final darkTextColor = Colors.grey.shade200;
   static final darkSplashColor = Colors.blue.shade600;
   ThemeData get opaqueDarkTheme {
     final theme = ThemeData(
@@ -273,12 +275,95 @@ class ThemeParameters extends ThemeParametersFromZero {
       ),
     );
     return theme.copyWith(
+      colorScheme: theme.colorScheme.copyWith(
+        outline: darkDividerColor,
+      ),
+      textTheme: theme.textTheme.copyWith(
+        labelSmall: theme.textTheme.labelSmall!.copyWith(
+          color: theme.textTheme.labelSmall!.color==Colors.white
+              ? darkTextColor
+              : theme.textTheme.labelSmall!.color,
+        ),
+        labelMedium: theme.textTheme.labelMedium!.copyWith(
+          color: theme.textTheme.labelMedium!.color==Colors.white
+              ? darkTextColor
+              : theme.textTheme.labelMedium!.color,
+        ),
+        labelLarge: theme.textTheme.labelLarge!.copyWith(
+          color: theme.textTheme.labelLarge!.color==Colors.white
+              ? darkTextColor
+              : theme.textTheme.labelLarge!.color,
+        ),
+        bodySmall: theme.textTheme.bodySmall!.copyWith(
+          color: theme.textTheme.bodySmall!.color==Colors.white
+              ? darkTextColor
+              : theme.textTheme.bodySmall!.color,
+        ),
+        bodyMedium: theme.textTheme.bodyMedium!.copyWith(
+          color: theme.textTheme.bodyMedium!.color==Colors.white
+              ? darkTextColor
+              : theme.textTheme.bodyMedium!.color,
+        ),
+        bodyLarge: theme.textTheme.bodyLarge!.copyWith(
+          color: theme.textTheme.bodyLarge!.color==Colors.white
+              ? darkTextColor
+              : theme.textTheme.bodyLarge!.color,
+        ),
+        titleSmall: theme.textTheme.titleSmall!.copyWith(
+          color: theme.textTheme.titleSmall!.color==Colors.white
+              ? darkTextColor
+              : theme.textTheme.titleSmall!.color,
+        ),
+        titleMedium: theme.textTheme.titleMedium!.copyWith(
+          color: theme.textTheme.titleMedium!.color==Colors.white
+              ? darkTextColor
+              : theme.textTheme.titleMedium!.color,
+        ),
+        titleLarge: theme.textTheme.titleLarge!.copyWith(
+          color: theme.textTheme.titleLarge!.color==Colors.white
+              ? darkTextColor
+              : theme.textTheme.titleLarge!.color,
+        ),
+        headlineSmall: theme.textTheme.headlineSmall!.copyWith(
+          color: theme.textTheme.headlineSmall!.color==Colors.white
+              ? darkTextColor
+              : theme.textTheme.headlineSmall!.color,
+        ),
+        headlineMedium: theme.textTheme.headlineMedium!.copyWith(
+          color: theme.textTheme.headlineMedium!.color==Colors.white
+              ? darkTextColor
+              : theme.textTheme.headlineMedium!.color,
+        ),
+        headlineLarge: theme.textTheme.headlineLarge!.copyWith(
+          color: theme.textTheme.headlineLarge!.color==Colors.white
+              ? darkTextColor
+              : theme.textTheme.headlineLarge!.color,
+        ),
+        displaySmall: theme.textTheme.displaySmall!.copyWith(
+          color: theme.textTheme.displaySmall!.color==Colors.white
+              ? darkTextColor
+              : theme.textTheme.displaySmall!.color,
+        ),
+        displayMedium: theme.textTheme.displayMedium!.copyWith(
+          color: theme.textTheme.displayMedium!.color==Colors.white
+              ? darkTextColor
+              : theme.textTheme.displayMedium!.color,
+        ),
+        displayLarge: theme.textTheme.displayLarge!.copyWith(
+          color: theme.textTheme.displayLarge!.color==Colors.white
+              ? darkTextColor
+              : theme.textTheme.displayLarge!.color,
+        ),
+      ),
       listTileTheme: theme.listTileTheme.copyWith(
         titleTextStyle: theme.textTheme.bodyLarge!.copyWith(
           height: 1.3,
           fontSize: 16,
           fontWeight: FontWeight.w600,
         ),
+      ),
+      iconTheme: theme.iconTheme.copyWith(
+        color: darkIconColor,
       ),
     );
   }

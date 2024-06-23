@@ -33,9 +33,11 @@ class MainPage extends StatelessWidget {
                 child: Stack(
                   children: [
                     const Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         FiltersWidget(),
-                        Expanded(child: TagsExplorer()),
+                        Expanded(child: TagsExplorerV1()),
                       ],
                     ),
                     Positioned(
@@ -71,13 +73,19 @@ class MainPage extends StatelessWidget {
               if (!showItemViewInMainPage) {
                 return const SizedBox.shrink();
               }
-              final openItem = ref.watch(AppStateProvider.openItem);
-              if (openItem==null) {
-                return const Expanded(child: SizedBox.shrink(),);
+              final selectedItem = ref.watch(AppStateProvider.selectedItem);
+              if (selectedItem!=null) {
+                return Expanded(
+                  child: Text('Selected Item: $selectedItem'),
+                );
               }
-              return Expanded(
-                child: Text('Open Item: $openItem'),
-              );
+              final selectedTag = ref.watch(AppStateProvider.selectedTag);
+              if (selectedTag!=null) {
+                return Expanded(
+                  child: Text('Selected Tag: $selectedTag'),
+                );
+              }
+              return const Expanded(child: SizedBox.shrink(),);
             },
           ),
           Consumer(

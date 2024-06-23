@@ -69,7 +69,6 @@ class ItemCardsExplorer extends ConsumerWidget {
             child: MultiTapListener(
               onDoubleTap: () {
                 final filePath = item.getAbsoluteFilePath();
-                ref.read(AppStateProvider.openItem.state).state = item;
                 if (!ref.read(AppStateProvider.showItemViewInMainPage)) {
                   if (filePath!=null) {
                     launch(filePath);

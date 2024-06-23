@@ -6,9 +6,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 
 
-class TagsExplorer extends ConsumerWidget {
+class TagsExplorerV1 extends ConsumerWidget {
 
-  const TagsExplorer({
+  const TagsExplorerV1({
     super.key,
   });
 
@@ -66,48 +66,60 @@ class TabExplorerItem extends ConsumerWidget {
           );
         },
       ),
-      // contextMenuActions: [
-      //   if (tag is DirectoryTag)
-      //     ActionFromZero(
-      //       title: 'Open in File Explorer',
-      //       icon: const Icon(Icons.window_sharp), // TODO 1 find the fucking popup icon
-      //       onTap: (context) {
-      //         launchUrl(Uri.file(tag.name, windows: Platform.isWindows));
-      //       },
-      //     ),
-      //   if (tag is! DirectoryTag)
-      //     ActionFromZero(
-      //       title: 'New Child Tag',
-      //       icon: const Icon(Icons.add),
-      //       onTap: (context) async {
-      //         final model = await TagDAO.buildDao(null, tag).maybeEdit(ref as BuildContext);
-      //         if (model!=null) {
-      //           selectedTag.value = model;
-      //         }
-      //       },
-      //     ),
-      //   ActionFromZero(
-      //     title: 'Edit Tag',
-      //     icon: const Icon(Icons.edit),
-      //     onTap: (context) async {
-      //       tag.parentTag.loadSync(); // this is not the best practice, but oh well
-      //       final model = await TagDAO.buildDao(tag, tag.parentTag.value).maybeEdit(ref as BuildContext);
-      //       if (model!=null) {
-      //         selectedTag.value = model;
-      //       }
-      //     },
-      //   ),
-      //   ActionFromZero(
-      //     title: 'Delete Tag',
-      //     icon: const Icon(Icons.delete_forever),
-      //     onTap: (context) async {
-      //       final result = await TagDAO.buildDao(tag, tag.parentTag.value).maybeDelete(ref as BuildContext);
-      //       if (result && selectedTag.value?.id==tag.id) {
-      //         selectedTag.value = null;
-      //       }
-      //     },
-      //   ),
-      // ],
+      contextMenuActions: [
+        // TODO 1 make this remove the tag
+        ActionFromZero(
+          title: 'Filter including tag',
+          icon: const Icon(Icons.filter_alt_outlined),
+          onTap: (context) {
+            final notifier = ref.read(AppStateProvider.filterIncludingTags.notifier);
+            if (!notifier.state.contains(tag)) {
+              notifier.state = [...notifier.state, tag];
+            }
+          },
+        ),
+        ActionFromZero(
+          title: 'Filter excluding tag',
+          icon: const Icon(Icons.filter_alt_off_outlined),
+          onTap: (context) {
+            final notifier = ref.read(AppStateProvider.filterExcludingTags.notifier);
+            if (!notifier.state.contains(tag)) {
+              notifier.state = [...notifier.state, tag];
+            }
+          },
+        ),
+        //   ActionFromZero(
+        //     title: 'New Child Tag',
+        //     icon: const Icon(Icons.add),
+        //     onTap: (context) async {
+        //       final model = await TagDAO.buildDao(null, tag).maybeEdit(ref as BuildContext);
+        //       if (model!=null) {
+        //         selectedTag.value = model;
+        //       }
+        //     },
+        //   ),
+        // ActionFromZero(
+        //   title: 'Edit Tag',
+        //   icon: const Icon(Icons.edit),
+        //   onTap: (context) async {
+        //     tag.parentTag.loadSync(); // this is not the best practice, but oh well
+        //     final model = await TagDAO.buildDao(tag, tag.parentTag.value).maybeEdit(ref as BuildContext);
+        //     if (model!=null) {
+        //       selectedTag.value = model;
+        //     }
+        //   },
+        // ),
+        // ActionFromZero(
+        //   title: 'Delete Tag',
+        //   icon: const Icon(Icons.delete_forever),
+        //   onTap: (context) async {
+        //     final result = await TagDAO.buildDao(tag, tag.parentTag.value).maybeDelete(ref as BuildContext);
+        //     if (result && selectedTag.value?.id==tag.id) {
+        //       selectedTag.value = null;
+        //     }
+        //   },
+        // ),
+      ],
       onExpansionChanged: (expanding) {
         final selectedTagState = ref.read(AppStateProvider.selectedTag.state);
         if (selectedTagState.state==tag) {
