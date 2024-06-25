@@ -83,7 +83,7 @@ class FiltersWidget extends StatelessWidget {
                               fontWeight: FontWeight.w900,
                               color: selected
                                   ? textStyle.color!.withOpacity(0.8)
-                                  : color,s
+                                  : color,
                             ),
                           ),
                         );
