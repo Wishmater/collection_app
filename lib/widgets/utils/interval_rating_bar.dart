@@ -7,8 +7,8 @@ class IntervalRatingBar extends StatelessWidget {
   final int max;
   final int? from;
   final int? to;
-  final ValueChanged<int?> onFromChanged;
-  final ValueChanged<int?> onToChanged;
+  final ValueChanged<int?>? onFromChanged;
+  final ValueChanged<int?>? onToChanged;
   final Color? color;
   final Widget Function(BuildContext context, int value, {required bool selected, Color? color}) widgetBuilder;
 
@@ -29,6 +29,7 @@ class IntervalRatingBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final count = max - min + 1;
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: List.generate(count, (i) {
         final value = i + min;
         final selected = from==null || to==null
@@ -43,19 +44,19 @@ class IntervalRatingBar extends StatelessWidget {
           willMoveFrom = fromDiff<=toDiff;
         }
         return DragTarget<bool>(
-          onWillAccept: (data) {
+          onWillAccept: onFromChanged==null||onToChanged==null ? null : (data) {
             if (data==null) return false;
             if (from==null || to==null) {
-              onFromChanged(value);
-              onToChanged(value);
+              onFromChanged!(value);
+              onToChanged!(value);
             } else if (value<from!) {
-              onFromChanged(value);
+              onFromChanged!(value);
             } else if (value>to!) {
-              onToChanged(value);
+              onToChanged!(value);
             } else if (data) {
-              onFromChanged(value);
+              onFromChanged!(value);
             } else {
-              onToChanged(value);
+              onToChanged!(value);
             }
             return false;
           },
@@ -64,22 +65,22 @@ class IntervalRatingBar extends StatelessWidget {
               data: willMoveFrom,
               feedback: const SizedBox.shrink(),
               child: InkWell(
-                onTap: () {
+                onTap: onFromChanged==null||onToChanged==null ? null : () {
                   if (from==null || to==null) {
-                    onFromChanged(value);
-                    onToChanged(value);
+                    onFromChanged!(value);
+                    onToChanged!(value);
                   } else if (value==from && value==to) {
-                    onFromChanged(null);
-                    onToChanged(null);
+                    onFromChanged!(null);
+                    onToChanged!(null);
                   } else if (value<from!) {
-                    onFromChanged(value);
+                    onFromChanged!(value);
                   } else if (value>to!) {
-                    onToChanged(value);
+                    onToChanged!(value);
                   } else {
                     if (willMoveFrom) {
-                      onFromChanged(value);
+                      onFromChanged!(value);
                     } else {
-                      onToChanged(value);
+                      onToChanged!(value);
                     }
                   }
                 },

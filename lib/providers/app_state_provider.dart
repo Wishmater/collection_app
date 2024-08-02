@@ -34,9 +34,11 @@ abstract class AppStateProvider {
 
   static final filterExcludingCollections = StateProvider((ref) => <Collection>[]);
 
+  static final filterRatingNull = StateProvider<bool>((ref) => false);
   static final filterRatingMin = StateProvider<int?>((ref) => null);
   static final filterRatingMax = StateProvider<int?>((ref) => null);
 
+  static final filterExplorePriorityNull = StateProvider<bool>((ref) => false);
   static final filterExplorePriorityMin = StateProvider<int?>((ref) => null);
   static final filterExplorePriorityMax = StateProvider<int?>((ref) => null);
 
@@ -57,8 +59,10 @@ abstract class AppStateProvider {
     final List<Item> result = [];
     final filterIncludingTags = ref.watch(AppStateProvider.filterIncludingTags);
     final filterExcludingTags = ref.watch(AppStateProvider.filterExcludingTags);
+    final filterRatingNull = ref.watch(AppStateProvider.filterRatingNull);
     final filterRatingMin = ref.watch(AppStateProvider.filterRatingMin);
     final filterRatingMax = ref.watch(AppStateProvider.filterRatingMax);
+    final filterExplorePriorityNull = ref.watch(AppStateProvider.filterExplorePriorityNull);
     final filterExplorePriorityMin = ref.watch(AppStateProvider.filterExplorePriorityMin);
     final filterExplorePriorityMax = ref.watch(AppStateProvider.filterExplorePriorityMax);
     final itemSearchQuery = ref.watch(AppStateProvider.itemSearchQuery)?.toLowerCase();
@@ -69,19 +73,31 @@ abstract class AppStateProvider {
       if (filterExcludingTags.isNotEmpty && e.tags.containsAny(filterExcludingTags)) {
         continue;
       }
-      if (filterRatingMin!=null && (e.rating==null || e.rating! < filterRatingMin)) {
-        continue;
+      if (filterRatingNull) {
+        if (e.rating!=null) {
+          continue;
+        }
+      } else {
+        if (filterRatingMin!=null && (e.rating==null || e.rating! < filterRatingMin)) {
+          continue;
+        }
+        if (filterRatingMax!=null && (e.rating==null || e.rating! > filterRatingMax)) {
+          continue;
+        }
       }
-      if (filterRatingMax!=null && (e.rating==null || e.rating! > filterRatingMax)) {
-        continue;
-      }
-      if (filterExplorePriorityMin!=null
-          && (e.explorePriority==null || e.explorePriority! < filterExplorePriorityMin)) {
-        continue;
-      }
-      if (filterExplorePriorityMax!=null
-          && (e.explorePriority==null || e.explorePriority! > filterExplorePriorityMax)) {
-        continue;
+      if (filterExplorePriorityNull) {
+        if (e.explorePriority!=null) {
+          continue;
+        }
+      } else {
+        if (filterExplorePriorityMin!=null
+            && (e.explorePriority==null || e.explorePriority! < filterExplorePriorityMin)) {
+          continue;
+        }
+        if (filterExplorePriorityMax!=null
+            && (e.explorePriority==null || e.explorePriority! > filterExplorePriorityMax)) {
+          continue;
+        }
       }
       if (itemSearchQuery!=null && !e.name.toLowerCase().contains(itemSearchQuery)) {
         continue;

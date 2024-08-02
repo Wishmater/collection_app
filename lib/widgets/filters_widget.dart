@@ -13,6 +13,7 @@ class FiltersWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textStyle = Theme.of(context).textTheme.titleMedium!;
     return Padding(
       padding: const EdgeInsets.only(left: 12, right: 12, top: 4, bottom: 8),
       child: Column(
@@ -24,23 +25,70 @@ class FiltersWidget extends StatelessWidget {
             builder: (context, ref, child) {
               final filterRatingMin = ref.watch(AppStateProvider.filterRatingMin);
               final filterRatingMax = ref.watch(AppStateProvider.filterRatingMax);
-              return Row(
+              final filterRatingNull = ref.watch(AppStateProvider.filterRatingNull);
+              final color = Color.alphaBlend(Colors.yellow.withOpacity(0.6), Theme.of(context).canvasColor);
+              return Wrap(
                 children: [
                   const SizedBox(
                     width: 56,
                     child: Text('Rating:'),
                   ),
-                  Expanded(
-                    child: IntervalRatingBar(
-                      min: 1, max: 6,
-                      color: Color.alphaBlend(Colors.yellow.withOpacity(0.6), Theme.of(context).canvasColor),
-                      from: filterRatingMin, to: filterRatingMax,
-                      onFromChanged: (value) {
-                        ref.read(AppStateProvider.filterRatingMin.notifier).state = value;
-                      },
-                      onToChanged: (value) {
-                        ref.read(AppStateProvider.filterRatingMax.notifier).state = value;
-                      },
+                  IntervalRatingBar(
+                    min: 1, max: 10,
+                    color: filterRatingNull ? Theme.of(context).disabledColor : color,
+                    from: filterRatingMin, to: filterRatingMax,
+                    onFromChanged: filterRatingNull ? null : (value) {
+                      ref.read(AppStateProvider.filterRatingMin.notifier).state = value;
+                    },
+                    onToChanged: filterRatingNull ? null : (value) {
+                      ref.read(AppStateProvider.filterRatingMax.notifier).state = value;
+                    },
+                    widgetBuilder: (context, value, {required selected, color}) {
+                      return AnimatedContainer(
+                        width: value==10 ? 24 : 18, height: 24,
+                        duration: const Duration(milliseconds: 100),
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: selected ? color : null,
+                          borderRadius: BorderRadius.horizontal(
+                            left: filterRatingMin==value ? const Radius.circular(6) : Radius.zero,
+                            right: filterRatingMax==value ? const Radius.circular(6) : Radius.zero,
+                          ),
+                        ),
+                        child: Text(value.toString(),
+                          style: textStyle.copyWith(
+                            fontWeight: FontWeight.w900,
+                            color: selected
+                                ? textStyle.color!.withOpacity(0.8)
+                                : color,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(width: 12,),
+                  InkWell(
+                    onTap: () {
+                      ref.read(AppStateProvider.filterRatingNull.notifier).state = !filterRatingNull;
+                    },
+                    child: AnimatedContainer(
+                      width: 38, height: 24,
+                      duration: const Duration(milliseconds: 100),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: filterRatingNull
+                            ? color
+                            : null,
+                        borderRadius: const BorderRadius.all(Radius.circular(6)),
+                      ),
+                      child: Text('null',
+                        style: textStyle.copyWith(
+                          fontWeight: FontWeight.w900,
+                          color: filterRatingNull
+                              ? textStyle.color!.withOpacity(0.8)
+                              : color,
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -52,42 +100,70 @@ class FiltersWidget extends StatelessWidget {
             builder: (context, ref, child) {
               final filterExplorePriorityMin = ref.watch(AppStateProvider.filterExplorePriorityMin);
               final filterExplorePriorityMax = ref.watch(AppStateProvider.filterExplorePriorityMax);
-              return Row(
+              final filterExplorePriorityNull = ref.watch(AppStateProvider.filterExplorePriorityNull);
+              final color = Color.alphaBlend(Colors.purple.withOpacity(0.8), Theme.of(context).canvasColor);
+              return Wrap(
                 children: [
                   const SizedBox(
                     width: 56,
                     child: Text('Priority:'),
                   ),
-                  Expanded(
-                    child: IntervalRatingBar(
-                      min: 0, max: 3,
-                      color: Color.alphaBlend(Colors.purple.withOpacity(0.8), Theme.of(context).canvasColor),
-                      from: filterExplorePriorityMin, to: filterExplorePriorityMax,
-                      onFromChanged: (value) {
-                        ref.read(AppStateProvider.filterExplorePriorityMin.notifier).state = value;
-                      },
-                      onToChanged: (value) {
-                        ref.read(AppStateProvider.filterExplorePriorityMax.notifier).state = value;
-                      },
-                      widgetBuilder: (context, value, {required selected, color}) {
-                        final textStyle = Theme.of(context).textTheme.titleMedium!;
-                        return Container(
-                          width: 24, height: 24,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                            color: selected ? color : null,
-                            borderRadius: const BorderRadius.all(Radius.circular(6)),
+                  IntervalRatingBar(
+                    min: 0, max: 3,
+                    color: filterExplorePriorityNull ? Theme.of(context).disabledColor : color,
+                    from: filterExplorePriorityMin, to: filterExplorePriorityMax,
+                    onFromChanged: filterExplorePriorityNull ? null : (value) {
+                      ref.read(AppStateProvider.filterExplorePriorityMin.notifier).state = value;
+                    },
+                    onToChanged: filterExplorePriorityNull ? null : (value) {
+                      ref.read(AppStateProvider.filterExplorePriorityMax.notifier).state = value;
+                    },
+                    widgetBuilder: (context, value, {required selected, color}) {
+                      final textStyle = Theme.of(context).textTheme.titleMedium!;
+                      return Container(
+                        width: 20, height: 24,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: selected ? color : null,
+                          borderRadius: BorderRadius.horizontal(
+                            left: filterExplorePriorityMin==value ? const Radius.circular(6) : Radius.zero,
+                            right: filterExplorePriorityMax==value ? const Radius.circular(6) : Radius.zero,
                           ),
-                          child: Text(value.toString(),
-                            style: textStyle.copyWith(
-                              fontWeight: FontWeight.w900,
-                              color: selected
-                                  ? textStyle.color!.withOpacity(0.8)
-                                  : color,
-                            ),
+                        ),
+                        child: Text(value.toString(),
+                          style: textStyle.copyWith(
+                            fontWeight: FontWeight.w900,
+                            color: selected
+                                ? textStyle.color!.withOpacity(0.8)
+                                : color,
                           ),
-                        );
-                      },
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(width: 12,),
+                  InkWell(
+                    onTap: () {
+                      ref.read(AppStateProvider.filterExplorePriorityNull.notifier).state = !filterExplorePriorityNull;
+                    },
+                    child: AnimatedContainer(
+                      width: 38, height: 24,
+                      duration: const Duration(milliseconds: 100),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: filterExplorePriorityNull
+                            ? color
+                            : null,
+                        borderRadius: const BorderRadius.all(Radius.circular(6)),
+                      ),
+                      child: Text('null',
+                        style: textStyle.copyWith(
+                          fontWeight: FontWeight.w900,
+                          color: filterExplorePriorityNull
+                              ? textStyle.color!.withOpacity(0.8)
+                              : color,
+                        ),
+                      ),
                     ),
                   ),
                 ],
