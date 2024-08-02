@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:collection_app/providers/app_state_provider.dart';
+import 'package:collection_app/widgets/item_explorer_appbar.dart';
 import 'package:collection_app/widgets/item_thumbnail/video_cached_thumbnail.dart';
 import 'package:collection_app/widgets/utils/multi_tap_recognizer.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +26,6 @@ class ItemCardsExplorer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final scrollController = ScrollController();
     final items = ref.watch(AppStateProvider.itemsWithCurrentFilters);
-    const toolbarHeight = 42.0;
     return Stack(
       children: [
         ScrollbarFromZero(
@@ -38,7 +38,7 @@ class ItemCardsExplorer extends ConsumerWidget {
             padding: const EdgeInsets.only(
               left: horizontalSpacing/2, right: horizontalSpacing/2,
               bottom: verticalSpacing/2,
-              top: verticalSpacing/2 + toolbarHeight,
+              top: verticalSpacing/2 + ItemExplorerAppbar.toolbarHeight,
             ),
             // crossAxisSpacing: horizontalSpacing,
             // mainAxisSpacing: verticalSpacing,
@@ -108,41 +108,6 @@ class ItemCardsExplorer extends ConsumerWidget {
                 ),
               );
             },
-          ),
-        ),
-        Positioned(
-          top: 0, left: 0, right: 0,
-          child: AppbarFromZero(
-            toolbarHeight: toolbarHeight,
-            backgroundColor: Theme.of(context).canvasColor.withOpacity(0.7),
-            title: Text('${NumberFormat.decimalPattern().format(items.length)} items',
-              style: Theme.of(context).textTheme.titleSmall,
-            ),
-            actions: [
-              ActionFromZero(
-                title: 'Search',
-                icon: const Icon(Icons.search),
-                centerExpanded: false,
-                expandedBuilder: ({required context, required title, color, disablingError, icon, onTap}) {
-                  return SizedBox(
-                    width: 256,
-                    child: TextField(
-                      decoration: InputDecoration(
-                        isDense: true,
-                        labelText: 'Search',
-                        floatingLabelStyle: TextStyle(height: 0.5, color: Theme.of(context).iconTheme.color,),
-                        labelStyle: TextStyle(color: Theme.of(context).iconTheme.color,),
-                        suffixIcon: Icon(Icons.search, size: 24, color: Theme.of(context).iconTheme.color,),
-                        border: InputBorder.none,
-                      ),
-                      onChanged: (value) {
-                        ref.read(AppStateProvider.itemSearchQuery.notifier).state = value;
-                      },
-                    ),
-                  );
-                },
-              ),
-            ],
           ),
         ),
       ],

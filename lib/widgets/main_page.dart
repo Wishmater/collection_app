@@ -1,6 +1,7 @@
 import 'package:collection_app/providers/app_state_provider.dart';
 import 'package:collection_app/widgets/filters_widget.dart';
 import 'package:collection_app/widgets/item_cards_explorer.dart';
+import 'package:collection_app/widgets/item_explorer_appbar.dart';
 import 'package:collection_app/widgets/tags_explorer.dart';
 import 'package:dartx/dartx_io.dart';
 import 'package:flutter/material.dart';
@@ -97,6 +98,10 @@ class MainPage extends StatelessWidget {
                 children: [
                   const ItemCardsExplorer(
                     isMainScrollbar: true,
+                  ),
+                  const Positioned(
+                    top: 0, left: 0, right: 0,
+                    child: ItemExplorerAppbar(),
                   ),
                   if (showItemViewInMainPage)
                     Positioned(
