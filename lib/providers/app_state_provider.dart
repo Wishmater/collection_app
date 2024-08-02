@@ -40,6 +40,8 @@ abstract class AppStateProvider {
   static final filterExplorePriorityMin = StateProvider<int?>((ref) => null);
   static final filterExplorePriorityMax = StateProvider<int?>((ref) => null);
 
+  static final itemSearchQuery = StateProvider<String?>((ref) => null);
+
   static final itemsWithCurrentFilters = StateProvider((ref) {
     final filterIncludingCollections = ref.watch(AppStateProvider.filterIncludingCollections);
     final List<Collection> collections = filterIncludingCollections.isNotEmpty
@@ -59,6 +61,7 @@ abstract class AppStateProvider {
     final filterRatingMax = ref.watch(AppStateProvider.filterRatingMax);
     final filterExplorePriorityMin = ref.watch(AppStateProvider.filterExplorePriorityMin);
     final filterExplorePriorityMax = ref.watch(AppStateProvider.filterExplorePriorityMax);
+    final itemSearchQuery = ref.watch(AppStateProvider.itemSearchQuery)?.toLowerCase();
     for (final e in collections.flatMap((e) => e.items)) {
       if (filterIncludingTags.isNotEmpty && !e.tags.containsAll(filterIncludingTags)) {
         continue;
@@ -78,6 +81,9 @@ abstract class AppStateProvider {
       }
       if (filterExplorePriorityMax!=null
           && (e.explorePriority==null || e.explorePriority! > filterExplorePriorityMax)) {
+        continue;
+      }
+      if (itemSearchQuery!=null && !e.name.toLowerCase().contains(itemSearchQuery)) {
         continue;
       }
       result.add(e);
