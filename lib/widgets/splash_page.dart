@@ -3,10 +3,13 @@ import 'dart:io';
 import 'package:collection_app/models/collection.dart';
 import 'package:collection_app/providers/collection_provider.dart';
 import 'package:collection_app/router.dart';
+import 'package:collection_app/scripts/import_prnhb.dart';
 import 'package:collection_app/util/database.dart';
+import 'package:dartx/dartx_io.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
+import 'package:hive/hive.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 
@@ -33,9 +36,9 @@ class PageSplashState extends ConsumerState<PageSplash> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async{
       sqfliteFfiInit();
 
-      // TODO 1 streamline main initialization once we have persisted data
+      // TODO 1 remove all hardcoded stuff from main initialization once we have persisted data, collection selection UI and scripts UI
 
-      // await importPrnhb();
+      await importPrnhb();
 
       final collection = Collection(
         name: 'Prnhb',
@@ -47,7 +50,29 @@ class PageSplashState extends ConsumerState<PageSplash> {
       );
       await DbHelper.waitForAllDbOperationsToFinish();
 
-      RouteMain().go(context);
+      // TODO 1 re-add this once we have a collections UI where we can select new ones, and they're saved to hive box
+      // final collectionsBox = Hive.box<(String, DateTime)>('collections');
+      // List<(String, String, DateTime)> collections = [];
+      // for (final key in collectionsBox.keys) {
+      //   final value = collectionsBox.get(key)!;
+      //   collections.add((key, value.$1, value.$2));
+      // }
+      // collections = collections.sortedByDescending((e) => e.$3);
+      // if (collections.isNotEmpty) {
+      //   final collection = Collection(
+      //     name: collections.first.$1,
+      //     baseDirectory: collections.first.$2,
+      //   );
+      //   CollectionProvider.addCollection(ref, collection,
+      //     checkIfAlreadyExists: false,
+      //     saveToDb: false,
+      //   );
+      //   await DbHelper.waitForAllDbOperationsToFinish();
+      // }
+
+      if (context.mounted) {
+        RouteMain().go(context);
+      }
     });
   }
 

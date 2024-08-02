@@ -83,7 +83,7 @@ void initLoggingDebug() {
     );
     if (message!=null) {
       if (PlatformExtended.isAndroid) {
-        // TODO 2 better logging handling in Android
+        // TODO 3 better logging handling in Android
         // in android, stdout.writeln doesn't show in dev console
         print(message); // ignore: avoid_print
       } else {
