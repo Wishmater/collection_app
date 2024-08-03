@@ -13,11 +13,20 @@ class Item {
   DateTime? lastSeen;
   DateTime? lastModified;
   String? filePath;
-  // List<String> sourceUrls;
-  // TODO 2 PERFORMANCE maybe create a map from ID(name) to tag for faster search
-  List<Tag> tags;
+  // List<String> sourceUrls; // TODO 2 meaybe implement this in the future...
+  List<Tag> tags; // TODO 2 PERFORMANCE maybe create a map from ID(name) to tag for faster search
   int? explorePriority;
   int? rating;
+
+  // metadata
+  ItemType? itemType;
+  DateTime? metadataLastUpdated;
+  DateTime? fileCreated;
+  DateTime? fileModified;
+  int? filesize;
+  int? resolutionWidth; /// only on types: image, video
+  int? resolutionHeight; /// only on types: image, video
+  Duration? duration; /// only on types: video, audio
 
   Item({
     required this.collection,
@@ -30,6 +39,15 @@ class Item {
     List<Tag>? tags,
     this.explorePriority,
     this.rating,
+    // metadata
+    this.itemType,
+    this.metadataLastUpdated,
+    this.fileCreated,
+    this.fileModified,
+    this.filesize,
+    this.resolutionWidth, /// only on types: image, video
+    this.resolutionHeight, /// only on types: image, video
+    this.duration, /// only on types: video, audio
   })  : assert(id!=null || collection!=null, 'Item ID must be directly supplied, or a collection must be specified to get the next id from it'),
         id = id ?? DbHelper.getNextItemIdForCollection(collection!),
         added = added ?? DateTime.now(),
@@ -61,4 +79,12 @@ class Item {
     return result;
   }
 
+}
+
+
+enum ItemType {
+  image,
+  video,
+  audio,
+  unknown,
 }

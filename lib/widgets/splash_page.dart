@@ -38,7 +38,7 @@ class PageSplashState extends ConsumerState<PageSplash> {
 
       // TODO 1 remove all hardcoded stuff from main initialization once we have persisted data, collection selection UI and scripts UI
 
-      await importPrnhb();
+      // await importPrnhb();
 
       final collection = Collection(
         name: 'Prnhb',

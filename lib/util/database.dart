@@ -19,7 +19,7 @@ import 'package:uuid/uuid.dart';
 
 abstract class DbHelper {
 
-  static const _dbVersion = 1;
+  static const _dbVersion = 2;
   // TODO 1 make sure all DBs are closed gracefully when exiting the app
   // TODO 1 when exiting the app, show an "are you sure message if there are DB operations pending"
   static final Map<Collection, Database> _openDatabases = {};
@@ -300,15 +300,26 @@ abstract class DbHelper {
           item.filePath,
           item.explorePriority,
           item.rating,
+          // metadata
+          item.itemType,
+          datetimeFormat.tryFormat(item.metadataLastUpdated),
+          datetimeFormat.tryFormat(item.fileCreated),
+          datetimeFormat.tryFormat(item.fileModified),
+          item.filesize,
+          item.resolutionWidth,
+          item.resolutionHeight,
+          item.duration?.inMilliseconds,
         ];
         // TODO 2 PERFORMANCE this can probably be way more optimized,
         //   including reducing the amount of queries, making some of them optional
         //   or allowing to add/remove specific relations instead of saving all of them
         await txn.execute(/*language=SQLite*/ '''
           insert into item 
-            values (?, ?, ?, ?, ?, ?, ?, ?)
+            values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
           on conflict (id) do update 
-            set id=?, name=?, added=?, lastSeen=?, lastModified=?, filePath=?, explorePriority=?, rating=?;
+            set id=?, name=?, added=?, lastSeen=?, lastModified=?, filePath=?, explorePriority=?, rating=?,
+                itemType=?, metadataLastUpdated=?, fileCreated=?, fileModified=?, filesize=?, 
+                resolutionWidth=?, resolutionHeight=?, duration=?;
         ''', [...args, ...args],);
         for (final tag in item.tags) {
           final args = [
@@ -414,6 +425,14 @@ abstract class DbHelper {
         explorePriority: query['explorePriority'] as int?,
         rating: query['rating'] as int?,
         tags: secondaryParentsQuery.map((e) => tags[e['tagName']! as String]!).toList(),
+        itemType: query['itemType']==null ? null : ItemType.values[query['itemType']! as int],
+        metadataLastUpdated: datetimeFormat.tryParse(query['metadataLastUpdated'] as String?),
+        fileCreated: datetimeFormat.tryParse(query['fileCreated'] as String?),
+        fileModified: datetimeFormat.tryParse(query['fileModified'] as String?),
+        filesize: query['filesize'] as int?,
+        resolutionWidth: query['resolutionWidth'] as int?,
+        resolutionHeight: query['resolutionHeight'] as int?,
+        duration: query['duration']==null ? null : Duration(milliseconds: query['duration']! as int),
       );
       if (_nextItemId[collection]! <= item.id) {
         _nextItemId[collection] = item.id + 1;
@@ -473,6 +492,18 @@ abstract class DbHelper {
           foreign key(itemId) references item(id),
           foreign key(tagName) references tag(name)
         );
+      ''');
+    }
+    if (oldVersion<2 && newVersion>=2) {
+      await db.execute(/*language=SQLite*/ '''
+        alter table item add column itemType int;
+        alter table item add column metadataLastUpdated datetime;
+        alter table item add column fileCreated datetime;
+        alter table item add column fileModified datetime;
+        alter table item add column filesize int;
+        alter table item add column resolutionWidth int;
+        alter table item add column resolutionHeight int;
+        alter table item add column duration int;
       ''');
     }
   }

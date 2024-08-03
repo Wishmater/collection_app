@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:collection_app/models/collection.dart';
 import 'package:collection_app/models/item.dart';
 import 'package:collection_app/providers/collection_provider.dart';
@@ -16,6 +18,16 @@ abstract class ItemProvider {
     return ref.watch(CollectionProvider.all).flatMap((e) => e.items);
   });
 
+  static final one = StateProvider.family((ref, (Collection collection, int id) param) {
+    return param.$1.items.firstWhere((e) => e.id==param.$2);
+  });
+  static void invalidateOne(WidgetRef ref, Item item) {
+    ref.invalidate(one.call((item.collection, item.id))); // TODO 2 PERFORMANCE: this triggers the provider to re-search the item list. Ideally we just notify listeners if replaceInList==false.
+    _updatedItemIdsStreamController.add(item);
+  }
+  static final StreamController<Item> _updatedItemIdsStreamController = StreamController.broadcast();
+  static Stream<Item> get updatedItemIdsStream => _updatedItemIdsStreamController.stream;
+
 
   // MUTATIONS
 
@@ -27,9 +39,21 @@ abstract class ItemProvider {
     );
     if (added) {
       ref.invalidate(all);
-      ref.invalidate(CollectionProvider.one.call(item.collection.name)); // TODO 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
+      ref.invalidate(CollectionProvider.one.call(item.collection.name)); // TODO 2 PERFORMANCE: this triggers the provider to re-search in the list of all items. Ideally we just notify listeners.
     }
     return added;
+  }
+
+  bool saveItem(WidgetRef ref, Item item, {
+    bool replaceInList = false, /// usually not necessary, because we work by mutating the same object
+  }) {
+    final saved = itemService.saveItem(item,
+      replaceInList: false,
+    );
+    if (saved) {
+      invalidateOne(ref, item);
+    }
+    return true;
   }
 
 }

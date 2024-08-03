@@ -63,6 +63,20 @@ class ItemService {
     return done;
   }
 
+  bool saveItem(Item item, {
+    bool replaceInList = false, /// usually not necessary, because we work by mutating the same object
+    bool saveToDb = true,
+  }) {
+    if (replaceInList) {
+      final index = item.collection.items.indexWhere((e) => e.id==item.id);
+      if (index<0) throw Exception('Trying to save item, but item not found in Collection: $item');
+    }
+    if (saveToDb) {
+      DbHelper.saveItem(item); // TODO 3 PERFORMANCE, in some cases (or all cases?), we can skip updating the relations in db (like tags)
+    }
+    return true;
+  }
+
   bool addTagToItem(Item item, Tag tag, {
     bool checkIfAlreadyExists = true,
     bool saveToDb = true,
