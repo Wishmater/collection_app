@@ -185,7 +185,7 @@ void _processFolder(Directory folder, List<Tag> tags, {
       addTagsToPathsAtTheEnd[resolvedShortcutPath] ??= [];
       addTagsToPathsAtTheEnd[resolvedShortcutPath]!.add(unknownShortcutTag);
     } else {
-      const allowedExtensions = ['.mkv', '.mp4', '.mpg', '.mpeg', '.avi'];
+      const allowedExtensions = ItemType.videoExtensions;
       if (!allowedExtensions.contains(childExtension)) {
         log (LgLvl.warning,
           'Unallowed extension found: $childExtension -- $childAbsolutePath',

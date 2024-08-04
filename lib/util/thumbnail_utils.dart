@@ -5,7 +5,7 @@ import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:mlog/mlog.dart';
 
 
-abstract class VideoThumbnailUtils {
+abstract class ThumbnailUtils {
 
   static Future<Directory?> ensureThumbnailFolderCreated(Collection collection) async {
     final folderPath = collection.getAbsoluteFilePathForThumbnailsFolder();

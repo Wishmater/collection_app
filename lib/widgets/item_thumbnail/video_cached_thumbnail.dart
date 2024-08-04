@@ -26,6 +26,7 @@ class _VideoCachedThumbnailState extends ConsumerState<VideoCachedThumbnail> {
   Widget build(BuildContext context) {
     return ApiProviderBuilder(
       provider: DataProvider.thumbnail.call(widget.item),
+      animatedSwitcherType: AnimatedSwitcherType.normal,
       dataBuilder: (context, file) {
         if (file==null) {
           return const SizedBox.shrink();

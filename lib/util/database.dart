@@ -301,7 +301,7 @@ abstract class DbHelper {
           item.explorePriority,
           item.rating,
           // metadata
-          item.itemType,
+          item.itemType?.index,
           datetimeFormat.tryFormat(item.metadataLastUpdated),
           datetimeFormat.tryFormat(item.fileCreated),
           datetimeFormat.tryFormat(item.fileModified),

@@ -53,6 +53,7 @@ class Item {
         added = added ?? DateTime.now(),
         tags = tags ?? [];
 
+
   @override
   bool operator ==(Object other) => identical(this, other)
       || other is Item
@@ -65,6 +66,9 @@ class Item {
 
   @override
   String toString() => '(Item: $name)';
+
+
+  bool get hasMetadata => metadataLastUpdated!=null;
 
   String? getAbsoluteFilePath() {
     if (filePath==null) return null;
@@ -86,5 +90,16 @@ enum ItemType {
   image,
   video,
   audio,
-  unknown,
+  unknown;
+
+  static const imageExtensions = ['.png', '.jpg', '.jpeg', '.webp', '.bmp'];
+  static const videoExtensions = ['.mp4', '.mkv', '.gif', '.mpg', '.mpeg', '.avi']; // TODO 3 test GIF files, should we treat them as videos or as images?
+  static const audioExtensions = ['.mp3', '.wav'];
+  static ItemType inferFromExtension(String extension) {
+    if (!extension.startsWith('.')) extension = '.$extension';
+    if (imageExtensions.contains(extension)) return ItemType.image;
+    if (videoExtensions.contains(extension)) return ItemType.video;
+    if (audioExtensions.contains(extension)) return ItemType.audio;
+    return ItemType.unknown;
+  }
 }

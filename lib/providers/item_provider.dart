@@ -21,7 +21,7 @@ abstract class ItemProvider {
   static final one = StateProvider.family((ref, (Collection collection, int id) param) {
     return param.$1.items.firstWhere((e) => e.id==param.$2);
   });
-  static void invalidateOne(WidgetRef ref, Item item) {
+  static void invalidateOne(Ref ref, Item item) {
     ref.invalidate(one.call((item.collection, item.id))); // TODO 2 PERFORMANCE: this triggers the provider to re-search the item list. Ideally we just notify listeners if replaceInList==false.
     _updatedItemIdsStreamController.add(item);
   }
@@ -31,7 +31,7 @@ abstract class ItemProvider {
 
   // MUTATIONS
 
-  bool addItem(WidgetRef ref, Item item, {
+  static bool addItem(Ref ref, Item item, {
     bool checkIfAlreadyExists = true,
   }) {
     final added = itemService.addItem(item,
@@ -44,7 +44,7 @@ abstract class ItemProvider {
     return added;
   }
 
-  bool saveItem(WidgetRef ref, Item item, {
+  static bool saveItem(Ref ref, Item item, {
     bool replaceInList = false, /// usually not necessary, because we work by mutating the same object
   }) {
     final saved = itemService.saveItem(item,
