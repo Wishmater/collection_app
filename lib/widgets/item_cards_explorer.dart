@@ -130,6 +130,27 @@ class _ItemCardsWidgetState extends ConsumerState<ItemCardsWidget> {
       case ItemType.unknown:
         thumbnail = const ErrorSign(title: '');
     }
+    if (item.duration!=null) {
+      thumbnail = Stack(
+        children: [
+          thumbnail,
+          Positioned(
+            bottom: -0.5, // fixes an ugly rendering bug on windows
+            right: 0,
+            child: Container(
+              padding: const EdgeInsets.only(left: 5, right: 2.5, top: 2, bottom: 1.5),
+              decoration: BoxDecoration(
+                borderRadius: const BorderRadius.only(topLeft: Radius.circular(4)),
+                color: Theme.of(context).canvasColor.withOpacity(0.6),
+              ),
+              child: Text(_printDuration(item.duration!),
+                style: Theme.of(context).textTheme.labelMedium,
+              ),
+            ),
+          ),
+        ],
+      );
+    }
     return ContextMenuFromZero(
       actions: [
         ActionFromZero(
@@ -191,4 +212,12 @@ class _ItemCardsWidgetState extends ConsumerState<ItemCardsWidget> {
     );
   }
 
+}
+
+
+String _printDuration(Duration duration) {
+  String twoDigits(int n) => n.toString().padLeft(2, "0");
+  String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60).abs());
+  String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60).abs());
+  return "${duration.inHours==0 ? '' : '${twoDigits(duration.inHours)}:'}$twoDigitMinutes:$twoDigitSeconds";
 }
