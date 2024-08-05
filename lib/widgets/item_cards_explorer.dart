@@ -42,7 +42,7 @@ class ItemCardsExplorer extends ConsumerWidget {
         padding: const EdgeInsets.only(
           left: horizontalSpacing/2, right: horizontalSpacing/2,
           bottom: verticalSpacing/2,
-          top: verticalSpacing/2 + ItemExplorerAppbar.toolbarHeight,
+          top: verticalSpacing/2 + ItemExplorerAppbar.toolbarHeight - 4,
         ),
         // crossAxisSpacing: horizontalSpacing,
         // mainAxisSpacing: verticalSpacing,

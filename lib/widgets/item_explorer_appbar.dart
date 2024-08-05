@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 
 class ItemExplorerAppbar extends ConsumerWidget {
 
-  static const toolbarHeight = 42.0;
+  static const toolbarHeight = 46.0;
 
   const ItemExplorerAppbar({super.key});
 
@@ -38,6 +38,7 @@ class ItemExplorerAppbar extends ConsumerWidget {
                     labelStyle: TextStyle(color: Theme.of(context).iconTheme.color,),
                     suffixIcon: Icon(Icons.search, size: 24, color: Theme.of(context).iconTheme.color,),
                     border: InputBorder.none,
+                    contentPadding: const EdgeInsets.only(bottom: 4),
                   ),
                   onChanged: (value) {
                     ref.read(AppStateProvider.itemSearchQuery.notifier).state = value;
