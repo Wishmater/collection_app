@@ -31,7 +31,12 @@ class _VideoCachedThumbnailState extends ConsumerState<VideoCachedThumbnail> {
         if (file==null) {
           return const SizedBox.shrink();
         }
-        return Image.file(file);
+        return SizedBox(
+          width: double.infinity,
+          child: Image.file(file,
+            fit: BoxFit.fitWidth,
+          ),
+        );
       },
     );
   }

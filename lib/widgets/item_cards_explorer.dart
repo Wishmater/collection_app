@@ -32,29 +32,25 @@ class ItemCardsExplorer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final scrollController = ScrollController();
     final items = ref.watch(AppStateProvider.itemsWithCurrentFilters);
-    return Stack(
-      children: [
-        ScrollbarFromZero(
-          controller: scrollController,
-          mainScrollbar: isMainScrollbar,
-          child: AlignedGridView.extent(
-            controller: scrollController,
-            itemCount: items.length,
-            maxCrossAxisExtent: 256,
-            padding: const EdgeInsets.only(
-              left: horizontalSpacing/2, right: horizontalSpacing/2,
-              bottom: verticalSpacing/2,
-              top: verticalSpacing/2 + ItemExplorerAppbar.toolbarHeight,
-            ),
-            // crossAxisSpacing: horizontalSpacing,
-            // mainAxisSpacing: verticalSpacing,
-            itemBuilder: (context, index) {
-              final item = items[index];
-              return ItemCardsWidget(item: item);
-            },
-          ),
+    return ScrollbarFromZero(
+      controller: scrollController,
+      mainScrollbar: isMainScrollbar,
+      child: AlignedGridView.extent(
+        controller: scrollController,
+        itemCount: items.length,
+        maxCrossAxisExtent: 256,
+        padding: const EdgeInsets.only(
+          left: horizontalSpacing/2, right: horizontalSpacing/2,
+          bottom: verticalSpacing/2,
+          top: verticalSpacing/2 + ItemExplorerAppbar.toolbarHeight,
         ),
-      ],
+        // crossAxisSpacing: horizontalSpacing,
+        // mainAxisSpacing: verticalSpacing,
+        itemBuilder: (context, index) {
+          final item = items[index];
+          return ItemCardsWidget(item: item);
+        },
+      ),
     );
   }
 
@@ -151,6 +147,44 @@ class _ItemCardsWidgetState extends ConsumerState<ItemCardsWidget> {
         ],
       );
     }
+    final isSelected = ref.watch(AppStateProvider.selectedItem.select((v) => v==item));
+    Widget result = MultiTapListener(
+      onDoubleTap: () {
+        final filePath = item.getAbsoluteFilePath();
+        if (filePath!=null) {
+          launch(filePath);
+        }
+      },
+      child: InkWell(
+        borderRadius: const BorderRadius.all(Radius.circular(6)),
+        onTap: () {
+          ref.read(AppStateProvider.selectedItem.state).state = item;
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+            horizontal: ItemCardsExplorer.horizontalSpacing/2,
+            vertical: ItemCardsExplorer.verticalSpacing/2,
+          ),
+          decoration: !isSelected ? null : BoxDecoration(
+            color: Colors.blueAccent.withOpacity(0.2),
+            borderRadius: const BorderRadius.all(Radius.circular(6)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AspectRatio(
+                aspectRatio: 16/9,
+                child: thumbnail,
+              ),
+              Text(item.name),
+              // TODO 1 show tags
+              // TODO 1 show explore priority
+              // TODO 1 show rating
+            ],
+          ),
+        ),
+      ),
+    );
     return ContextMenuFromZero(
       actions: [
         ActionFromZero(
@@ -174,41 +208,7 @@ class _ItemCardsWidgetState extends ConsumerState<ItemCardsWidget> {
           },
         ),
       ],
-      child: MultiTapListener(
-        onDoubleTap: () {
-          final filePath = item.getAbsoluteFilePath();
-          if (!ref.read(AppStateProvider.showItemViewInMainPage)) {
-            if (filePath!=null) {
-              launch(filePath);
-            }
-          }
-        },
-        child: InkWell(
-          borderRadius: const BorderRadius.all(Radius.circular(6)),
-          onTap: () {
-            ref.read(AppStateProvider.selectedItem.state).state = item;
-          },
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: ItemCardsExplorer.horizontalSpacing/2,
-              vertical: ItemCardsExplorer.verticalSpacing/2,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                AspectRatio(
-                  aspectRatio: 16/9,
-                  child: thumbnail,
-                ),
-                Text(item.name),
-                // TODO 1 show tags
-                // TODO 1 show explore priority
-                // TODO 1 show rating
-              ],
-            ),
-          ),
-        ),
-      ),
+      child: result,
     );
   }
 

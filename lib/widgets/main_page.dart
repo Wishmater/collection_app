@@ -1,6 +1,7 @@
 import 'package:collection_app/providers/app_state_provider.dart';
 import 'package:collection_app/widgets/filters_widget.dart';
 import 'package:collection_app/widgets/item_cards_explorer.dart';
+import 'package:collection_app/widgets/item_details_view.dart';
 import 'package:collection_app/widgets/item_explorer_appbar.dart';
 import 'package:collection_app/widgets/tags_explorer.dart';
 import 'package:dartx/dartx_io.dart';
@@ -18,7 +19,6 @@ class MainPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.sizeOf(context).width;
-    final screenWidthThird = screenWidth / 3;
     return ScaffoldFromZero(
       appbarType: AppbarType.none,
       constraintBodyOnXLargeScreens: false,
@@ -28,7 +28,7 @@ class MainPage extends StatelessWidget {
           Consumer(
             builder: (context, ref, child) {
               double tagsColumnWidth = ref.watch(AppStateProvider.tagsColumnWidth)
-                  .coerceAtMost(screenWidthThird);
+                  .coerceAtMost(screenWidth / 3);
               return SizedBox(
                 width: tagsColumnWidth,
                 child: Stack(
@@ -55,10 +55,16 @@ class MainPage extends StatelessWidget {
                           onPanUpdate: (details) {
                             if (details.delta.dx!=0) {
                               tagsColumnWidth = (tagsColumnWidth + details.delta.dx)
-                                  .clamp(AppStateProvider.mainPageMinColumnWidth, screenWidthThird);
+                                  .clamp(AppStateProvider.mainPageMinColumnWidth, screenWidth / 3);
                               ref.read(AppStateProvider.tagsColumnWidth.notifier)
                                   .setState(tagsColumnWidth);
                             }
+                          },
+                          onDoubleTap: () {
+                            tagsColumnWidth = AppStateProvider.mainPageDefaultTagsColumnWidth
+                                .clamp(AppStateProvider.mainPageMinColumnWidth, screenWidth / 3);
+                            ref.read(AppStateProvider.tagsColumnWidth.notifier)
+                                .setState(tagsColumnWidth);
                           },
                         ),
                       ),
@@ -70,34 +76,15 @@ class MainPage extends StatelessWidget {
           ),
           Consumer(
             builder: (context, ref, child) {
-              final showItemViewInMainPage = ref.watch(AppStateProvider.showItemViewInMainPage);
-              if (!showItemViewInMainPage) {
-                return const SizedBox.shrink();
-              }
-              final selectedItem = ref.watch(AppStateProvider.selectedItem);
-              if (selectedItem!=null) {
-                return Expanded(
-                  child: Text('Selected Item: $selectedItem'),
-                );
-              }
-              final selectedTag = ref.watch(AppStateProvider.selectedTag);
-              if (selectedTag!=null) {
-                return Expanded(
-                  child: Text('Selected Tag: $selectedTag'),
-                );
-              }
-              return const Expanded(child: SizedBox.shrink(),);
-            },
-          ),
-          Consumer(
-            builder: (context, ref, child) {
-              final itemsColumnWidth = ref.watch(AppStateProvider.itemsColumnWidth)
-                  .coerceAtMost(screenWidthThird);
-              final showItemViewInMainPage = ref.watch(AppStateProvider.showItemViewInMainPage);
+              double itemsColumnWidth = ref.watch(AppStateProvider.itemsColumnWidth)
+                  .coerceAtMost(screenWidth / 2);
+              final showItemViewInMainPage = ref.watch(AppStateProvider.showItemViewInMainPage)
+                  && ref.watch(AppStateProvider.selectedItem.select((v) => v!=null));
               Widget result = Stack(
                 children: [
                   const ItemCardsExplorer(
                     isMainScrollbar: true,
+                    // isMainScrollbar: !showItemViewInMainPage,
                   ),
                   const Positioned(
                     top: 0, left: 0, right: 0,
@@ -105,9 +92,32 @@ class MainPage extends StatelessWidget {
                   ),
                   if (showItemViewInMainPage)
                     Positioned(
-                      top: 0, bottom: 0, left: 0, width: 1,
+                      top: 0, bottom: 0, right: 0, width: 1,
                       child: ColoredBox(
                         color: Theme.of(context).dividerColor,
+                      ),
+                    ),
+                  if (showItemViewInMainPage)
+                    Positioned(
+                      top: 0, bottom: 0, right: 0, width: 8,
+                      child: MouseRegion(
+                        cursor: SystemMouseCursors.resizeColumn,
+                        child: GestureDetector(
+                          onPanUpdate: (details) {
+                            if (details.delta.dx!=0) {
+                              itemsColumnWidth = (itemsColumnWidth + details.delta.dx)
+                                  .clamp(AppStateProvider.mainPageMinColumnWidth, screenWidth / 2);
+                              ref.read(AppStateProvider.itemsColumnWidth.notifier)
+                                  .setState(itemsColumnWidth);
+                            }
+                          },
+                          onDoubleTap: () {
+                            itemsColumnWidth = AppStateProvider.mainPageDefaultItemsColumnWidth
+                                .clamp(AppStateProvider.mainPageMinColumnWidth, screenWidth / 2);
+                            ref.read(AppStateProvider.itemsColumnWidth.notifier)
+                                .setState(itemsColumnWidth);
+                          },
+                        ),
                       ),
                     ),
                 ],
@@ -123,6 +133,31 @@ class MainPage extends StatelessWidget {
                 );
               }
               return result;
+            },
+          ),
+          Consumer(
+            builder: (context, ref, child) {
+              final showItemViewInMainPage = ref.watch(AppStateProvider.showItemViewInMainPage);
+              if (!showItemViewInMainPage) {
+                return const SizedBox.shrink();
+              }
+              final selectedItem = ref.watch(AppStateProvider.selectedItem);
+              if (selectedItem==null) {
+                return const SizedBox.shrink();
+              }
+              return Expanded(
+                child: ItemDetailsView(
+                  item: selectedItem,
+                  isMainScrollbar: true,
+                ),
+              );
+              // final selectedTag = ref.watch(AppStateProvider.selectedTag);
+              // if (selectedTag!=null) {
+              //   return Expanded(
+              //     child: Text('Selected Tag: $selectedTag'),
+              //   );
+              // }
+              return const Expanded(child: SizedBox.shrink(),);
             },
           ),
         ],

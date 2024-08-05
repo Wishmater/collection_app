@@ -22,24 +22,27 @@ class ItemExplorerAppbar extends ConsumerWidget {
       ),
       actions: [
         ActionFromZero(
-          title: 'Search',
+          title: 'Search items',
           icon: const Icon(Icons.search),
           centerExpanded: false,
           expandedBuilder: ({required context, required title, color, disablingError, icon, onTap}) {
-            return SizedBox(
-              width: 256,
-              child: TextField(
-                decoration: InputDecoration(
-                  isDense: true,
-                  labelText: 'Search',
-                  floatingLabelStyle: TextStyle(height: 0.5, color: Theme.of(context).iconTheme.color,),
-                  labelStyle: TextStyle(color: Theme.of(context).iconTheme.color,),
-                  suffixIcon: Icon(Icons.search, size: 24, color: Theme.of(context).iconTheme.color,),
-                  border: InputBorder.none,
+            return Align(
+              alignment: Alignment.centerRight,
+              child: SizedBox(
+                width: 256,
+                child: TextField(
+                  decoration: InputDecoration(
+                    isDense: true,
+                    labelText: 'Search',
+                    floatingLabelStyle: TextStyle(height: 0.5, color: Theme.of(context).iconTheme.color,),
+                    labelStyle: TextStyle(color: Theme.of(context).iconTheme.color,),
+                    suffixIcon: Icon(Icons.search, size: 24, color: Theme.of(context).iconTheme.color,),
+                    border: InputBorder.none,
+                  ),
+                  onChanged: (value) {
+                    ref.read(AppStateProvider.itemSearchQuery.notifier).state = value;
+                  },
                 ),
-                onChanged: (value) {
-                  ref.read(AppStateProvider.itemSearchQuery.notifier).state = value;
-                },
               ),
             );
           },

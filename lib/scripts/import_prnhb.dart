@@ -149,7 +149,7 @@ void _processFolder(Directory folder, List<Tag> tags, {
         );
         addedTag = creator;
       } else {
-        if (childName=='rated') {
+        if (childName=='rated' || childName=='!channels') {
           // do nothing
         } else if (childName=='!') {
           childPriority = 0;
