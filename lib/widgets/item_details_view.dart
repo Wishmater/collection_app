@@ -56,8 +56,11 @@ class ItemDetailsView extends ConsumerWidget {
         slivers: [
           SliverToBoxAdapter(
             child: AppbarFromZero(
-              title: Text(item.name,
-                style: Theme.of(context).textTheme.titleMedium,
+              key: ValueKey(item.name), // fixes weird behaviour in OverflowScroll when switching items
+              title: OverflowScroll(
+                child: Text(item.name,
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
               ),
               backgroundColor: Theme.of(context).canvasColor.withOpacity(0.7),
               actions: [
