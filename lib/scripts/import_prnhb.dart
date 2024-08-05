@@ -204,6 +204,15 @@ void _processFolder(Directory folder, List<Tag> tags, {
         rating = int.tryParse(name[1]);
         if (rating!=null) name = name.substring(4);
       }
+      if (rating!=null) {
+        if (rating==6) {
+          rating = 10;
+        } else if (rating==5) {
+          rating = 9;
+        } else {
+          rating *= 2;
+        }
+      }
       final newItem = Item(
         collection: collection,
         added: addedDatetime,
