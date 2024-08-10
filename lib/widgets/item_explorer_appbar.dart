@@ -30,7 +30,8 @@ class ItemExplorerAppbar extends ConsumerWidget {
               alignment: Alignment.centerRight,
               child: SizedBox(
                 width: 256,
-                child: TextField(
+                child: TextFormField(
+                  initialValue: ref.read(AppStateProvider.itemSearchQuery),
                   decoration: InputDecoration(
                     isDense: true,
                     labelText: 'Search',

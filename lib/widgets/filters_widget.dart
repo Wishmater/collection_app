@@ -109,7 +109,7 @@ class FiltersWidget extends StatelessWidget {
                     child: Text('Priority:'),
                   ),
                   IntervalRatingBar(
-                    min: 0, max: 3,
+                    min: -6, max: 3,
                     color: filterExplorePriorityNull ? Theme.of(context).disabledColor : color,
                     from: filterExplorePriorityMin, to: filterExplorePriorityMax,
                     onFromChanged: filterExplorePriorityNull ? null : (value) {
@@ -121,7 +121,7 @@ class FiltersWidget extends StatelessWidget {
                     widgetBuilder: (context, value, {required selected, color}) {
                       final textStyle = Theme.of(context).textTheme.titleMedium!;
                       return Container(
-                        width: 20, height: 24,
+                        width: value<0 ? 20 : 18, height: 24,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
                           color: selected ? color!.withOpacity(color.opacity*0.6) : null,
