@@ -99,10 +99,12 @@ enum ItemType {
   album;
 
   static const imageExtensions = ['.png', '.jpg', '.jpeg', '.webp', '.bmp'];
-  static const videoExtensions = ['.mp4', '.mkv', '.gif', '.mpg', '.mpeg', '.avi']; // TODO 3 test GIF files, should we treat them as videos or as images?
+  // TODO 3 test GIF files, should we treat them as videos or as images?
+  static const videoExtensions = ['.mp4', '.mkv', '.gif', '.mpg', '.mpeg', '.webm', '.avi', '.rmvb', '.wmv', '.mov'];
   static const audioExtensions = ['.mp3', '.wav'];
   static ItemType inferFromExtension(String extension) {
     if (!extension.startsWith('.')) extension = '.$extension';
+    extension = extension.toLowerCase();
     if (imageExtensions.contains(extension)) return ItemType.image;
     if (videoExtensions.contains(extension)) return ItemType.video;
     if (audioExtensions.contains(extension)) return ItemType.audio;

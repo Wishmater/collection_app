@@ -48,6 +48,7 @@ Future<void> importPrnhb({
     name: 'Prnhb',
     baseDirectory: rootFolder.absolute.path,
   );
+  collectionService.removeCollection(collection);
   if (clearDb) {
     await DbHelper.deleteDbForCollection(collection);
   }
@@ -68,7 +69,7 @@ Future<void> importPrnhb({
     name: '!!! ATTENTION shortcut in unknown place during import',
   ), collection,);
   final Map<String, List<Tag>> addTagsToPathsAtTheEnd = {};
-  _processFolder(rootFolder, [],
+  await _processFolder(rootFolder, [],
     collection: collection,
     addedDatetime: addedDatetime,
     rootTagCreator: rootTagCreator,
@@ -105,7 +106,7 @@ Future<void> importPrnhb({
 
 
 
-void _processFolder(Directory folder, List<Tag> tags, {
+Future<void> _processFolder(Directory folder, List<Tag> tags, {
   required Collection collection,
   required Tag rootTagContent,
   required Tag rootTagCreator,
@@ -113,11 +114,11 @@ void _processFolder(Directory folder, List<Tag> tags, {
   required DateTime addedDatetime,
   required Map<String, List<Tag>> addTagsToPathsAtTheEnd,
   int? priority,
-}) {
-  final children = folder.listSync();
+}) async {
+  final children = await folder.list().toList();
   for (final child in children) {
     final childName = child.nameWithoutExtension.trim();
-    final childExtension = child.extension;
+    final childExtension = child.extension.toLowerCase();
     final childAbsolutePath = child.absolute.path.trim();
     if (childName=='.collection_app') continue;
     if (child is Directory) {
@@ -179,7 +180,7 @@ void _processFolder(Directory folder, List<Tag> tags, {
           ), collection,);
         }
       }
-      _processFolder(child, [...tags, if (addedTag!=null) addedTag],
+      await _processFolder(child, [...tags, if (addedTag!=null) addedTag],
         addedDatetime: addedDatetime,
         collection: collection,
         rootTagCreator: rootTagCreator,
@@ -190,7 +191,7 @@ void _processFolder(Directory folder, List<Tag> tags, {
       );
     } else if (childExtension=='.lnk') {
       // shortcuts need to be processed last, to make sure the actual item is already created
-      final resolvedShortcutPath = (child as File).resolveIfShortcutSync();
+      final resolvedShortcutPath = await (child as File).resolveIfShortcut();
       // log (LgLvl.finer,
       //   'Resolved shortcut path for file: $childAbsolutePath\n    $resolvedShortcutPath',
       //   type: LgType.script,

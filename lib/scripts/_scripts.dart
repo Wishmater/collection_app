@@ -14,7 +14,7 @@ final List<ScriptRegistration> registeredScripts = [
 class ScriptRegistration {
   final String name;
   final String description;
-  final VoidCallback callback;
+  final Future<dynamic> Function() callback;
 
   const ScriptRegistration({
     required this.name,

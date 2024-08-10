@@ -262,6 +262,7 @@ abstract class DbHelper {
           on conflict (name) do update 
             set name=?, added=?, lastSeen=?, lastModified=?, parentTagName=?;
         ''', [...args, ...args],);
+        // TODO 1 the approach here, and in many other places won't work for removing elements
         for (final secondaryParent in tag.secondaryParentTags) {
           final args = [
             secondaryParent.name,

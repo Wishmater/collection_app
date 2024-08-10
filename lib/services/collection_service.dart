@@ -35,6 +35,14 @@ class CollectionService {
     return true;
   }
 
+  bool removeCollection(Collection collection) {
+    final index = _all.indexOf(collection);
+    if (index<0) return false;
+    DbHelper.closeDbForCollection(collection);
+    _all.removeAt(index);
+    return true;
+  }
+
   bool addTagToCollection(Collection collection, Tag tag, {
     bool checkIfAlreadyExists = true,
     bool saveToDb = true,

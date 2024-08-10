@@ -1,9 +1,11 @@
 import 'package:collection_app/providers/app_state_provider.dart';
 import 'package:collection_app/providers/collection_provider.dart';
+import 'package:collection_app/scripts/_scripts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_font_icons/flutter_font_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
+import 'package:from_zero_ui/src/app_scaffolding/api_snackbar.dart';
 
 
 class MainAppbar extends ConsumerStatefulWidget {
@@ -32,6 +34,7 @@ class _MainAppbarState extends ConsumerState<MainAppbar> {
           key: popupGlobalKey,
           useCursorLocation: false,
           anchorAlignment: Alignment.topLeft,
+          offsetCorrection: const Offset(-16, -4),
           contextMenuWidget: Consumer(
             builder: (context, ref, child) {
               final collections = ref.watch(CollectionProvider.all);
@@ -40,6 +43,9 @@ class _MainAppbarState extends ConsumerState<MainAppbar> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   AppbarFromZero(
+                    title: Text('Collections',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
                     actions: [
                       ActionFromZero(
                         title: 'Load Collection...',
@@ -92,7 +98,40 @@ class _MainAppbarState extends ConsumerState<MainAppbar> {
           icon: const Icon(MaterialCommunityIcons.script_text),
           breakpoints: {0: ActionState.overflow},
           onTap: (context) {
-
+            showModalFromZero(context: context,
+              builder: (context) {
+                return DialogFromZero(
+                  title: const Text('Scripts'),
+                  contentPadding: EdgeInsets.zero,
+                  maxWidth: 512,
+                  dialogActions: const [
+                    DialogButton.cancel(
+                      child: Text('CLOSE'),
+                    ),
+                  ],
+                  content: Column(
+                    children: registeredScripts.map((e) {
+                      return ListTile(
+                        title: Text(e.name),
+                        subtitle: Text(e.description),
+                        onTap: () {
+                          APISnackBar(context: context,
+                            stateNotifier: ApiState.noProvider((_) {
+                              return e.callback().then((value) async {
+                                ref.invalidate(CollectionProvider.all);
+                              });
+                            }),
+                            cancelable: false,
+                            successTitle: 'Script executed successfully',
+                            successMessage: e.name,
+                          ).show();
+                        },
+                      );
+                    }).toList(),
+                  ),
+                );
+              },
+            );
           },
         ),
         ActionFromZero(
@@ -106,5 +145,6 @@ class _MainAppbarState extends ConsumerState<MainAppbar> {
       ],
     );
   }
+
 
 }

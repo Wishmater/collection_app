@@ -106,9 +106,7 @@ Future<void> startApp() async {
   });
   fromZeroThemeParametersProvider = themeParametersProvider;
   RendererBinding.instance.deferFirstFrame();
-  runApp(const ProviderScope(
-    child: App(),
-  ),);
+  runApp(const App(),);
   if (!kIsWeb && Platform.isWindows) {
     if (kReleaseMode) {
       try {
