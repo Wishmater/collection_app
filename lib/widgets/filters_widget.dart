@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:collection_app/models/tag.dart';
 import 'package:collection_app/providers/app_state_provider.dart';
 import 'package:collection_app/widgets/utils/interval_rating_bar.dart';
+import 'package:dartx/dartx_io.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/util/copied_flutter_widgets/my_tooltip.dart';
@@ -120,8 +121,8 @@ class FiltersWidget extends StatelessWidget {
                     },
                     widgetBuilder: (context, value, {required selected, color}) {
                       final textStyle = Theme.of(context).textTheme.titleMedium!;
-                      return Container(
-                        width: value<0 ? 20 : 18, height: 24,
+                      Widget result = Container(
+                        width: 18, height: 24,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
                           color: selected ? color!.withOpacity(color.opacity*0.6) : null,
@@ -130,7 +131,7 @@ class FiltersWidget extends StatelessWidget {
                             right: filterExplorePriorityMax==value ? const Radius.circular(6) : Radius.zero,
                           ),
                         ),
-                        child: Text(value.toString(),
+                        child: Text(value.abs().toString(),
                           style: textStyle.copyWith(
                             fontWeight: FontWeight.w900,
                             color: selected
@@ -139,6 +140,21 @@ class FiltersWidget extends StatelessWidget {
                           ),
                         ),
                       );
+                      if (value==-1) {
+                        result = Row(
+                          children: [
+                            result,
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4, right: 1),
+                              child: Container(
+                                width: 5, height: 3,
+                                color: Theme.of(context).dividerColor,
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+                      return result;
                     },
                   ),
                   const SizedBox(width: 12,),
