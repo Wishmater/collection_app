@@ -18,7 +18,7 @@ abstract class TagProvider {
   });
 
   static final one = StateProviderFamily((ref, String name) {
-    return tagService.getAllTags().firstWhere((e) => e.name==name);
+    return ref.watch(all).firstWhere((e) => e.name==name);
   });
   // TODO 1 do the same thing with streams we didi in items to update widgets that represent one collection
 

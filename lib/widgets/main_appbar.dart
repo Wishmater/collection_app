@@ -1,5 +1,6 @@
 import 'package:collection_app/providers/app_state_provider.dart';
 import 'package:collection_app/providers/collection_provider.dart';
+import 'package:collection_app/providers/tag_provider.dart';
 import 'package:collection_app/scripts/_scripts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_font_icons/flutter_font_icons.dart';
@@ -119,6 +120,7 @@ class _MainAppbarState extends ConsumerState<MainAppbar> {
                             stateNotifier: ApiState.noProvider((_) {
                               return e.callback().then((value) async {
                                 ref.invalidate(CollectionProvider.all);
+                                ref.invalidate(TagProvider.all);
                               });
                             }),
                             cancelable: false,

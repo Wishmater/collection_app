@@ -96,6 +96,14 @@ class _ItemCardsWidgetState extends ConsumerState<ItemCardsWidget> {
         provider: DataProvider.metadata.call(widget.item),
         animatedSwitcherType: AnimatedSwitcherType.normal,
         dataBuilder: buildContent,
+        loadingBuilder: (context, progress) {
+          return AspectRatio(
+            aspectRatio: 16/9,
+            child: SizedBox(width: double.infinity,
+              child: ApiProviderBuilder.defaultLoadingBuilder(context, progress),
+            ),
+          );
+        },
       );
     }
     return buildContent(context, widget.item);

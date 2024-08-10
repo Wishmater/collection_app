@@ -21,7 +21,7 @@ abstract class MetadataUtils {
     final extension = file.extension;
     item.metadataLastUpdated = DateTime.now();
     item.itemType = ItemType.inferFromExtension(extension);
-    final fileStats = file.statSync();
+    final fileStats = await file.stat();
     item.filesize = fileStats.size;
     item.fileCreated = fileStats.changed; // On Windows platforms, this is instead the file creation time.
     item.fileModified = fileStats.modified;

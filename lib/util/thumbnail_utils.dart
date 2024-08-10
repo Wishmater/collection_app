@@ -11,7 +11,7 @@ abstract class ThumbnailUtils {
     final folderPath = collection.getAbsoluteFilePathForThumbnailsFolder();
     if (folderPath==null) return null;
     final thumbnailsFolder = Directory(folderPath);
-    if (!thumbnailsFolder.existsSync()) {
+    if (!await thumbnailsFolder.exists()) {
       await thumbnailsFolder.create(recursive: true);
     }
     return thumbnailsFolder;
@@ -23,7 +23,7 @@ abstract class ThumbnailUtils {
     final path = item.getAbsoluteFilePathForThumbnail();
     if (path==null) return null;
     final thumbnail = File(path);
-    if (!thumbnail.existsSync()) {
+    if (!await thumbnail.exists()) {
       return createThumbnail(item, thumbnail: thumbnail);
     }
     return thumbnail;
@@ -39,7 +39,7 @@ abstract class ThumbnailUtils {
       thumbnail = File(path);
     }
     final thumbnailParentFolder = thumbnail.parent;
-    if (!thumbnailParentFolder.existsSync()) {
+    if (!await thumbnailParentFolder.exists()) {
       await thumbnailParentFolder.create(recursive: true);
     }
     final itemPath = item.getAbsoluteFilePath();

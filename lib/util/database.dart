@@ -154,7 +154,7 @@ abstract class DbHelper {
     }
     final dbFile = File(dbPath);
     final collectionDataRoot = dbFile.parent;
-    if (!collectionDataRoot.existsSync()) {
+    if (!await collectionDataRoot.exists()) {
       await collectionDataRoot.create();
       if (PlatformExtended.isWindows) {
         await Process.run('attrib', ['+h', collectionDataRoot.absolute.path]); // hide folder
@@ -208,8 +208,8 @@ abstract class DbHelper {
   }) async {
     await closeDbForCollection(collection);
     final file = File(dbPath ?? collection.getAbsoluteFilePathForDatabase()!);
-    if (file.existsSync()) {
-      file.deleteSync();
+    if (await file.exists()) {
+      await file.delete();
     }
   }
 

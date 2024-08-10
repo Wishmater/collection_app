@@ -38,6 +38,14 @@ class _VideoCachedThumbnailState extends ConsumerState<VideoCachedThumbnail> {
           ),
         );
       },
+      loadingBuilder: (context, progress) {
+        return AspectRatio(
+          aspectRatio: 16/9,
+          child: SizedBox(width: double.infinity,
+            child: ApiProviderBuilder.defaultLoadingBuilder(context, progress),
+          ),
+        );
+      },
     );
   }
 
