@@ -19,7 +19,7 @@ import 'package:uuid/uuid.dart';
 
 abstract class DbHelper {
 
-  static const _dbVersion = 2;
+  static const _dbVersion = 3;
   // TODO 1 make sure all DBs are closed gracefully when exiting the app
   // TODO 1 when exiting the app, show an "are you sure message if there are DB operations pending"
   static final Map<Collection, Database> _openDatabases = {};
@@ -321,16 +321,33 @@ abstract class DbHelper {
                 itemType=?, metadataLastUpdated=?, fileCreated=?, fileModified=?, filesize=?, 
                 resolutionWidth=?, resolutionHeight=?, duration=?;
         ''', [...args, ...args],);
+        await txn.execute(/*language=SQLite*/ '''
+          delete from itemTags where itemId=?;
+        ''', [item.id],);
         for (final tag in item.tags) {
           final args = [
             item.id,
             tag.name,
           ];
           await txn.execute(/*language=SQLite*/ '''
-            insert into itemTags
-              values (?, ?)
-            on conflict (itemId, tagName) do nothing;
+            insert into itemTags values (?, ?)
           ''', args,);
+        }
+        if (item.itemType==ItemType.album) {
+          await txn.execute(/*language=SQLite*/ '''
+            delete from albumItems where albumId=?;
+          ''', [item.id],);
+          for (int i=0; i<item.albumChildren!.length; i++) {
+            final child = item.albumChildren![i];
+            final args = [
+              item.id,
+              child.id,
+              i,
+            ];
+            await txn.execute(/*language=SQLite*/ '''
+              insert into albumItems values (?, ?, ?)
+            ''', args,);
+          }
         }
       });
     });
@@ -442,6 +459,23 @@ abstract class DbHelper {
         saveToDb: false,
       );
     }
+    final items = itemService.getAllItems();
+    for (final album in items.where((e) => e.itemType==ItemType.album)) {
+      final albumChildrenQuery = await db.rawQuery(/*language=SQLite*/ '''
+        select childId 
+        from albumItems
+        where albumId = ?
+        order by childIndex
+      ''', [album.id],);
+      for (final query in albumChildrenQuery) {
+        final childId = query['childId']! as int;
+        final item = items.firstWhere((e) => e.id==childId);
+        itemService.addItemToAlbum(item, album,
+          checkIfAlreadyExists: false,
+          saveToDb: false,
+        );
+      }
+    }
   }
 
   static Future<void> _applySchemaMigration(Database db, int oldVersion, int newVersion) async {
@@ -486,7 +520,7 @@ abstract class DbHelper {
           foreign key(tagName) references tag(name)
         );
         create table itemTags(
-          itemId text not null,
+          itemId int not null,
           tagName text not null,
           primary key (itemId, tagName),
           foreign key(itemId) references item(id),
@@ -504,6 +538,18 @@ abstract class DbHelper {
         alter table item add column resolutionWidth int;
         alter table item add column resolutionHeight int;
         alter table item add column duration int;
+      ''');
+    }
+    if (oldVersion<3 && newVersion>=3) {
+      await db.execute(/*language=SQLite*/ '''
+        create table albumItems(
+          albumId int not null,
+          childId int not null,
+          childIndex int not null,
+          primary key (albumId, childId),
+          foreign key(albumId) references item(id),
+          foreign key(childId) references item(id)
+        );
       ''');
     }
   }

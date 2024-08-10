@@ -46,6 +46,13 @@ class ItemDetailsView extends ConsumerWidget {
         );
       case ItemType.unknown:
         visualization = const ErrorSign(title: '');
+      case ItemType.album:
+      // TODO 1 implement visualization for album
+        visualization = Center(
+          child: Text('Visualization widget for albums not implemented',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        );
     }
     final filePath = item.getAbsoluteFilePath();
     return ScrollbarFromZero(

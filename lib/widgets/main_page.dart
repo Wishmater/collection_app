@@ -3,9 +3,11 @@ import 'package:collection_app/widgets/filters_widget.dart';
 import 'package:collection_app/widgets/item_cards_explorer.dart';
 import 'package:collection_app/widgets/item_details_view.dart';
 import 'package:collection_app/widgets/item_explorer_appbar.dart';
+import 'package:collection_app/widgets/main_appbar.dart';
 import 'package:collection_app/widgets/tags_explorer.dart';
 import 'package:dartx/dartx_io.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_font_icons/flutter_font_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 
@@ -37,6 +39,7 @@ class MainPage extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
+                        MainAppbar(),
                         FiltersWidget(),
                         Expanded(child: TagsExplorerV1()),
                       ],

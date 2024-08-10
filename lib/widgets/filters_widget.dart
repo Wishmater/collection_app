@@ -49,7 +49,7 @@ class FiltersWidget extends StatelessWidget {
                         duration: const Duration(milliseconds: 100),
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          color: selected ? color : null,
+                          color: selected ? color!.withOpacity(color.opacity*0.6) : null,
                           borderRadius: BorderRadius.horizontal(
                             left: filterRatingMin==value ? const Radius.circular(6) : Radius.zero,
                             right: filterRatingMax==value ? const Radius.circular(6) : Radius.zero,
@@ -77,7 +77,7 @@ class FiltersWidget extends StatelessWidget {
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: filterRatingNull
-                            ? color
+                            ? color.withOpacity(color.opacity*0.6)
                             : null,
                         borderRadius: const BorderRadius.all(Radius.circular(6)),
                       ),
@@ -95,7 +95,7 @@ class FiltersWidget extends StatelessWidget {
               );
             },
           ),
-          const SizedBox(height: 2,),
+          const SizedBox(height: 4,),
           Consumer(
             builder: (context, ref, child) {
               final filterExplorePriorityMin = ref.watch(AppStateProvider.filterExplorePriorityMin);
@@ -124,7 +124,7 @@ class FiltersWidget extends StatelessWidget {
                         width: 20, height: 24,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          color: selected ? color : null,
+                          color: selected ? color!.withOpacity(color.opacity*0.6) : null,
                           borderRadius: BorderRadius.horizontal(
                             left: filterExplorePriorityMin==value ? const Radius.circular(6) : Radius.zero,
                             right: filterExplorePriorityMax==value ? const Radius.circular(6) : Radius.zero,
@@ -152,7 +152,7 @@ class FiltersWidget extends StatelessWidget {
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         color: filterExplorePriorityNull
-                            ? color
+                            ? color.withOpacity(color.opacity*0.6)
                             : null,
                         borderRadius: const BorderRadius.all(Radius.circular(6)),
                       ),

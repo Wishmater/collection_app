@@ -96,7 +96,31 @@ class ItemService {
         saveToDb: saveToDb,
       );
       if (saveToDb) {
-        DbHelper.saveItem(item);
+        DbHelper.saveItem(item); // TODO 3 PERFORMANCE, save only item - tags relations
+      }
+    }
+    return done;
+  }
+
+  bool addItemToAlbum(Item item, Item album, {
+    bool checkIfAlreadyExists = true,
+    bool saveToDb = true,
+  }) {
+    bool done = false;
+    if (checkIfAlreadyExists) {
+      if (!album.albumChildren!.contains(item)) {
+        album.albumChildren!.add(item);
+        item.albumParent = album;
+        done = true;
+      }
+    } else {
+      album.albumChildren!.add(item);
+      item.albumParent = album;
+      done = true;
+    }
+    if (done) {
+      if (saveToDb) {
+        DbHelper.saveItem(album); // TODO 3 PERFORMANCE, save only item - tags relations
       }
     }
     return done;

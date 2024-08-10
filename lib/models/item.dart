@@ -13,13 +13,15 @@ class Item {
   DateTime? lastSeen;
   DateTime? lastModified;
   String? filePath;
-  // List<String> sourceUrls; // TODO 2 meaybe implement this in the future...
+  // List<String> sourceUrls; // TODO 2 maybe implement this in the future...
   List<Tag> tags; // TODO 2 PERFORMANCE maybe create a map from ID(name) to tag for faster search
   int? explorePriority;
   int? rating;
+  List<Item>? albumChildren; // only not null if itemType==ItemType.album
+  Item? albumParent; // backlink to parent, null if this item doesn't belong to an album
 
   // metadata
-  ItemType? itemType;
+  ItemType? itemType; // technically not metadata, sometimes it is pre-defined (case of albums)
   DateTime? metadataLastUpdated;
   DateTime? fileCreated;
   DateTime? fileModified;
@@ -48,10 +50,11 @@ class Item {
     this.resolutionWidth, /// only on types: image, video
     this.resolutionHeight, /// only on types: image, video
     this.duration, /// only on types: video, audio
-  })  : assert(id!=null || collection!=null, 'Item ID must be directly supplied, or a collection must be specified to get the next id from it'),
-        id = id ?? DbHelper.getNextItemIdForCollection(collection!),
+    List<Item>? albumChildren,
+  })  : id = id ?? DbHelper.getNextItemIdForCollection(collection),
         added = added ?? DateTime.now(),
-        tags = tags ?? [];
+        tags = tags ?? [],
+        albumChildren = albumChildren ?? (itemType==ItemType.album ? [] : null);
 
 
   @override
@@ -87,10 +90,13 @@ class Item {
 
 
 enum ItemType {
+  // IMPORTANT: since the index of the enum is used for serialization when saving to DB
+  // we can't delete or reorder existing ItemTypes, only add new ones at the end
   image,
   video,
   audio,
-  unknown;
+  unknown,
+  album;
 
   static const imageExtensions = ['.png', '.jpg', '.jpeg', '.webp', '.bmp'];
   static const videoExtensions = ['.mp4', '.mkv', '.gif', '.mpg', '.mpeg', '.avi']; // TODO 3 test GIF files, should we treat them as videos or as images?

@@ -48,6 +48,8 @@ abstract class MetadataUtils {
         log(LgLvl.error, 'Metadata loading for audio not implemented: $item');
       case ItemType.unknown:
         log(LgLvl.warning, 'Unknown type for extension $extension: $item');
+      case ItemType.album:
+        // TODO 1 implement loading metadata for album (probably nothing and just aggregate children when they are updated). Maybe when told to update album, just update all children
     }
     return item;
   }

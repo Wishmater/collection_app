@@ -36,10 +36,6 @@ class PageSplashState extends ConsumerState<PageSplash> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async{
       sqfliteFfiInit();
 
-      // TODO 1 remove all hardcoded stuff from main initialization once we have persisted data, collection selection UI and scripts UI
-
-      // await importPrnhb();
-
       final collection = Collection(
         name: 'Prnhb',
         baseDirectory: r'D:\Polnareff\prnhb',

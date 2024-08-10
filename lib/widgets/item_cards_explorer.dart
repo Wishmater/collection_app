@@ -125,6 +125,13 @@ class _ItemCardsWidgetState extends ConsumerState<ItemCardsWidget> {
         );
       case ItemType.unknown:
         thumbnail = const ErrorSign(title: '');
+      case ItemType.album:
+        // TODO 1 implement visualization for album
+        thumbnail = Center(
+          child: Text('Thumbnail widget for albums not implemented',
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
+        );
     }
     if (item.duration!=null) {
       thumbnail = Stack(

@@ -14,6 +14,30 @@ import 'package:path/path.dart' as p;
 import 'package:resolve_windows_shortcut/resolve_windows_shortcut.dart';
 
 
+// this doesn't work because some used parts need to import flutter (DBHelper for ValueNotifiers)
+void main() async {
+  importPrnhb();
+  log(LgLvl.info,
+    'Finished importing, saving Collections to DB...',
+    type: LgType.script,
+  );
+  DbHelper.activeDbOperationsCount.addListener(() {
+    if (DbHelper.activeDbOperationsCount.value%50==0) {
+      log(LgLvl.finer,
+        'Remaining DB operations: ${DbHelper.activeDbOperationsCount.value}',
+        type: LgType.script,
+      );
+    }
+  });
+  log(LgLvl.info,
+    'SUCCESS !!!',
+    type: LgType.script,
+  );
+  await DbHelper.waitForAllDbOperationsToFinish(); // we don't actually need to await this, the app can keep working and execute all DB operations in the background
+}
+
+
+
 Future<void> importPrnhb({
   bool clearDb = true,
 }) async {
@@ -31,27 +55,18 @@ Future<void> importPrnhb({
     checkIfAlreadyExists: false,
   );
   await DbHelper.waitForAllDbOperationsToFinish();
-  final rootTagCreator = Tag(
+  final rootTagCreator = tagService.getTagByNameOrCreate(Tag(
     added: addedDatetime,
     name: 'Creator',
-  );
-  tagService.addTag(rootTagCreator, collection,
-    checkIfAlreadyExists: false,
-  );
-  final rootTagContent = Tag(
+  ), collection,);
+  final rootTagContent = tagService.getTagByNameOrCreate(Tag(
     added: addedDatetime,
     name: 'Content Tag',
-  );
-  tagService.addTag(rootTagContent, collection,
-    checkIfAlreadyExists: false,
-  );
-  final unknownShortcutTag = Tag(
+  ), collection,);
+  final unknownShortcutTag = tagService.getTagByNameOrCreate(Tag(
     added: addedDatetime,
     name: '!!! ATTENTION shortcut in unknown place during import',
-  );
-  tagService.addTag(unknownShortcutTag, collection,
-    checkIfAlreadyExists: false,
-  );
+  ), collection,);
   final Map<String, List<Tag>> addTagsToPathsAtTheEnd = {};
   _processFolder(rootFolder, [],
     collection: collection,
@@ -62,7 +77,7 @@ Future<void> importPrnhb({
     addTagsToPathsAtTheEnd: addTagsToPathsAtTheEnd,
   );
   for (final entry in addTagsToPathsAtTheEnd.entries) {
-    final item = collection.items.firstOrNullWhere((e) => e.filePath==entry.key);
+    final item = collection.items.firstOrNullWhere((e) => e.getAbsoluteFilePath()==entry.key);
     if (item==null) {
       log(LgLvl.info,
         'Broken shortcut found to path: ${entry.key}'
@@ -83,10 +98,11 @@ Future<void> importPrnhb({
         '\ndb saving will be executed in the background...',
     type: LgType.script,
   );
-  // TODO 2 PERFORMANCE it would be WAY more performant to not add the save operations individually, and instead save the entire collection as a single batch at the end
-  // await DbHelper.waitForAllDbOperationsToFinish(); // we don't actually need to await this, the app can keep working and execute all DB operations in the background
+  // TODO 3 PERFORMANCE it would be WAY more performant to not add the save operations individually, and instead save the entire collection as a single batch at the end
+  // TODO 1 implement parsing rest of folders, including shortcuts in root and "/z - wait"
   return;
 }
+
 
 
 void _processFolder(Directory folder, List<Tag> tags, {
@@ -138,15 +154,12 @@ void _processFolder(Directory folder, List<Tag> tags, {
           }
         }
         final creatorName = creatorBuffer.toString().trim();
-        final creator = Tag(
+        final creator = tagService.getTagByNameOrCreate(Tag(
           added: addedDatetime,
           name: creatorName,
           parentTag: rootTagCreator,
           secondaryParentTags: creatorTags,
-        );
-        tagService.addTag(creator, collection,
-          checkIfAlreadyExists: false,
-        );
+        ), collection,);
         addedTag = creator;
       } else {
         if (childName=='rated' || childName=='!channels') {
@@ -176,12 +189,12 @@ void _processFolder(Directory folder, List<Tag> tags, {
         addTagsToPathsAtTheEnd: addTagsToPathsAtTheEnd,
       );
     } else if (childExtension=='.lnk') {
-      // do nothing with shortcuts inside channels
+      // shortcuts need to be processed last, to make sure the actual item is already created
       final resolvedShortcutPath = (child as File).resolveIfShortcutSync();
-      log (LgLvl.finer,
-        'Resolved shortcut path for file: $childAbsolutePath\n    $resolvedShortcutPath',
-        type: LgType.script,
-      );
+      // log (LgLvl.finer,
+      //   'Resolved shortcut path for file: $childAbsolutePath\n    $resolvedShortcutPath',
+      //   type: LgType.script,
+      // );
       addTagsToPathsAtTheEnd[resolvedShortcutPath] ??= [];
       addTagsToPathsAtTheEnd[resolvedShortcutPath]!.add(unknownShortcutTag);
     } else {

@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:collection_app/models/collection.dart';
 import 'package:collection_app/models/item.dart';
+import 'package:collection_app/models/tag.dart';
 import 'package:collection_app/providers/collection_provider.dart';
+import 'package:collection_app/providers/tag_provider.dart';
 import 'package:collection_app/services/item_service.dart';
 import 'package:dartx/dartx.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -54,6 +56,34 @@ abstract class ItemProvider {
       invalidateOne(ref, item);
     }
     return true;
+  }
+
+  static bool addTagToItem(Ref ref, Item item, Tag tag, {
+    bool checkIfAlreadyExists = true,
+  }) {
+    final added = itemService.addTagToItem(item, tag,
+      checkIfAlreadyExists: checkIfAlreadyExists,
+      saveToDb: true,
+    );
+    if (added) {
+      invalidateOne(ref, item);
+      ref.invalidate(TagProvider.one.call(tag.name)); // TODO 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
+    }
+    return added;
+  }
+
+  static bool addItemToAlbum(Ref ref, Item item, Item album, {
+    bool checkIfAlreadyExists = true,
+  }) {
+    final added = itemService.addItemToAlbum(item, album,
+      checkIfAlreadyExists: checkIfAlreadyExists,
+      saveToDb: true,
+    );
+    if (added) {
+      invalidateOne(ref, item);
+      invalidateOne(ref, album);
+    }
+    return added;
   }
 
 }
