@@ -358,8 +358,8 @@ packages:
     dependency: transitive
     description:
       path: "."
-      ref: a166206797368ee3f75092ec7e32c20e3c3546c1
-      resolved-ref: a166206797368ee3f75092ec7e32c20e3c3546c1
+      ref: a970b49aa6f8f69c978e644904f28bb174af1d03
+      resolved-ref: a970b49aa6f8f69c978e644904f28bb174af1d03
       url: "https://github.com/Wishmater/excel"
     source: git
     version: "4.0.2"
@@ -674,8 +674,8 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: f82cb53d7c47b3e17beffd29a468512a75b75f04
-      resolved-ref: f82cb53d7c47b3e17beffd29a468512a75b75f04
+      ref: "930195d75698fab1b1d4bc38776714457665ccdd"
+      resolved-ref: "930195d75698fab1b1d4bc38776714457665ccdd"
       url: "https://github.com/ross96D/mlog"
     source: git
     version: "1.0.0"
@@ -1220,30 +1220,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.4"
-  video_player:
-    dependency: transitive
-    description:
-      name: video_player
-      sha256: efa2e24042166906ddf836dd131258d0371d0009cdf0476f6a83fd992a17f5d0
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.8.5"
-  video_player_android:
-    dependency: transitive
-    description:
-      name: video_player_android
-      sha256: "4dd9b8b86d70d65eecf3dcabfcdfbb9c9115d244d022654aba49a00336d540c2"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.4.12"
-  video_player_avfoundation:
-    dependency: transitive
-    description:
-      name: video_player_avfoundation
-      sha256: bc923884640d6dc403050586eb40713cdb8d1d84e6886d8aca50ab04c59124c2
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.5.2"
   video_player_platform_interface:
     dependency: transitive
     description:
@@ -1252,22 +1228,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.2.1"
-  video_player_web:
-    dependency: transitive
-    description:
-      name: video_player_web
-      sha256: "34beb3a07d4331a24f7e7b2f75b8e2b103289038e07e65529699a671b6a6e2cb"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.3"
   video_player_win:
     dependency: "direct main"
     description:
       name: video_player_win
-      sha256: b99e8dfe7fa87a6732b5c91caef4955ae3453fd6255fb8860a7686beccdcfe43
+      sha256: "2406d5e1b0133542ca7271448708e21553f4c0f094aed36218d35cad9a3058ee"
       url: "https://pub.dev"
     source: hosted
-    version: "2.3.6"
+    version: "2.3.10"
   vm_service:
     dependency: transitive
     description:

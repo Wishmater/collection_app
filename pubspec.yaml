@@ -46,7 +46,7 @@ dependencies:
   device_info_plus: ^9.0.3
   bitsdojo_window: ^0.1.5 # ideally, we would do all window-related stuff with window_manager, and remove this dependency here
   window_manager: ^0.3.5
-  video_player_win: 2.3.6
+  video_player_win: 2.3.10
   resolve_windows_shortcut: ^2.0.0
 
   # * Specific Utility
@@ -56,7 +56,7 @@ dependencies:
   mlog:
     git:
       url: https://github.com/ross96D/mlog
-      ref: f82cb53d7c47b3e17beffd29a468512a75b75f04
+      ref: 930195d75698fab1b1d4bc38776714457665ccdd
 
 
 dev_dependencies:
