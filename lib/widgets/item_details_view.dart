@@ -87,7 +87,10 @@ class ItemDetailsView extends ConsumerWidget {
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: visualization,
+              child: AspectRatio(
+                aspectRatio: 16/9,
+                child: visualization,
+              ),
             ),
           ),
 

@@ -34,7 +34,7 @@ class _VideoCachedThumbnailState extends ConsumerState<VideoCachedThumbnail> {
         return SizedBox(
           width: double.infinity,
           child: Image.file(file,
-            fit: BoxFit.fitWidth,
+            fit: BoxFit.contain,
           ),
         );
       },
