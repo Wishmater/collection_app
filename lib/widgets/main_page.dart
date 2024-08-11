@@ -54,8 +54,9 @@ class MainPage extends StatelessWidget {
                       top: 0, bottom: 0, right: 0, width: 8,
                       child: MouseRegion(
                         cursor: SystemMouseCursors.resizeColumn,
+                        hitTestBehavior: HitTestBehavior.translucent,
                         child: GestureDetector(
-                          onPanUpdate: (details) {
+                          onHorizontalDragUpdate: (details) {
                             if (details.delta.dx!=0) {
                               tagsColumnWidth = (tagsColumnWidth + details.delta.dx)
                                   .clamp(AppStateProvider.mainPageMinColumnWidth, screenWidth / 3);
@@ -105,8 +106,9 @@ class MainPage extends StatelessWidget {
                       top: 0, bottom: 0, right: 0, width: 8,
                       child: MouseRegion(
                         cursor: SystemMouseCursors.resizeColumn,
+                        hitTestBehavior: HitTestBehavior.translucent,
                         child: GestureDetector(
-                          onPanUpdate: (details) {
+                          onHorizontalDragUpdate: (details) {
                             if (details.delta.dx!=0) {
                               itemsColumnWidth = (itemsColumnWidth + details.delta.dx)
                                   .clamp(AppStateProvider.mainPageMinColumnWidth, screenWidth / 2);
