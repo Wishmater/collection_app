@@ -131,13 +131,26 @@ class FiltersWidget extends StatelessWidget {
                             right: filterExplorePriorityMax==value ? const Radius.circular(6) : Radius.zero,
                           ),
                         ),
-                        child: Text(value.abs().toString(),
-                          style: textStyle.copyWith(
-                            fontWeight: FontWeight.w900,
-                            color: selected
-                                ? textStyle.color!.withOpacity(0.8)
-                                : color,
-                          ),
+                        child: Stack(
+                          children: [
+                            Text(value.abs().toString(),
+                              style: textStyle.copyWith(
+                                fontWeight: FontWeight.w900,
+                                color: selected
+                                    ? textStyle.color!.withOpacity(0.8)
+                                    : color,
+                              ),
+                            ),
+                            if (value<0)
+                              Positioned(
+                                bottom: 1, left: -1, right: -1, height: 3,
+                                child: ColoredBox(
+                                  color: selected
+                                      ? textStyle.color!.withOpacity(0.6)
+                                      : color!.withOpacity(color.opacity*0.8),
+                                ),
+                              ),
+                          ],
                         ),
                       );
                       if (value==-1) {

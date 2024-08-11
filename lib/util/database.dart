@@ -214,20 +214,25 @@ abstract class DbHelper {
   }
 
   static Future<void> saveCollection(Collection collection) async {
+    // we need to pre-build the args arrays with the primitive values, otherwise
+    // we are vulnerable to a race condition if the item object properties are
+    // modified before db operation gets to execute
+    const sql = /*language=SQLite*/ '''
+      insert into collection 
+        values (?, ?, ?, ?, ?)
+      on conflict (name) do update 
+        set name=?, added=?, lastSeen=?, lastModified=?, baseDirectory=?;
+    ''';
+    final args = [
+      collection.name,
+      datetimeFormat.format(collection.added),
+      datetimeFormat.tryFormat(collection.lastSeen),
+      datetimeFormat.tryFormat(collection.lastModified),
+      collection.baseDirectory,
+    ];
+    args.addAll(List.from(args)); // args are doubled on insert statement do to on conflict update statement
     return _executeDbOperation<void>(collection, (db, operationId) async {
-      final args = [
-        collection.name,
-        datetimeFormat.format(collection.added),
-        datetimeFormat.tryFormat(collection.lastSeen),
-        datetimeFormat.tryFormat(collection.lastModified),
-        collection.baseDirectory,
-      ];
-      await db.execute(/*language=SQLite*/ '''
-        insert into collection 
-          values (?, ?, ?, ?, ?)
-        on conflict (name) do update 
-          set name=?, added=?, lastSeen=?, lastModified=?, baseDirectory=?;
-      ''', [...args, ...args],);
+      db.execute(sql, args);
     });
   }
 
@@ -244,113 +249,117 @@ abstract class DbHelper {
     }
   }
   static Future<void> saveTagToCollection(Tag tag, Collection collection) async {
+    // TODO 2 PERFORMANCE make each of the queries optional
+    // TODO 3 PERFORMANCE allow to add/remove specific relations instead of saving all of them
+    // we need to pre-build the args arrays with the primitive values, otherwise
+    // we are vulnerable to a race condition if the item object properties are
+    // modified before db operation gets to execute
+    List<(String, List<dynamic>)> sql = [];
+    // main table upsert
+    final args = [
+      tag.name,
+      datetimeFormat.format(tag.added),
+      datetimeFormat.tryFormat(tag.lastSeen),
+      datetimeFormat.tryFormat(tag.lastModified),
+      tag.parentTag?.name,
+    ];
+    sql.add((/*language=SQLite*/ '''
+      insert into tag 
+        values (?, ?, ?, ?, ?)
+      on conflict (name) do update 
+        set name=?, added=?, lastSeen=?, lastModified=?, parentTagName=?;
+    ''', [...args, ...args]),);
+    // relation with tag secondary children
+    sql.add((/*language=SQLite*/ '''
+      delete from tagSecondaryChildren where childTagName=?;
+    ''', [tag.name]),);
+    for (final secondaryParent in tag.secondaryParentTags) {
+      sql.add((/*language=SQLite*/ '''
+        insert into tagSecondaryChildren values (?, ?);
+      ''', [secondaryParent.name, tag.name,]),);
+    }
+    // relation with tag aliases
+    sql.add((/*language=SQLite*/ '''
+      delete from tagAliases where tagName=?;
+    ''', [tag.name]),);
+    for (final alias in tag.aliases) {
+      sql.add((/*language=SQLite*/ '''
+        insert into tagAliases values (?, ?);
+      ''', [tag.name, alias,]),);
+    }
+    // schedule db operation to be executed when async queue is free
     return _executeDbOperation<void>(collection, (db, operationId) async {
-      await db.transaction<void>((txn) async {
-        final args = [
-          tag.name,
-          datetimeFormat.format(tag.added),
-          datetimeFormat.tryFormat(tag.lastSeen),
-          datetimeFormat.tryFormat(tag.lastModified),
-          tag.parentTag?.name,
-        ];
-        // TODO 2 PERFORMANCE this can probably be way more optimized,
-        //   including reducing the amount of queries, making some of them optional
-        //   or allowing to add/remove specific relations instead of saving all of them
-        await txn.execute(/*language=SQLite*/ '''
-          insert into tag 
-            values (?, ?, ?, ?, ?)
-          on conflict (name) do update 
-            set name=?, added=?, lastSeen=?, lastModified=?, parentTagName=?;
-        ''', [...args, ...args],);
-        // TODO 1 the approach here, and in many other places won't work for removing elements
-        for (final secondaryParent in tag.secondaryParentTags) {
-          final args = [
-            secondaryParent.name,
-            tag.name,
-          ];
-          await txn.execute(/*language=SQLite*/ '''
-            insert into tagSecondaryChildren
-              values (?, ?)
-            on conflict (parentTagName, childTagName) do nothing;
-          ''', args,);
-        }
-        for (final alias in tag.aliases) {
-          final args = [
-            tag.name,
-            alias,
-          ];
-          await txn.execute(/*language=SQLite*/ '''
-            insert into tagAliases
-              values (?, ?)
-            on conflict (tagName, alias) do nothing;
-          ''', args,);
-        }
-      });
+      final batch = db.batch();
+      for (final e in sql) {
+        batch.execute(e.$1, e.$2);
+      }
+      await batch.commit();
     });
   }
 
   static Future<void> saveItem(Item item) async {
+    // TODO 2 PERFORMANCE make each of the queries optional
+    // TODO 3 PERFORMANCE allow to add/remove specific relations instead of saving all of them
+    // we need to pre-build the args arrays with the primitive values, otherwise
+    // we are vulnerable to a race condition if the item object properties are
+    // modified before db operation gets to execute
+    List<(String, List<dynamic>)> sql = [];
+    // main table upsert
+    final args = [
+      item.id,
+      item.name,
+      datetimeFormat.format(item.added),
+      datetimeFormat.tryFormat(item.lastSeen),
+      datetimeFormat.tryFormat(item.lastModified),
+      item.filePath,
+      item.explorePriority,
+      item.rating,
+      // metadata
+      item.itemType?.index,
+      datetimeFormat.tryFormat(item.metadataLastUpdated),
+      datetimeFormat.tryFormat(item.fileCreated),
+      datetimeFormat.tryFormat(item.fileModified),
+      item.filesize,
+      item.resolutionWidth,
+      item.resolutionHeight,
+      item.duration?.inMilliseconds,
+    ];
+    sql.add((/*language=SQLite*/ '''
+      insert into item 
+        values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      on conflict (id) do update 
+        set id=?, name=?, added=?, lastSeen=?, lastModified=?, filePath=?, explorePriority=?, rating=?,
+            itemType=?, metadataLastUpdated=?, fileCreated=?, fileModified=?, filesize=?, 
+            resolutionWidth=?, resolutionHeight=?, duration=?;
+    ''', [...args, ...args]),);
+    // relation with tags
+    sql.add((/*language=SQLite*/ '''
+      delete from itemTags where itemId=?;
+    ''', [item.id]),);
+    for (final tag in item.tags) {
+      sql.add((/*language=SQLite*/ '''
+        insert into itemTags values (?, ?);
+      ''', [item.id, tag.name,]),);
+    }
+    // relation with albumChildren
+    if (item.itemType==ItemType.album) {
+      sql.add((/*language=SQLite*/ '''
+        delete from albumItems where albumId=?;
+      ''', [item.id]),);
+      for (int i=0; i<item.albumChildren!.length; i++) {
+        final child = item.albumChildren![i];
+        sql.add((/*language=SQLite*/ '''
+          insert into albumItems values (?, ?, ?)
+        ''', [item.id, child.id, i,]),);
+      }
+    }
+    // schedule db operation to be executed when async queue is free
     return _executeDbOperation<void>(item.collection, (db, operationId) async {
-      return db.transaction<void>((txn) async {
-        final args = [
-          item.id,
-          item.name,
-          datetimeFormat.format(item.added),
-          datetimeFormat.tryFormat(item.lastSeen),
-          datetimeFormat.tryFormat(item.lastModified),
-          item.filePath,
-          item.explorePriority,
-          item.rating,
-          // metadata
-          item.itemType?.index,
-          datetimeFormat.tryFormat(item.metadataLastUpdated),
-          datetimeFormat.tryFormat(item.fileCreated),
-          datetimeFormat.tryFormat(item.fileModified),
-          item.filesize,
-          item.resolutionWidth,
-          item.resolutionHeight,
-          item.duration?.inMilliseconds,
-        ];
-        // TODO 2 PERFORMANCE this can probably be way more optimized,
-        //   including reducing the amount of queries, making some of them optional
-        //   or allowing to add/remove specific relations instead of saving all of them
-        await txn.execute(/*language=SQLite*/ '''
-          insert into item 
-            values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-          on conflict (id) do update 
-            set id=?, name=?, added=?, lastSeen=?, lastModified=?, filePath=?, explorePriority=?, rating=?,
-                itemType=?, metadataLastUpdated=?, fileCreated=?, fileModified=?, filesize=?, 
-                resolutionWidth=?, resolutionHeight=?, duration=?;
-        ''', [...args, ...args],);
-        await txn.execute(/*language=SQLite*/ '''
-          delete from itemTags where itemId=?;
-        ''', [item.id],);
-        for (final tag in item.tags) {
-          final args = [
-            item.id,
-            tag.name,
-          ];
-          await txn.execute(/*language=SQLite*/ '''
-            insert into itemTags values (?, ?)
-          ''', args,);
-        }
-        if (item.itemType==ItemType.album) {
-          await txn.execute(/*language=SQLite*/ '''
-            delete from albumItems where albumId=?;
-          ''', [item.id],);
-          for (int i=0; i<item.albumChildren!.length; i++) {
-            final child = item.albumChildren![i];
-            final args = [
-              item.id,
-              child.id,
-              i,
-            ];
-            await txn.execute(/*language=SQLite*/ '''
-              insert into albumItems values (?, ?, ?)
-            ''', args,);
-          }
-        }
-      });
+      final batch = db.batch();
+      for (final e in sql) {
+        batch.execute(e.$1, e.$2);
+      }
+      await batch.commit();
     });
   }
 

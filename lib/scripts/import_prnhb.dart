@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:collection_app/models/collection.dart';
 import 'package:collection_app/models/item.dart';
 import 'package:collection_app/models/tag.dart';
@@ -49,9 +50,11 @@ Future<void> importPrnhb({
     baseDirectory: rootFolder.absolute.path,
   );
   collectionService.removeCollection(collection);
+  await DbHelper.waitForAllDbOperationsToFinish();
   if (clearDb) {
     await DbHelper.deleteDbForCollection(collection);
   }
+  await DbHelper.waitForAllDbOperationsToFinish();
   collectionService.addCollection(collection,
     checkIfAlreadyExists: false,
   );
@@ -64,31 +67,39 @@ Future<void> importPrnhb({
     added: addedDatetime,
     name: 'Content Tag',
   ), collection,);
-  final unknownShortcutTag = tagService.getTagByNameOrCreate(Tag(
-    added: addedDatetime,
-    name: '!!! ATTENTION shortcut in unknown place during import',
-  ), collection,);
-  final Map<String, List<Tag>> addTagsToPathsAtTheEnd = {};
+  final Map<String, _ItemData> addToPathsAtTheEnd = {};
   await _processFolder(rootFolder, [],
     collection: collection,
     addedDatetime: addedDatetime,
     rootTagCreator: rootTagCreator,
     rootTagContent: rootTagContent,
-    unknownShortcutTag: unknownShortcutTag,
-    addTagsToPathsAtTheEnd: addTagsToPathsAtTheEnd,
+    addToPathsAtTheEnd: addToPathsAtTheEnd,
   );
-  for (final entry in addTagsToPathsAtTheEnd.entries) {
+  for (final entry in addToPathsAtTheEnd.entries) {
     final item = collection.items.firstOrNullWhere((e) => e.getAbsoluteFilePath()==entry.key);
     if (item==null) {
-      log(LgLvl.info,
+      log(LgLvl.warning,
         'Broken shortcut found to path: ${entry.key}'
-            '\n    The following tags were assigned to it: ${entry.value.map((e) => e.name)}',
+            '\n    The following tags were assigned to it: ${entry.value.tags.map((e) => e.name)}'
+            '; rating: ${entry.value.rating}; priority: ${entry.value.priority}',
         type: LgType.script,
       );
     } else {
-      // TODO 2 PERFORMANCE it will be faster if there was a way to add all items at once :)
-      for (final tag in entry.value) {
-        itemService.addTagToItem(item, tag);
+      // TODO 2 PERFORMANCE it would be faster if there was a way to add all items at once :)
+      bool needsSaving = false;
+      if (entry.value.rating!=null && (item.rating==null || item.rating!<entry.value.rating!)) {
+        item.rating = entry.value.rating;
+        needsSaving = true;
+      }
+      if (entry.value.priority!=null && (item.explorePriority==null || item.explorePriority!>entry.value.priority!)) {
+        item.explorePriority = entry.value.priority;
+        needsSaving = true;
+      }
+      if (needsSaving) {
+        itemService.saveItem(item); // TODO 2 PERFORMANCE save to db only base data, not relations
+      }
+      for (final tag in entry.value.tags) {
+        itemService.addTagToItem(item, tag); // TODO 2 PERFORMANCE to db only tag relations
       }
     }
   }
@@ -100,7 +111,6 @@ Future<void> importPrnhb({
     type: LgType.script,
   );
   // TODO 3 PERFORMANCE it would be WAY more performant to not add the save operations individually, and instead save the entire collection as a single batch at the end
-  // TODO 1 implement parsing rest of folders, including shortcuts in root and "/z - wait"
   return;
 }
 
@@ -110,9 +120,8 @@ Future<void> _processFolder(Directory folder, List<Tag> tags, {
   required Collection collection,
   required Tag rootTagContent,
   required Tag rootTagCreator,
-  required Tag unknownShortcutTag,
   required DateTime addedDatetime,
-  required Map<String, List<Tag>> addTagsToPathsAtTheEnd,
+  required Map<String, _ItemData> addToPathsAtTheEnd,
   int? priority,
 }) async {
   final children = await folder.list().toList();
@@ -186,8 +195,7 @@ Future<void> _processFolder(Directory folder, List<Tag> tags, {
         rootTagCreator: rootTagCreator,
         rootTagContent: rootTagContent,
         priority: childPriority ?? priority,
-        unknownShortcutTag: unknownShortcutTag,
-        addTagsToPathsAtTheEnd: addTagsToPathsAtTheEnd,
+        addToPathsAtTheEnd: addToPathsAtTheEnd,
       );
     } else if (childExtension=='.lnk') {
       // shortcuts need to be processed last, to make sure the actual item is already created
@@ -196,8 +204,25 @@ Future<void> _processFolder(Directory folder, List<Tag> tags, {
       //   'Resolved shortcut path for file: $childAbsolutePath\n    $resolvedShortcutPath',
       //   type: LgType.script,
       // );
-      addTagsToPathsAtTheEnd[resolvedShortcutPath] ??= [];
-      addTagsToPathsAtTheEnd[resolvedShortcutPath]!.add(unknownShortcutTag);
+      int? childPriority;
+      if (folder.name=='prnhb') {
+        childPriority = -1;
+        var tempChildName = childName;
+        while (childPriority!>-6 && tempChildName.startsWith('!')) {
+          childPriority--;
+          tempChildName = tempChildName.substring(1);
+        }
+      }
+      addToPathsAtTheEnd[resolvedShortcutPath] ??= _ItemData();
+      if (childPriority!=null) {
+        addToPathsAtTheEnd[resolvedShortcutPath]!.priority
+          = min(childPriority, addToPathsAtTheEnd[resolvedShortcutPath]!.priority??10);
+      }
+      for (final e in tags) {
+        if (!addToPathsAtTheEnd[resolvedShortcutPath]!.tags.contains(e)) {
+          addToPathsAtTheEnd[resolvedShortcutPath]!.tags.add(e);
+        }
+      }
     } else {
       const allowedExtensions = ItemType.videoExtensions;
       if (!allowedExtensions.contains(childExtension)) {
@@ -241,4 +266,10 @@ Future<void> _processFolder(Directory folder, List<Tag> tags, {
       );
     }
   }
+}
+
+class _ItemData {
+  final List<Tag> tags = [];
+  int? rating;
+  int? priority;
 }
