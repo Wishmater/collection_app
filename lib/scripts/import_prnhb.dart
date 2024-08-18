@@ -6,7 +6,7 @@ import 'package:collection_app/models/tag.dart';
 import 'package:collection_app/services/collection_service.dart';
 import 'package:collection_app/services/item_service.dart';
 import 'package:collection_app/services/tag_service.dart';
-import 'package:collection_app/util/database.dart';
+import 'package:collection_app/util/database_helper.dart';
 import 'package:collection_app/util/logging.dart';
 import 'package:dartx/dartx_io.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';

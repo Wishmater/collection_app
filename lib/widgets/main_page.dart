@@ -7,7 +7,6 @@ import 'package:collection_app/widgets/main_appbar.dart';
 import 'package:collection_app/widgets/tags_explorer.dart';
 import 'package:dartx/dartx_io.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_font_icons/flutter_font_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 

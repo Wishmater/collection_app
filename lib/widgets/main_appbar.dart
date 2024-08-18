@@ -3,12 +3,12 @@ import 'package:collection_app/providers/app_state_provider.dart';
 import 'package:collection_app/providers/collection_provider.dart';
 import 'package:collection_app/providers/tag_provider.dart';
 import 'package:collection_app/scripts/_scripts.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_font_icons/flutter_font_icons.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:from_zero_ui/src/app_scaffolding/api_snackbar.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:path/path.dart' as p;
 
 
@@ -125,7 +125,7 @@ class _MainAppbarState extends ConsumerState<MainAppbar> {
           icon: const Icon(MaterialCommunityIcons.script_text),
           breakpoints: {0: ActionState.overflow},
           onTap: (context) {
-            showModalFromZero(context: context,
+            showModalFromZero<dynamic>(context: context,
               builder: (context) {
                 return DialogFromZero(
                   title: const Text('Scripts'),

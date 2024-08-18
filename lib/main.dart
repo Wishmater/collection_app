@@ -3,7 +3,9 @@ import 'dart:io';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:collection_app/router.dart';
+import 'package:collection_app/services/collection_service.dart';
 import 'package:collection_app/theme_parameters.dart';
+import 'package:collection_app/util/database_helper.dart';
 import 'package:collection_app/util/logging.dart';
 import 'package:collection_app/widgets/utils/db_process_indicator_overlay.dart';
 import 'package:flutter/foundation.dart';
@@ -100,7 +102,7 @@ Future<void> startApp() async {
   FromZeroAppContentWrapper.appNameForCloseConfirmation = 'Collection App';
   // WindowBar.logoImageAssetsPath = 'assets/images/logo.png'; // TODO 2 re-add when we get a logo
   await initHive(kReleaseMode ? 'collection_app' : 'collection_app_debug');
-  PlatformExtended.customDownloadsDirectory = Hive.box('settings').get('download_folder');
+  PlatformExtended.customDownloadsDirectory = Hive.box<dynamic>('settings').get('download_folder');
   themeParametersProvider = ChangeNotifierProvider((ref) {
     return ThemeParameters();
   });
@@ -151,7 +153,7 @@ class App extends StatefulWidget {
 
 }
 
-class _AppState extends State<App> {
+class _AppState extends State<App> with WidgetsBindingObserver {
 
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey();
   late final GoRouter router = GoRouter(
@@ -165,7 +167,29 @@ class _AppState extends State<App> {
   void initState() {
     super.initState();
     RendererBinding.instance.allowFirstFrame();
+    // WidgetsBinding.instance.addObserver(this);
   }
+
+  @override
+  void dispose() {
+    super.dispose();
+    // WidgetsBinding.instance.removeObserver(this);
+  }
+
+  // @override
+  // void didChangeAppLifecycleState(AppLifecycleState state) {
+  //   // seems to not work on windows :)))
+  //   switch (state) {
+  //     case AppLifecycleState.detached:
+  //       for (final e in collectionService.getAllCollections()) {
+  //         DbHelper.closeDbForCollection(e);
+  //       }
+  //     case AppLifecycleState.resumed:
+  //     case AppLifecycleState.inactive:
+  //     case AppLifecycleState.hidden:
+  //     case AppLifecycleState.paused:
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {

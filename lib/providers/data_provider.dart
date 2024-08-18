@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'package:collection_app/models/item.dart';
 import 'package:collection_app/providers/item_provider.dart';
-import 'package:collection_app/util/metadata_utils.dart';
-import 'package:collection_app/util/thumbnail_utils.dart';
+import 'package:collection_app/util/metadata.dart';
+import 'package:collection_app/util/thumbnail.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 
 

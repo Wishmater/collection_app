@@ -2,7 +2,6 @@ import 'package:collection_app/models/collection.dart';
 import 'package:collection_app/models/item.dart';
 import 'package:collection_app/models/tag.dart';
 import 'package:collection_app/providers/collection_provider.dart';
-import 'package:collection_app/providers/item_provider.dart';
 import 'package:dartx/dartx_io.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

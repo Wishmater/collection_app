@@ -57,7 +57,7 @@ class ItemService {
         );
       }
       if (saveToDb) {
-        DbHelper.saveItem(item);
+        Persistence.saveItem(item);
       }
     }
     return done;
@@ -72,7 +72,7 @@ class ItemService {
       if (index<0) throw Exception('Trying to save item, but item not found in Collection: $item');
     }
     if (saveToDb) {
-      DbHelper.saveItem(item); // TODO 3 PERFORMANCE, in some cases (or all cases?), we can skip updating the relations in db (like tags)
+      Persistence.saveItem(item); // TODO 3 PERFORMANCE, in some cases (or all cases?), we can skip updating the relations in db (like tags)
     }
     return true;
   }
@@ -96,7 +96,7 @@ class ItemService {
         saveToDb: saveToDb,
       );
       if (saveToDb) {
-        DbHelper.saveItem(item); // TODO 3 PERFORMANCE, save only item - tags relations
+        Persistence.saveItem(item); // TODO 3 PERFORMANCE, save only item - tags relations
       }
     }
     return done;
@@ -120,7 +120,7 @@ class ItemService {
     }
     if (done) {
       if (saveToDb) {
-        DbHelper.saveItem(album); // TODO 3 PERFORMANCE, save only item - tags relations
+        Persistence.saveItem(album); // TODO 3 PERFORMANCE, save only item - tags relations
       }
     }
     return done;

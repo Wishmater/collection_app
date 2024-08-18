@@ -2,8 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:mlog/mlog.dart';
-import 'package:video_player_win/video_player_win.dart';
 import 'package:video_player_platform_interface/video_player_platform_interface.dart';
+import 'package:video_player_win/video_player_win.dart';
 
 
 class VideoLiveThumbnail extends StatefulWidget {

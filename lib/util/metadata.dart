@@ -3,9 +3,8 @@ import 'package:collection_app/models/item.dart';
 import 'package:dartx/dartx_io.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:mlog/mlog.dart';
-import 'package:dartx/dartx.dart';
-import 'package:video_player_win/video_player_win.dart';
 import 'package:video_player_platform_interface/video_player_platform_interface.dart';
+import 'package:video_player_win/video_player_win.dart';
 
 
 abstract class MetadataUtils {

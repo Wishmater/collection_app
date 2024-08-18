@@ -1,6 +1,7 @@
 import 'package:collection_app/models/collection.dart';
 import 'package:collection_app/models/tag.dart';
 import 'package:collection_app/util/database.dart';
+import 'package:collection_app/util/database_helper.dart';
 import 'package:hive/hive.dart';
 
 
@@ -30,7 +31,7 @@ class CollectionService {
     _all.add(collection);
     DbHelper.openDbForCollection(collection).then((_) {
       if (saveToDb) {
-        DbHelper.saveCollection(collection);
+        Persistence.saveCollection(collection);
         saveCollectionToRecents(collection);
       }
     });
@@ -59,7 +60,7 @@ class CollectionService {
     }
     collection.tags.add(tag);
     if (saveToDb) {
-      DbHelper.saveTagToCollection(tag, collection);
+      Persistence.saveTagToCollection(tag, collection);
     }
     return true;
   }

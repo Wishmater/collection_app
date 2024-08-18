@@ -91,7 +91,7 @@ class TagService {
     }
     if (saveToDb && done) {
       // TODO 2 PERFORMANCE here we could just add the single child relation, instead of saving the entire tag
-      DbHelper.saveTagToAllCollections(child);
+      Persistence.saveTagToAllCollections(child);
     }
     return done;
   }
@@ -116,7 +116,7 @@ class TagService {
       if (saveToDb) {
         for (final child in children) {
           // TODO 2 PERFORMANCE here we could just add the single child relation, instead of saving the entire tag
-          DbHelper.saveTagToAllCollections(child);
+          Persistence.saveTagToAllCollections(child);
         }
       }
       return true;
@@ -144,7 +144,7 @@ class TagService {
     }
     if (saveToDb && done) {
       // TODO 2 PERFORMANCE here we could just add the single child relation, instead of saving the entire tag
-      DbHelper.saveTagToAllCollections(child);
+      Persistence.saveTagToAllCollections(child);
     }
     return done;
   }
@@ -173,7 +173,7 @@ class TagService {
       if (saveToDb) {
         for (final child in children) {
           // TODO 2 PERFORMANCE here we could just add the single child relation, instead of saving the entire tag
-          DbHelper.saveTagToAllCollections(child);
+          Persistence.saveTagToAllCollections(child);
         }
       }
       return true;

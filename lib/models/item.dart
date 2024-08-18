@@ -1,6 +1,6 @@
 import 'package:collection_app/models/collection.dart';
 import 'package:collection_app/models/tag.dart';
-import 'package:collection_app/util/database.dart';
+import 'package:collection_app/util/database_helper.dart';
 import 'package:path/path.dart' as p;
 
 

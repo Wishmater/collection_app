@@ -1,218 +1,17 @@
 import 'dart:async';
-import 'dart:io';
-
 import 'package:collection_app/models/collection.dart';
 import 'package:collection_app/models/item.dart';
 import 'package:collection_app/models/tag.dart';
 import 'package:collection_app/services/collection_service.dart';
 import 'package:collection_app/services/item_service.dart';
 import 'package:collection_app/services/tag_service.dart';
-import 'package:collection_app/util/logging.dart';
-import 'package:dartx/dartx_io.dart';
-import 'package:flutter/material.dart'; // for ValueNotifier :)
-import 'package:from_zero_ui/from_zero_ui.dart';
-import 'package:intl/intl.dart';
-import 'package:mlog/mlog.dart';
+import 'package:collection_app/util/database_helper.dart';
+import 'package:collection_app/util/util.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
-import 'package:uuid/uuid.dart';
 
 
-abstract class DbHelper {
-
-  static const _dbVersion = 3;
-  // TODO 1 make sure all DBs are closed gracefully when exiting the app
-  // TODO 1 when exiting the app, show an "are you sure message if there are DB operations pending"
-  static final Map<Collection, Database> _openDatabases = {};
-  static final Map<Collection, int> _nextItemId = {};
-  static final datetimeFormat = DateFormat('yyyy-MM-dd hh:mm:ss');
-  static int getNextItemIdForCollection(Collection collection) {
-    final id = _nextItemId[collection]!;
-    _nextItemId[collection] = id + 1;
-    return id;
-  }
-
-
-
-  // SCAFFOLDING / INTERNAL DB UTILITY, USUALLY NOT CALLED FROM OUTSIDE THIS FILE
-
-  static Map<String, bool> activeDbOperations = {};
-  static ValueNotifier<int> activeDbOperationsCount = ValueNotifier(0);
-  static ValueNotifier<int> activeDbOperationsBlockingCount = ValueNotifier(0);
-  static void _onActiveOperationChanges() {
-    activeDbOperationsCount.value = activeDbOperations.length;
-    activeDbOperationsBlockingCount.value = activeDbOperations.count((e) => e.value);
-  }
+abstract class Persistence {
   
-  static Future<void> waitForAllDbOperationsToFinish() async {
-    if (activeDbOperationsCount.value==0) return;
-    final completer = Completer<void>();
-    VoidCallback? listener;
-    listener = () {
-      if (activeDbOperationsCount.value==0) {
-        activeDbOperationsCount.removeListener(listener!);
-        completer.complete();
-      }
-    };
-    activeDbOperationsCount.addListener(listener);
-    return completer.future;
-  }
-  
-  static Future<void> waitForAllBlockingDbOperationsToFinish() async {
-    if (activeDbOperationsBlockingCount.value==0) return;
-    final completer = Completer<void>();
-    VoidCallback? listener;
-    listener = () {
-      if (activeDbOperationsBlockingCount.value==0) {
-        activeDbOperationsBlockingCount.removeListener(listener!);
-        completer.complete();
-      }
-    };
-    activeDbOperationsBlockingCount.addListener(listener);
-    return completer.future;
-  }
-
-  static Future<void> waitForCurrentDbOperationsToFinish() async {
-    if (activeDbOperationsCount.value==0) return;
-    final currentOperations = List<String>.from(activeDbOperations.keys);
-    final completer = Completer<void>();
-    VoidCallback? listener;
-    listener = () {
-      final toRemove = currentOperations.where((c) => !activeDbOperations.containsKey(c));
-      for (final e in toRemove) {
-        currentOperations.remove(e);
-      }
-      if (currentOperations.isEmpty) {
-        activeDbOperationsCount.removeListener(listener!);
-        completer.complete();
-      }
-    };
-    activeDbOperationsCount.addListener(listener);
-    return completer.future;
-  }
-
-  static Future<void> waitForCurrentBlockingDbOperationsToFinish() async {
-    if (activeDbOperationsCount.value==0) return;
-    final currentOperations = List<String>.from(activeDbOperations.entries.where((e) => e.value).map((e) => e.key));
-    final completer = Completer<void>();
-    VoidCallback? listener;
-    listener = () {
-      final toRemove = currentOperations.where((c) => !activeDbOperations.containsKey(c)).toList();
-      for (final e in toRemove) {
-        currentOperations.remove(e);
-      }
-      if (currentOperations.isEmpty) {
-        activeDbOperationsCount.removeListener(listener!);
-        completer.complete();
-      }
-    };
-    activeDbOperationsCount.addListener(listener);
-    return completer.future;
-  }
-  
-  static Future<T> _executeDbOperation<T>(
-    Collection collection,
-    Future<T> Function(Database database, String operationId) operation, {
-      bool isBlocking = true,
-  }) async {
-    final db = _openDatabases[collection]!;
-    final operationId = const Uuid().v4();
-    final waitFuture = waitForCurrentBlockingDbOperationsToFinish();
-    activeDbOperations[operationId] = true;
-    _onActiveOperationChanges();
-    log (LgLvl.finer,
-      'INIT DB operation $operationId $isBlocking',
-      type: LgType.db,
-    );
-    await waitFuture;
-    log (LgLvl.finer,
-      'EXEC DB operation $operationId $isBlocking',
-      type: LgType.db,
-    );
-    final result = await operation(db, operationId);
-    log (LgLvl.finer,
-      ' END DB operation $operationId $isBlocking',
-      type: LgType.db,
-    );
-    activeDbOperations.remove(operationId);
-    _onActiveOperationChanges();
-    return result;
-  }
-
-
-
-  // DATABASE OPERATIONS AND MUTATIONS, USUALLY CALLED FROM SERVICES
-
-  static Future<void> openDbForCollection(Collection collection, {
-    String? dbPath,
-  }) async {
-    final operationId = const Uuid().v4();
-    activeDbOperations[operationId] = true;
-    _onActiveOperationChanges();
-    dbPath ??= collection.getAbsoluteFilePathForDatabase();
-    if (dbPath==null) {
-      throw Exception("Collection path is null, and no custom database provided, so we don't know where to save the sqlite db :(");
-    }
-    final dbFile = File(dbPath);
-    final collectionDataRoot = dbFile.parent;
-    if (!await collectionDataRoot.exists()) {
-      await collectionDataRoot.create();
-      if (PlatformExtended.isWindows) {
-        await Process.run('attrib', ['+h', collectionDataRoot.absolute.path]); // hide folder
-      }
-    }
-    final dbExists = await databaseFactoryFfi.databaseExists(dbPath);
-    final db = await databaseFactoryFfi.openDatabase(dbPath,
-      options: OpenDatabaseOptions(
-        version: _dbVersion,
-        onConfigure: (db) async {
-          // Add support for cascade delete
-          await db.execute("PRAGMA foreign_keys = ON");
-        },
-        onCreate: (db, version) async {
-          log(LgLvl.info,
-            'Creating db for collection ${collection.name} at $dbPath',
-            type: LgType.db,
-          );
-          return _applySchemaMigration(db, 0, _dbVersion);
-        },
-        onUpgrade: (db, oldVersion, newVersion) async {
-          log(LgLvl.info,
-            'Upgrading db for collection ${collection.name} at $dbPath from ver $oldVersion to $newVersion',
-            type: LgType.db,
-          );
-          return _applySchemaMigration(db, oldVersion, _dbVersion);
-        },
-      ),
-    );
-    _openDatabases[collection] = db;
-    if (dbExists) {
-      activeDbOperations[operationId] = false;
-      _onActiveOperationChanges();
-      await _loadDataFromDb(collection, db);
-    } else {
-      _nextItemId[collection] = 1;
-    }
-    activeDbOperations.remove(operationId);
-    _onActiveOperationChanges();
-  }
-
-  static Future<void> closeDbForCollection(Collection collection) async {
-    if (_openDatabases.containsKey(collection)) {
-      await _openDatabases[collection]!.close();
-      _openDatabases.remove(collection);
-    }
-  }
-
-  static Future<void> deleteDbForCollection(Collection collection, {
-    String? dbPath,
-  }) async {
-    await closeDbForCollection(collection);
-    final file = File(dbPath ?? collection.getAbsoluteFilePathForDatabase()!);
-    if (await file.exists()) {
-      await file.delete();
-    }
-  }
-
   static Future<void> saveCollection(Collection collection) async {
     // we need to pre-build the args arrays with the primitive values, otherwise
     // we are vulnerable to a race condition if the item object properties are
@@ -225,13 +24,13 @@ abstract class DbHelper {
     ''';
     final args = [
       collection.name,
-      datetimeFormat.format(collection.added),
-      datetimeFormat.tryFormat(collection.lastSeen),
-      datetimeFormat.tryFormat(collection.lastModified),
+      DbHelper.datetimeFormat.format(collection.added),
+      DbHelper.datetimeFormat.tryFormat(collection.lastSeen),
+      DbHelper.datetimeFormat.tryFormat(collection.lastModified),
       collection.baseDirectory,
     ];
     args.addAll(List.from(args)); // args are doubled on insert statement due to "on conflict" update statement
-    return _executeDbOperation<void>(collection, (db, operationId) async {
+    return DbHelper.executeDbOperation<void>(collection, (db, operationId) async {
       db.execute(sql, args);
     });
   }
@@ -258,9 +57,9 @@ abstract class DbHelper {
     // main table upsert
     final args = [
       tag.name,
-      datetimeFormat.format(tag.added),
-      datetimeFormat.tryFormat(tag.lastSeen),
-      datetimeFormat.tryFormat(tag.lastModified),
+      DbHelper.datetimeFormat.format(tag.added),
+      DbHelper.datetimeFormat.tryFormat(tag.lastSeen),
+      DbHelper.datetimeFormat.tryFormat(tag.lastModified),
       tag.parentTag?.name,
     ];
     sql.add((/*language=SQLite*/ '''
@@ -288,7 +87,7 @@ abstract class DbHelper {
       ''', [tag.name, alias,]),);
     }
     // schedule db operation to be executed when async queue is free
-    return _executeDbOperation<void>(collection, (db, operationId) async {
+    return DbHelper.executeDbOperation<void>(collection, (db, operationId) async {
       final batch = db.batch();
       for (final e in sql) {
         batch.execute(e.$1, e.$2);
@@ -308,17 +107,17 @@ abstract class DbHelper {
     final args = [
       item.id,
       item.name,
-      datetimeFormat.format(item.added),
-      datetimeFormat.tryFormat(item.lastSeen),
-      datetimeFormat.tryFormat(item.lastModified),
+      DbHelper.datetimeFormat.format(item.added),
+      DbHelper.datetimeFormat.tryFormat(item.lastSeen),
+      DbHelper.datetimeFormat.tryFormat(item.lastModified),
       item.filePath,
       item.explorePriority,
       item.rating,
       // metadata
       item.itemType?.index,
-      datetimeFormat.tryFormat(item.metadataLastUpdated),
-      datetimeFormat.tryFormat(item.fileCreated),
-      datetimeFormat.tryFormat(item.fileModified),
+      DbHelper.datetimeFormat.tryFormat(item.metadataLastUpdated),
+      DbHelper.datetimeFormat.tryFormat(item.fileCreated),
+      DbHelper.datetimeFormat.tryFormat(item.fileModified),
       item.filesize,
       item.resolutionWidth,
       item.resolutionHeight,
@@ -354,7 +153,7 @@ abstract class DbHelper {
       }
     }
     // schedule db operation to be executed when async queue is free
-    return _executeDbOperation<void>(item.collection, (db, operationId) async {
+    return DbHelper.executeDbOperation<void>(item.collection, (db, operationId) async {
       final batch = db.batch();
       for (final e in sql) {
         batch.execute(e.$1, e.$2);
@@ -367,15 +166,15 @@ abstract class DbHelper {
 
   // DATA LOADING AND SCHEMA MIGRATIONS, SHOULD ONLY BE CALLED ONCE ON APP STARTUP
 
-  static Future<void> _loadDataFromDb(Collection collection, Database db) async {
+  static Future<void> loadDataFromDb(Collection collection, Database db) async {
     // LOAD COLLECTION
     final collectionQuery = await db.rawQuery(/*language=SQLite*/ '''
       select * from collection
     ''');
     collection.name = collectionQuery[0]['name']! as String;
-    collection.added = datetimeFormat.parse(collectionQuery[0]['added']! as String);
-    collection.lastSeen = datetimeFormat.tryParse(collectionQuery[0]['lastSeen'] as String?);
-    collection.lastModified = datetimeFormat.tryParse(collectionQuery[0]['lastModified'] as String?);
+    collection.added = DbHelper.datetimeFormat.parse(collectionQuery[0]['added']! as String);
+    collection.lastSeen = DbHelper.datetimeFormat.tryParse(collectionQuery[0]['lastSeen'] as String?);
+    collection.lastModified = DbHelper.datetimeFormat.tryParse(collectionQuery[0]['lastModified'] as String?);
     collection.baseDirectory = collectionQuery[0]['baseDirectory'] as String?;
     // LOAD TAGS
     // TODO 2 PERFORMANCE play around more with json_group_array, to reduce query count
@@ -398,9 +197,9 @@ abstract class DbHelper {
       ''', [tagName],);
       final tag = Tag(
         name: tagName,
-        added: datetimeFormat.parse(query['added']! as String),
-        lastSeen: datetimeFormat.tryParse(query['lastSeen'] as String?),
-        lastModified: datetimeFormat.tryParse(query['lastModified'] as String?),
+        added: DbHelper.datetimeFormat.parse(query['added']! as String),
+        lastSeen: DbHelper.datetimeFormat.tryParse(query['lastSeen'] as String?),
+        lastModified: DbHelper.datetimeFormat.tryParse(query['lastModified'] as String?),
         aliases: aliasesQuery.map((e) => e['alias']! as String).toList(),
       );
       tags[tag.name] = tag;
@@ -433,7 +232,7 @@ abstract class DbHelper {
       from item
       -- left join itemTags iT on item.id = iT.itemId
     ''');
-    _nextItemId[collection] = 1;
+    DbHelper.nextItemId[collection] = 1;
     for (final query in itemQuery) {
       final itemId = query['id']! as int;
       final secondaryParentsQuery = await db.rawQuery(/*language=SQLite*/ '''
@@ -445,24 +244,24 @@ abstract class DbHelper {
         collection: collection,
         id: itemId,
         name: query['name']! as String,
-        added: datetimeFormat.parse(query['added']! as String),
-        lastSeen: datetimeFormat.tryParse(query['lastSeen'] as String?),
-        lastModified: datetimeFormat.tryParse(query['lastModified'] as String?),
+        added: DbHelper.datetimeFormat.parse(query['added']! as String),
+        lastSeen: DbHelper.datetimeFormat.tryParse(query['lastSeen'] as String?),
+        lastModified: DbHelper.datetimeFormat.tryParse(query['lastModified'] as String?),
         filePath: query['filePath'] as String?,
         explorePriority: query['explorePriority'] as int?,
         rating: query['rating'] as int?,
         tags: secondaryParentsQuery.map((e) => tags[e['tagName']! as String]!).toList(),
         itemType: query['itemType']==null ? null : ItemType.values[query['itemType']! as int],
-        metadataLastUpdated: datetimeFormat.tryParse(query['metadataLastUpdated'] as String?),
-        fileCreated: datetimeFormat.tryParse(query['fileCreated'] as String?),
-        fileModified: datetimeFormat.tryParse(query['fileModified'] as String?),
+        metadataLastUpdated: DbHelper.datetimeFormat.tryParse(query['metadataLastUpdated'] as String?),
+        fileCreated: DbHelper.datetimeFormat.tryParse(query['fileCreated'] as String?),
+        fileModified: DbHelper.datetimeFormat.tryParse(query['fileModified'] as String?),
         filesize: query['filesize'] as int?,
         resolutionWidth: query['resolutionWidth'] as int?,
         resolutionHeight: query['resolutionHeight'] as int?,
         duration: query['duration']==null ? null : Duration(milliseconds: query['duration']! as int),
       );
-      if (_nextItemId[collection]! <= item.id) {
-        _nextItemId[collection] = item.id + 1;
+      if (DbHelper.nextItemId[collection]! <= item.id) {
+        DbHelper.nextItemId[collection] = item.id + 1;
       }
       itemService.addItem(item,
         checkIfAlreadyExists: false,
@@ -488,7 +287,7 @@ abstract class DbHelper {
     }
   }
 
-  static Future<void> _applySchemaMigration(Database db, int oldVersion, int newVersion) async {
+  static Future<void> applySchemaMigration(Database db, int oldVersion, int newVersion) async {
     if (oldVersion<1 && newVersion>=1) {
       await db.execute(/*language=SQLite*/ '''
         create table collection(
@@ -564,16 +363,4 @@ abstract class DbHelper {
     }
   }
 
-}
-
-
-extension DateFormatTry on DateFormat {
-  String? tryFormat(DateTime? dateTime) {
-    if (dateTime==null) return null;
-    return format(dateTime);
-  }
-  DateTime? tryParse(String? string) {
-    if (string==null) return null;
-    return parse(string);
-  }
 }

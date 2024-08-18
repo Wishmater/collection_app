@@ -2,7 +2,6 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:collection_app/models/tag.dart';
 import 'package:collection_app/providers/app_state_provider.dart';
 import 'package:collection_app/widgets/utils/interval_rating_bar.dart';
-import 'package:dartx/dartx_io.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/util/copied_flutter_widgets/my_tooltip.dart';

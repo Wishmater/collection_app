@@ -1,19 +1,17 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:collection_app/models/item.dart';
 import 'package:collection_app/providers/app_state_provider.dart';
 import 'package:collection_app/providers/data_provider.dart';
 import 'package:collection_app/providers/item_provider.dart';
 import 'package:collection_app/widgets/item_explorer_appbar.dart';
 import 'package:collection_app/widgets/item_thumbnail/video_cached_thumbnail.dart';
-import 'package:collection_app/widgets/item_thumbnail/video_live_thumbnail.dart';
 import 'package:collection_app/widgets/utils/multi_tap_recognizer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:intl/intl.dart';
-import 'package:mlog/mlog.dart';
+import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 
