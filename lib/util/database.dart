@@ -230,7 +230,7 @@ abstract class DbHelper {
       datetimeFormat.tryFormat(collection.lastModified),
       collection.baseDirectory,
     ];
-    args.addAll(List.from(args)); // args are doubled on insert statement do to on conflict update statement
+    args.addAll(List.from(args)); // args are doubled on insert statement due to "on conflict" update statement
     return _executeDbOperation<void>(collection, (db, operationId) async {
       db.execute(sql, args);
     });

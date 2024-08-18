@@ -1,6 +1,7 @@
 import 'package:collection_app/models/collection.dart';
 import 'package:collection_app/models/tag.dart';
 import 'package:collection_app/util/database.dart';
+import 'package:hive/hive.dart';
 
 
 final collectionService = CollectionService();
@@ -30,9 +31,15 @@ class CollectionService {
     DbHelper.openDbForCollection(collection).then((_) {
       if (saveToDb) {
         DbHelper.saveCollection(collection);
+        saveCollectionToRecents(collection);
       }
     });
     return true;
+  }
+
+  void saveCollectionToRecents(Collection collection) {
+    final box = Hive.box<List<dynamic>>('collections');
+    box.put(collection.baseDirectory, [collection.name, DateTime.now()]);
   }
 
   bool removeCollection(Collection collection) {

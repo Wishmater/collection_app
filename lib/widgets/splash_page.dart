@@ -36,35 +36,24 @@ class PageSplashState extends ConsumerState<PageSplash> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async{
       sqfliteFfiInit();
 
-      final collection = Collection(
-        name: 'Prnhb',
-        baseDirectory: r'D:\Polnareff\prnhb',
-      );
-      CollectionProvider.addCollection(ref, collection,
-        checkIfAlreadyExists: false,
-        saveToDb: false,
-      );
+      final collectionsBox = await Hive.openBox<List<dynamic>>('collections');
+      List<(String, String, DateTime)> collectionsData = [];
+      for (final key in collectionsBox.keys) {
+        final value = collectionsBox.get(key)!;
+        collectionsData.add((key, value[0], value[1]));
+      }
+      collectionsData = collectionsData.sortedByDescending((e) => e.$3);
+      for (final e in collectionsData) {
+        final collection = Collection(
+          name: e.$2,
+          baseDirectory: e.$1,
+        );
+        CollectionProvider.addCollection(ref, collection,
+          checkIfAlreadyExists: false,
+          saveToDb: false,
+        );
+      }
       await DbHelper.waitForAllDbOperationsToFinish();
-
-      // TODO 1 re-add this once we have a collections UI where we can select new ones, and they're saved to hive box
-      // final collectionsBox = Hive.box<(String, DateTime)>('collections');
-      // List<(String, String, DateTime)> collections = [];
-      // for (final key in collectionsBox.keys) {
-      //   final value = collectionsBox.get(key)!;
-      //   collections.add((key, value.$1, value.$2));
-      // }
-      // collections = collections.sortedByDescending((e) => e.$3);
-      // if (collections.isNotEmpty) {
-      //   final collection = Collection(
-      //     name: collections.first.$1,
-      //     baseDirectory: collections.first.$2,
-      //   );
-      //   CollectionProvider.addCollection(ref, collection,
-      //     checkIfAlreadyExists: false,
-      //     saveToDb: false,
-      //   );
-      //   await DbHelper.waitForAllDbOperationsToFinish();
-      // }
 
       if (context.mounted) {
         RouteMain().go(context);

@@ -20,15 +20,20 @@ abstract class CollectionProvider {
 
   // MUTATIONS
 
-  static void addCollection(WidgetRef ref, Collection collection, {
+  static bool addCollection(WidgetRef ref, Collection collection, {
     bool checkIfAlreadyExists = true,
     bool saveToDb = true,
   }) {
-    collectionService.addCollection(collection,
+    final result = collectionService.addCollection(collection,
       checkIfAlreadyExists: checkIfAlreadyExists,
-      saveToDb: false,
+      saveToDb: saveToDb,
     );
     ref.invalidate(all);
+    return result;
+  }
+
+  static void saveCollectionToRecents(Collection collection) {
+    collectionService.saveCollectionToRecents(collection);
   }
 
 }
