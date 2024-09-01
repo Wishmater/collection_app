@@ -37,12 +37,12 @@ abstract class MetadataUtils {
         await controller.initialize();
         await controller.dispose();
       case ItemType.image:
-        // TODO 1 Implement loading metadata for images
+        // TODO 2 Implement loading metadata for images
         // item.resolutionWidth = ???;
         // item.resolutionHeight = ???;
         log(LgLvl.error, 'Metadata loading for images not implemented: $item');
       case ItemType.audio:
-        // TODO 1 Implement loading metadata for audio
+        // TODO 2 Implement loading metadata for audio
         // item.duration = ???;
         log(LgLvl.error, 'Metadata loading for audio not implemented: $item');
       case ItemType.unknown:

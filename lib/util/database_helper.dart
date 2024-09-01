@@ -18,7 +18,6 @@ typedef DbOperation<T> = Future<T> Function(Database database, String operationI
 abstract class DbHelper {
 
   static const _dbVersion = 3;
-  // TODO 1 make sure all DBs are closed gracefully when exiting the app
   // TODO 1 when exiting the app, show an "are you sure message if there are DB operations pending"
   static final Map<Collection, Database> openDatabases = {};
   static final Map<Collection, int> nextItemId = {};
