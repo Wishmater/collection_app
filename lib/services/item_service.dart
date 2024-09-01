@@ -2,7 +2,7 @@ import 'package:collection_app/models/collection.dart';
 import 'package:collection_app/models/item.dart';
 import 'package:collection_app/models/tag.dart';
 import 'package:collection_app/services/collection_service.dart';
-import 'package:collection_app/util/database.dart';
+import 'package:collection_app/util/persistence.dart';
 import 'package:dartx/dartx.dart';
 
 
