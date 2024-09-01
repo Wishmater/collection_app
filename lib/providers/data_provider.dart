@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:collection_app/models/item.dart';
 import 'package:collection_app/providers/item_provider.dart';
+import 'package:collection_app/util/any_ref.dart';
 import 'package:collection_app/util/metadata.dart';
 import 'package:collection_app/util/thumbnail.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
@@ -19,7 +20,7 @@ abstract class DataProvider {
   static final metadata = ApiProviderFamily<Item, Item>((ref, item) {
     return ApiState(ref, (apiState) async {
       final result = await MetadataUtils.loadMetadata(item);
-      ItemProvider.saveItem(ref, result);
+      ItemProvider.saveItem(AnyRef(ref: ref), result);
       return result;
     });
   },

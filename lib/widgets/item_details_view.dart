@@ -1,14 +1,19 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'package:collection_app/models/item.dart';
 import 'package:collection_app/providers/app_state_provider.dart';
+import 'package:collection_app/providers/item_provider.dart';
+import 'package:collection_app/util/any_ref.dart';
 import 'package:collection_app/widgets/item_thumbnail/video_cached_thumbnail.dart';
+import 'package:collection_app/widgets/utils/hover_builder.dart';
+import 'package:collection_app/widgets/utils/interval_rating_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:intl/intl.dart';
 
 
-class ItemDetailsView extends ConsumerWidget {
+class ItemDetailsView extends ConsumerStatefulWidget {
 
   final Item item;
   final bool isMainScrollbar;
@@ -20,11 +25,34 @@ class ItemDetailsView extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ItemDetailsView> createState() => _ItemDetailsViewState();
+
+}
+
+class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
+
+  StreamSubscription<Item>? _itemsUpdateSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _itemsUpdateSubscription = ItemProvider.updatedItemIdsStream.listen((Item item) {
+      if (item==widget.item) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    _itemsUpdateSubscription?.cancel();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final scrollController = ScrollController();
     Widget visualization;
     final dateFormat = DateFormat('yyyy MMMM dd - hh:mm:ss');
-    switch(item.itemType!) {
+    switch(widget.item.itemType!) {
       case ItemType.image:
         visualization = Center(
           child: Text('Visualization widget for images not implemented',
@@ -36,7 +64,7 @@ class ItemDetailsView extends ConsumerWidget {
       //   filePath: widget.item.getAbsoluteFilePath()!,
       // );
         visualization = VideoCachedThumbnail(
-          item: item,
+          item: widget.item,
         );
       case ItemType.audio:
         visualization = Center(
@@ -54,18 +82,18 @@ class ItemDetailsView extends ConsumerWidget {
           ),
         );
     }
-    final filePath = item.getAbsoluteFilePath();
+    final filePath = widget.item.getAbsoluteFilePath();
     return ScrollbarFromZero(
       controller: scrollController,
-      mainScrollbar: isMainScrollbar,
+      mainScrollbar: widget.isMainScrollbar,
       child: CustomScrollView(
         controller: scrollController,
         slivers: [
           SliverToBoxAdapter(
             child: AppbarFromZero(
-              key: ValueKey(item.name), // fixes weird behaviour in OverflowScroll when switching items
+              key: ValueKey(widget.item.name), // fixes weird behaviour in OverflowScroll when switching items
               title: OverflowScroll(
-                child: Text(item.name,
+                child: Text(widget.item.name,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
@@ -100,24 +128,184 @@ class ItemDetailsView extends ConsumerWidget {
           SliverToBoxAdapter(
             child: DetailsValueWidget(
               title: const Text('Rating'),
-              value: Text(item.rating?.toString()??'',
-                style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                  fontWeight: FontWeight.w900,
-                  color: Color.alphaBlend(Colors.yellow.withOpacity(0.6), Theme.of(context).canvasColor),
-                  height: 1.28,
-                ),
+              value: HoverBuilder(
+                layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
+                  return Stack(
+                    alignment: Alignment.centerLeft,
+                    children: <Widget>[
+                      if (previousChildren.isNotEmpty) previousChildren.last,
+                      if (currentChild!=null) currentChild,
+                    ],
+                  );
+                },
+                defaultBuilder: (context) {
+                  return Text(widget.item.rating?.toString()??'',
+                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: Color.alphaBlend(Colors.yellow.withOpacity(0.6), Theme.of(context).canvasColor),
+                      height: 1.28,
+                    ),
+                  );
+                },
+                hoveredBuilder: (context) {
+                  final color = Color.alphaBlend(Colors.yellow.withOpacity(0.6), Theme.of(context).canvasColor);
+                  final textStyle = Theme.of(context).textTheme.titleMedium!;
+                  return IntervalRatingBar(
+                    min: 1, max: 10,
+                    color: color,
+                    from: widget.item.rating, to: widget.item.rating,
+                    onFromChanged: (value) {
+                      if (widget.item.rating==value) return;
+                      widget.item.rating = value;
+                      ItemProvider.saveItem(AnyRef(widgetRef: ref), widget.item);
+                    },
+                    onToChanged: (value) {
+                      if (widget.item.rating==value) return;
+                      widget.item.rating = value;
+                      ItemProvider.saveItem(AnyRef(widgetRef: ref), widget.item);
+                    },
+                    widgetBuilder: (context, value, {required selected, color}) {
+                      return Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Positioned(
+                            left: 0, right: 0, top: -2, bottom: -2,
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 100),
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: selected ? color!.withOpacity(color.opacity*0.6) : null,
+                                borderRadius: BorderRadius.horizontal(
+                                  left: widget.item.rating==value ? const Radius.circular(6) : Radius.zero,
+                                  right: widget.item.rating==value ? const Radius.circular(6) : Radius.zero,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: value==10 ? 24 : 18,
+                            alignment: Alignment.center,
+                            child: Text(value.toString(),
+                              style: textStyle.copyWith(
+                                fontWeight: FontWeight.w900,
+                                height: 1.28,
+                                color: selected
+                                    ? textStyle.color!.withOpacity(0.8)
+                                    : color,
+                              ),
+                            ),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                },
               ),
             ),
           ),
           SliverToBoxAdapter(
             child: DetailsValueWidget(
               title: const Text('Priority'),
-              value: Text(item.explorePriority?.toString()??'',
-                style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                  fontWeight: FontWeight.w900,
-                  color: Color.alphaBlend(Colors.purple.withOpacity(0.8), Theme.of(context).canvasColor),
-                  height: 1.28,
-                ),
+              value: HoverBuilder(
+                layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
+                  return Stack(
+                    alignment: Alignment.centerLeft,
+                    children: <Widget>[
+                      if (previousChildren.isNotEmpty) previousChildren.last,
+                      if (currentChild!=null) currentChild,
+                    ],
+                  );
+                },
+                defaultBuilder: (context) {
+                  return Text(widget.item.explorePriority?.toString()??'',
+                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: Color.alphaBlend(Colors.purple.withOpacity(0.8), Theme.of(context).canvasColor),
+                      height: 1.28,
+                    ),
+                  );
+                },
+                hoveredBuilder: (context) {
+                  final color = Color.alphaBlend(Colors.purple.withOpacity(0.8), Theme.of(context).canvasColor);
+                  final textStyle = Theme.of(context).textTheme.titleMedium!;
+                  return IntervalRatingBar(
+                    min: -6, max: 3,
+                    color: color,
+                    from: widget.item.explorePriority, to: widget.item.explorePriority,
+                    onFromChanged: (value) {
+                      if (widget.item.explorePriority==value) return;
+                      widget.item.explorePriority = value;
+                      ItemProvider.saveItem(AnyRef(widgetRef: ref), widget.item);
+                    },
+                    onToChanged: (value) {
+                      if (widget.item.explorePriority==value) return;
+                      widget.item.explorePriority = value;
+                      ItemProvider.saveItem(AnyRef(widgetRef: ref), widget.item);
+                    },
+                    widgetBuilder: (context, value, {required selected, color}) {
+                      Widget result = Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          Positioned(
+                            left: 0, right: 0, top: -2, bottom: -2,
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 100),
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                color: selected ? color!.withOpacity(color.opacity*0.6) : null,
+                                borderRadius: BorderRadius.horizontal(
+                                  left: widget.item.explorePriority==value ? const Radius.circular(6) : Radius.zero,
+                                  right: widget.item.explorePriority==value ? const Radius.circular(6) : Radius.zero,
+                                ),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: 18,
+                            alignment: Alignment.center,
+                            child: Stack(
+                              children: [
+                                Text(value.abs().toString(),
+                                  style: textStyle.copyWith(
+                                    fontWeight: FontWeight.w900,
+                                    height: 1.28,
+                                    color: selected
+                                        ? textStyle.color!.withOpacity(0.8)
+                                        : color,
+                                  ),
+                                ),
+                                if (value<0)
+                                  Positioned(
+                                    bottom: 1, left: -1, right: -1, height: 3,
+                                    child: ColoredBox(
+                                      color: selected
+                                          ? textStyle.color!.withOpacity(0.6)
+                                          : color!.withOpacity(color.opacity*0.8),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      );
+                      if (value==-1) {
+                        result = Row(
+                          children: [
+                            result,
+                            Padding(
+                              padding: const EdgeInsets.only(top: 4, right: 1),
+                              child: Container(
+                                width: 5, height: 3,
+                                color: Theme.of(context).dividerColor,
+                              ),
+                            ),
+                          ],
+                        );
+                      }
+                      return result;
+                    },
+                  );
+                },
               ),
             ),
           ),
@@ -125,21 +313,21 @@ class ItemDetailsView extends ConsumerWidget {
           SliverToBoxAdapter(
             child: DetailsValueWidget(
               title: const Text('Tags'),
-              value: Text(item.tags.map((e) => e.name).reduce((v, e) => '$v, $e')),
+              value: Text(widget.item.tags.map((e) => e.name).reduce((v, e) => '$v, $e')),
             ),
           ),
-          if (item.duration!=null)
+          if (widget.item.duration!=null)
             SliverToBoxAdapter(
               child: DetailsValueWidget(
                 title: const Text('Duration'),
-                value: Text(_printDuration(item.duration!)),
+                value: Text(_printDuration(widget.item.duration!)),
               ),
             ),
-          if (item.resolutionWidth!=null && item.resolutionHeight!=null)
+          if (widget.item.resolutionWidth!=null && widget.item.resolutionHeight!=null)
             SliverToBoxAdapter(
               child: DetailsValueWidget(
                 title: const Text('Resolution'),
-                value: Text('${item.resolutionWidth} x ${item.resolutionHeight}'),
+                value: Text('${widget.item.resolutionWidth} x ${widget.item.resolutionHeight}'),
               ),
             ),
 
@@ -149,59 +337,59 @@ class ItemDetailsView extends ConsumerWidget {
           SliverToBoxAdapter(
             child: DetailsValueWidget(
               title: const Text('Collection'),
-              value: Text(item.collection.name),
+              value: Text(widget.item.collection.name),
             ),
           ),
           SliverToBoxAdapter(
             child: DetailsValueWidget(
               title: const Text('Item Added'),
-              value: Text(dateFormat.format(item.added)),
+              value: Text(dateFormat.format(widget.item.added)),
             ),
           ),
-          if (item.lastModified!=null)
+          if (widget.item.lastModified!=null)
             SliverToBoxAdapter(
               child: DetailsValueWidget(
                 title: const Text('Item Modified'),
-                value: Text(dateFormat.format(item.lastModified!)),
+                value: Text(dateFormat.format(widget.item.lastModified!)),
               ),
             ),
-          if (item.lastSeen!=null)
+          if (widget.item.lastSeen!=null)
             SliverToBoxAdapter(
               child: DetailsValueWidget(
                 title: const Text('Last Seen'),
-                value: Text(dateFormat.format(item.lastSeen!)),
+                value: Text(dateFormat.format(widget.item.lastSeen!)),
               ),
             ),
 
           const SliverToBoxAdapter(child: SizedBox(height: 24,),),
 
           // file metadata
-          if (item.metadataLastUpdated!=null)
+          if (widget.item.metadataLastUpdated!=null)
             SliverToBoxAdapter(
               child: DetailsValueWidget(
                 title: const Text('Metadata'),
-                value: Text(dateFormat.format(item.metadataLastUpdated!)),
+                value: Text(dateFormat.format(widget.item.metadataLastUpdated!)),
               ),
             ),
-          if (item.filesize!=null)
+          if (widget.item.filesize!=null)
             SliverToBoxAdapter(
               child: DetailsValueWidget(
                 title: const Text('File Size'),
-                value: Text(_getFileSize(item.filesize!)),
+                value: Text(_getFileSize(widget.item.filesize!)),
               ),
             ),
-          if (item.fileCreated!=null)
+          if (widget.item.fileCreated!=null)
             SliverToBoxAdapter(
               child: DetailsValueWidget(
                 title: const Text('File Created'),
-                value: Text(dateFormat.format(item.fileCreated!)),
+                value: Text(dateFormat.format(widget.item.fileCreated!)),
               ),
             ),
-          if (item.fileModified!=null)
+          if (widget.item.fileModified!=null)
             SliverToBoxAdapter(
               child: DetailsValueWidget(
                 title: const Text('File Mod.'),
-                value: Text(dateFormat.format(item.fileModified!)),
+                value: Text(dateFormat.format(widget.item.fileModified!)),
               ),
             ),
           if (filePath!=null)
@@ -218,7 +406,6 @@ class ItemDetailsView extends ConsumerWidget {
       ),
     );
   }
-
 }
 
 
