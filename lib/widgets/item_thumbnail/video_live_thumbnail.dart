@@ -5,33 +5,28 @@ import 'package:mlog/mlog.dart';
 import 'package:video_player_platform_interface/video_player_platform_interface.dart';
 import 'package:video_player_win/video_player_win.dart';
 
-
 class VideoLiveThumbnail extends StatefulWidget {
-
   final String filePath;
 
-  const VideoLiveThumbnail({
-    required this.filePath,
-    super.key,
-  });
+  const VideoLiveThumbnail({required this.filePath, super.key});
 
   @override
   State<VideoLiveThumbnail> createState() => _VideoLiveThumbnailState();
-
 }
 
-
 class _VideoLiveThumbnailState extends State<VideoLiveThumbnail> {
-
   late WinVideoPlayerController controller;
 
   @override
   void initState() {
     super.initState();
     controller = WinVideoPlayerController.file(File(widget.filePath));
-    log (LgLvl.fine, 'Initializing video live thumbnail  --  ${widget.filePath}');
+    log(
+      LgLvl.fine,
+      'Initializing video live thumbnail  --  ${widget.filePath}',
+    );
     controller.videoEventStream.listen((event) {
-      log (LgLvl.info, '${event.eventType}  --  ${widget.filePath}');
+      log(LgLvl.info, '${event.eventType}  --  ${widget.filePath}');
       switch (event.eventType) {
         case VideoEventType.initialized:
           setState(() {
@@ -58,5 +53,4 @@ class _VideoLiveThumbnailState extends State<VideoLiveThumbnail> {
   Widget build(BuildContext context) {
     return WinVideoPlayer(controller);
   }
-
 }

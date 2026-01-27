@@ -9,9 +9,7 @@ import 'package:collection_app/util/database_helper.dart';
 import 'package:collection_app/util/util.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-
 abstract class Persistence {
-  
   static Future<void> saveCollection(Collection collection) async {
     // we need to pre-build the args arrays with the primitive values, otherwise
     // we are vulnerable to a race condition if the item object properties are
@@ -29,8 +27,13 @@ abstract class Persistence {
       DbHelper.datetimeFormat.tryFormat(collection.lastModified),
       collection.baseDirectory,
     ];
-    args.addAll(List.from(args)); // args are doubled on insert statement due to "on conflict" update statement
-    return DbHelper.executeDbOperation<void>(collection, (db, operationId) async {
+    args.addAll(
+      List.from(args),
+    ); // args are doubled on insert statement due to "on conflict" update statement
+    return DbHelper.executeDbOperation<void>(collection, (
+      db,
+      operationId,
+    ) async {
       db.execute(sql, args);
     });
   }
@@ -44,10 +47,16 @@ abstract class Persistence {
       }
     }
     if (!done) {
-      throw Exception('Trying to save tag $tag to all collection DBs, but it is not included in any collection');
+      throw Exception(
+        'Trying to save tag $tag to all collection DBs, but it is not included in any collection',
+      );
     }
   }
-  static Future<void> saveTagToCollection(Tag tag, Collection collection) async {
+
+  static Future<void> saveTagToCollection(
+    Tag tag,
+    Collection collection,
+  ) async {
     // TODO 2 PERFORMANCE make each of the queries optional
     // TODO 3 PERFORMANCE allow to add/remove specific relations instead of saving all of them
     // we need to pre-build the args arrays with the primitive values, otherwise
@@ -62,32 +71,50 @@ abstract class Persistence {
       DbHelper.datetimeFormat.tryFormat(tag.lastModified),
       tag.parentTag?.name,
     ];
-    sql.add((/*language=SQLite*/ '''
+    sql.add((
+      /*language=SQLite*/ '''
       insert into tag 
         values (?, ?, ?, ?, ?)
       on conflict (name) do update 
         set name=?, added=?, lastSeen=?, lastModified=?, parentTagName=?;
-    ''', [...args, ...args]),);
+    ''',
+      [...args, ...args],
+    ));
     // relation with tag secondary children
-    sql.add((/*language=SQLite*/ '''
+    sql.add((
+      /*language=SQLite*/ '''
       delete from tagSecondaryChildren where childTagName=?;
-    ''', [tag.name]),);
+    ''',
+      [tag.name],
+    ));
     for (final secondaryParent in tag.secondaryParentTags) {
-      sql.add((/*language=SQLite*/ '''
+      sql.add((
+        /*language=SQLite*/ '''
         insert into tagSecondaryChildren values (?, ?);
-      ''', [secondaryParent.name, tag.name,]),);
+      ''',
+        [secondaryParent.name, tag.name],
+      ));
     }
     // relation with tag aliases
-    sql.add((/*language=SQLite*/ '''
+    sql.add((
+      /*language=SQLite*/ '''
       delete from tagAliases where tagName=?;
-    ''', [tag.name]),);
+    ''',
+      [tag.name],
+    ));
     for (final alias in tag.aliases) {
-      sql.add((/*language=SQLite*/ '''
+      sql.add((
+        /*language=SQLite*/ '''
         insert into tagAliases values (?, ?);
-      ''', [tag.name, alias,]),);
+      ''',
+        [tag.name, alias],
+      ));
     }
     // schedule db operation to be executed when async queue is free
-    return DbHelper.executeDbOperation<void>(collection, (db, operationId) async {
+    return DbHelper.executeDbOperation<void>(collection, (
+      db,
+      operationId,
+    ) async {
       final batch = db.batch();
       for (final e in sql) {
         batch.execute(e.$1, e.$2);
@@ -123,37 +150,55 @@ abstract class Persistence {
       item.resolutionHeight,
       item.duration?.inMilliseconds,
     ];
-    sql.add((/*language=SQLite*/ '''
+    sql.add((
+      /*language=SQLite*/ '''
       insert into item 
         values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       on conflict (id) do update 
         set id=?, name=?, added=?, lastSeen=?, lastModified=?, filePath=?, explorePriority=?, rating=?,
             itemType=?, metadataLastUpdated=?, fileCreated=?, fileModified=?, filesize=?, 
             resolutionWidth=?, resolutionHeight=?, duration=?;
-    ''', [...args, ...args]),);
+    ''',
+      [...args, ...args],
+    ));
     // relation with tags
-    sql.add((/*language=SQLite*/ '''
+    sql.add((
+      /*language=SQLite*/ '''
       delete from itemTags where itemId=?;
-    ''', [item.id]),);
+    ''',
+      [item.id],
+    ));
     for (final tag in item.tags) {
-      sql.add((/*language=SQLite*/ '''
+      sql.add((
+        /*language=SQLite*/ '''
         insert into itemTags values (?, ?);
-      ''', [item.id, tag.name,]),);
+      ''',
+        [item.id, tag.name],
+      ));
     }
     // relation with albumChildren
-    if (item.itemType==ItemType.album) {
-      sql.add((/*language=SQLite*/ '''
+    if (item.itemType == ItemType.album) {
+      sql.add((
+        /*language=SQLite*/ '''
         delete from albumItems where albumId=?;
-      ''', [item.id]),);
-      for (int i=0; i<item.albumChildren!.length; i++) {
+      ''',
+        [item.id],
+      ));
+      for (int i = 0; i < item.albumChildren!.length; i++) {
         final child = item.albumChildren![i];
-        sql.add((/*language=SQLite*/ '''
+        sql.add((
+          /*language=SQLite*/ '''
           insert into albumItems values (?, ?, ?)
-        ''', [item.id, child.id, i,]),);
+        ''',
+          [item.id, child.id, i],
+        ));
       }
     }
     // schedule db operation to be executed when async queue is free
-    return DbHelper.executeDbOperation<void>(item.collection, (db, operationId) async {
+    return DbHelper.executeDbOperation<void>(item.collection, (
+      db,
+      operationId,
+    ) async {
       final batch = db.batch();
       for (final e in sql) {
         batch.execute(e.$1, e.$2);
@@ -161,8 +206,6 @@ abstract class Persistence {
       await batch.commit();
     });
   }
-
-
 
   // DATA LOADING AND SCHEMA MIGRATIONS, SHOULD ONLY BE CALLED ONCE ON APP STARTUP
 
@@ -172,9 +215,15 @@ abstract class Persistence {
       select * from collection
     ''');
     collection.name = collectionQuery[0]['name']! as String;
-    collection.added = DbHelper.datetimeFormat.parse(collectionQuery[0]['added']! as String);
-    collection.lastSeen = DbHelper.datetimeFormat.tryParse(collectionQuery[0]['lastSeen'] as String?);
-    collection.lastModified = DbHelper.datetimeFormat.tryParse(collectionQuery[0]['lastModified'] as String?);
+    collection.added = DbHelper.datetimeFormat.parse(
+      collectionQuery[0]['added']! as String,
+    );
+    collection.lastSeen = DbHelper.datetimeFormat.tryParse(
+      collectionQuery[0]['lastSeen'] as String?,
+    );
+    collection.lastModified = DbHelper.datetimeFormat.tryParse(
+      collectionQuery[0]['lastModified'] as String?,
+    );
     collection.baseDirectory = collectionQuery[0]['baseDirectory'] as String?;
     // LOAD TAGS
     // TODO 2 PERFORMANCE play around more with json_group_array, to reduce query count
@@ -190,16 +239,23 @@ abstract class Persistence {
     final tags = <String, Tag>{};
     for (final query in tagQuery) {
       final tagName = query['name']! as String;
-      final aliasesQuery = await db.rawQuery(/*language=SQLite*/ '''
+      final aliasesQuery = await db.rawQuery(
+        /*language=SQLite*/ '''
         select alias 
         from tagAliases
         where tagName = ?
-      ''', [tagName],);
+      ''',
+        [tagName],
+      );
       final tag = Tag(
         name: tagName,
         added: DbHelper.datetimeFormat.parse(query['added']! as String),
-        lastSeen: DbHelper.datetimeFormat.tryParse(query['lastSeen'] as String?),
-        lastModified: DbHelper.datetimeFormat.tryParse(query['lastModified'] as String?),
+        lastSeen: DbHelper.datetimeFormat.tryParse(
+          query['lastSeen'] as String?,
+        ),
+        lastModified: DbHelper.datetimeFormat.tryParse(
+          query['lastModified'] as String?,
+        ),
         aliases: aliasesQuery.map((e) => e['alias']! as String).toList(),
       );
       tags[tag.name] = tag;
@@ -208,18 +264,23 @@ abstract class Persistence {
     for (final query in tagQuery) {
       final tag = tags[query['name']! as String]!;
       tag.parentTag = tags[query['parentTagName'] as String?];
-      final secondaryParentsQuery = await db.rawQuery(/*language=SQLite*/ '''
+      final secondaryParentsQuery = await db.rawQuery(
+        /*language=SQLite*/ '''
         select parentTagName 
         from tagSecondaryChildren
         where childTagName = ?
-      ''', [tag.name],);
+      ''',
+        [tag.name],
+      );
       for (final query in secondaryParentsQuery) {
         tag.secondaryParentTags.add(tags[query['parentTagName']! as String]!);
       }
     }
     // final pass to add them to collection via service, which includes filling all reverse links info
     for (final tag in tags.values) {
-      tagService.addTag(tag, collection,
+      tagService.addTag(
+        tag,
+        collection,
         checkIfAlreadyExists: false,
         saveToDb: false,
       );
@@ -235,51 +296,66 @@ abstract class Persistence {
     DbHelper.nextItemId[collection] = 1;
     for (final query in itemQuery) {
       final itemId = query['id']! as int;
-      final secondaryParentsQuery = await db.rawQuery(/*language=SQLite*/ '''
+      final secondaryParentsQuery = await db.rawQuery(
+        /*language=SQLite*/ '''
         select tagName 
         from itemTags
         where itemId = ?
-      ''', [itemId],);
+      ''',
+        [itemId],
+      );
       final item = Item(
         collection: collection,
         id: itemId,
         name: query['name']! as String,
         added: DbHelper.datetimeFormat.parse(query['added']! as String),
-        lastSeen: DbHelper.datetimeFormat.tryParse(query['lastSeen'] as String?),
-        lastModified: DbHelper.datetimeFormat.tryParse(query['lastModified'] as String?),
+        lastSeen: DbHelper.datetimeFormat.tryParse(
+          query['lastSeen'] as String?,
+        ),
+        lastModified: DbHelper.datetimeFormat.tryParse(
+          query['lastModified'] as String?,
+        ),
         filePath: query['filePath'] as String?,
         explorePriority: query['explorePriority'] as int?,
         rating: query['rating'] as int?,
         tags: secondaryParentsQuery.map((e) => tags[e['tagName']! as String]!).toList(),
-        itemType: query['itemType']==null ? null : ItemType.values[query['itemType']! as int],
-        metadataLastUpdated: DbHelper.datetimeFormat.tryParse(query['metadataLastUpdated'] as String?),
-        fileCreated: DbHelper.datetimeFormat.tryParse(query['fileCreated'] as String?),
-        fileModified: DbHelper.datetimeFormat.tryParse(query['fileModified'] as String?),
+        itemType: query['itemType'] == null ? null : ItemType.values[query['itemType']! as int],
+        metadataLastUpdated: DbHelper.datetimeFormat.tryParse(
+          query['metadataLastUpdated'] as String?,
+        ),
+        fileCreated: DbHelper.datetimeFormat.tryParse(
+          query['fileCreated'] as String?,
+        ),
+        fileModified: DbHelper.datetimeFormat.tryParse(
+          query['fileModified'] as String?,
+        ),
         filesize: query['filesize'] as int?,
         resolutionWidth: query['resolutionWidth'] as int?,
         resolutionHeight: query['resolutionHeight'] as int?,
-        duration: query['duration']==null ? null : Duration(milliseconds: query['duration']! as int),
+        duration: query['duration'] == null ? null : Duration(milliseconds: query['duration']! as int),
       );
       if (DbHelper.nextItemId[collection]! <= item.id) {
         DbHelper.nextItemId[collection] = item.id + 1;
       }
-      itemService.addItem(item,
-        checkIfAlreadyExists: false,
-        saveToDb: false,
-      );
+      itemService.addItem(item, checkIfAlreadyExists: false, saveToDb: false);
     }
     final items = itemService.getAllItems();
-    for (final album in items.where((e) => e.itemType==ItemType.album)) {
-      final albumChildrenQuery = await db.rawQuery(/*language=SQLite*/ '''
+    for (final album in items.where((e) => e.itemType == ItemType.album)) {
+      final albumChildrenQuery = await db.rawQuery(
+        /*language=SQLite*/ '''
         select childId 
         from albumItems
         where albumId = ?
         order by childIndex
-      ''', [album.id],);
+      ''',
+        [album.id],
+      );
       for (final query in albumChildrenQuery) {
         final childId = query['childId']! as int;
-        final item = items.firstWhere((e) => e.id==childId);
-        itemService.addItemToAlbum(item, album,
+        final item = items.firstWhere((e) => e.id == childId);
+        itemService.addItemToAlbum(
+          item,
+          album,
           checkIfAlreadyExists: false,
           saveToDb: false,
         );
@@ -287,8 +363,12 @@ abstract class Persistence {
     }
   }
 
-  static Future<void> applySchemaMigration(Database db, int oldVersion, int newVersion) async {
-    if (oldVersion<1 && newVersion>=1) {
+  static Future<void> applySchemaMigration(
+    Database db,
+    int oldVersion,
+    int newVersion,
+  ) async {
+    if (oldVersion < 1 && newVersion >= 1) {
       await db.execute(/*language=SQLite*/ '''
         create table collection(
           name text primary key not null,
@@ -337,7 +417,7 @@ abstract class Persistence {
         );
       ''');
     }
-    if (oldVersion<2 && newVersion>=2) {
+    if (oldVersion < 2 && newVersion >= 2) {
       await db.execute(/*language=SQLite*/ '''
         alter table item add column itemType int;
         alter table item add column metadataLastUpdated datetime;
@@ -349,7 +429,7 @@ abstract class Persistence {
         alter table item add column duration int;
       ''');
     }
-    if (oldVersion<3 && newVersion>=3) {
+    if (oldVersion < 3 && newVersion >= 3) {
       await db.execute(/*language=SQLite*/ '''
         create table albumItems(
           albumId int not null,
@@ -362,5 +442,4 @@ abstract class Persistence {
       ''');
     }
   }
-
 }

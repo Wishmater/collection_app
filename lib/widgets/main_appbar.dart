@@ -11,20 +11,14 @@ import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:from_zero_ui/src/app_scaffolding/api_snackbar.dart';
 import 'package:path/path.dart' as p;
 
-
 class MainAppbar extends ConsumerStatefulWidget {
-
-  const MainAppbar({
-    super.key,
-  });
+  const MainAppbar({super.key});
 
   @override
   ConsumerState<MainAppbar> createState() => _MainAppbarState();
-
 }
 
 class _MainAppbarState extends ConsumerState<MainAppbar> {
-
   final GlobalKey<ContextMenuFromZeroState> popupGlobalKey = GlobalKey();
 
   @override
@@ -42,13 +36,16 @@ class _MainAppbarState extends ConsumerState<MainAppbar> {
           contextMenuWidget: Consumer(
             builder: (context, ref, child) {
               final collections = ref.watch(CollectionProvider.all);
-              final includingCollections = ref.watch(AppStateProvider.filterIncludingCollections);
+              final includingCollections = ref.watch(
+                AppStateProvider.filterIncludingCollections,
+              );
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   AppbarFromZero(
                     // TODO 1 show badge with number of open collections (different color with number of filterIncluding if any)
-                    title: Text('Collections',
+                    title: Text(
+                      'Collections',
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     actions: [
@@ -60,7 +57,7 @@ class _MainAppbarState extends ConsumerState<MainAppbar> {
                             dialogTitle: 'Open Collection...',
                             lockParentWindow: true,
                           );
-                          if (path!=null) {
+                          if (path != null) {
                             // TODO 2 show a warning that it will be created if it doesn't already exist,
                             // TODO 2 and validate that it isn't inside an existing collection
                             final collection = Collection(
@@ -68,7 +65,9 @@ class _MainAppbarState extends ConsumerState<MainAppbar> {
                               baseDirectory: path,
                             );
                             // TODO 2 show a warning if it already exists, and don't save to db... right now it assumes it doesn't
-                            CollectionProvider.addCollection(ref, collection,
+                            CollectionProvider.addCollection(
+                              ref,
+                              collection,
                               saveToDb: true,
                             );
                             // TODO 2 show a warning if the collection couldn't be loaded
@@ -77,8 +76,7 @@ class _MainAppbarState extends ConsumerState<MainAppbar> {
                       ),
                     ],
                   ),
-                  if (collections.isEmpty)
-                    const ErrorSign(title: 'No collections registered...'),
+                  if (collections.isEmpty) const ErrorSign(title: 'No collections registered...'),
                   if (collections.isNotEmpty)
                     ...collections.map((e) {
                       // TODO 3 implement excluding collections
@@ -88,29 +86,40 @@ class _MainAppbarState extends ConsumerState<MainAppbar> {
                         value: includingCollections.contains(e),
                         controlAffinity: ListTileControlAffinity.leading,
                         dense: true,
-                        title: Text(e.name,
+                        title: Text(
+                          e.name,
                           style: Theme.of(context).textTheme.titleMedium,
                         ),
                         onChanged: (value) {
                           if (value!) {
-                            ref.read(AppStateProvider.filterIncludingCollections.state)
-                                .state = [...includingCollections, e];
+                            ref
+                                .read(
+                                  AppStateProvider.filterIncludingCollections.state,
+                                )
+                                .state = [
+                              ...includingCollections,
+                              e,
+                            ];
                             CollectionProvider.saveCollectionToRecents(e);
                           } else {
-                            ref.read(AppStateProvider.filterIncludingCollections.state)
-                                .state = List.from(includingCollections)..remove(e);
+                            ref
+                                .read(
+                                  AppStateProvider.filterIncludingCollections.state,
+                                )
+                                .state = List.from(includingCollections)
+                              ..remove(e);
                           }
                         },
                       );
                     }),
-                  if (collections.isNotEmpty)
-                    const SizedBox(height: 12,),
+                  if (collections.isNotEmpty) const SizedBox(height: 12),
                 ],
               );
             },
           ),
           child: TextButton(
-            child: Text('Collections',
+            child: Text(
+              'Collections',
               style: Theme.of(context).textTheme.titleLarge,
             ),
             onPressed: () {
@@ -125,16 +134,15 @@ class _MainAppbarState extends ConsumerState<MainAppbar> {
           icon: const Icon(MaterialCommunityIcons.script_text),
           breakpoints: {0: ActionState.overflow},
           onTap: (context) {
-            showModalFromZero<dynamic>(context: context,
+            showModalFromZero<dynamic>(
+              context: context,
               builder: (context) {
                 return DialogFromZero(
                   title: const Text('Scripts'),
                   contentPadding: EdgeInsets.zero,
                   maxWidth: 512,
                   dialogActions: const [
-                    DialogButton.cancel(
-                      child: Text('CLOSE'),
-                    ),
+                    DialogButton.cancel(child: Text('CLOSE')),
                   ],
                   content: Column(
                     children: registeredScripts.map((e) {
@@ -142,7 +150,8 @@ class _MainAppbarState extends ConsumerState<MainAppbar> {
                         title: Text(e.name),
                         subtitle: Text(e.description),
                         onTap: () {
-                          APISnackBar(context: context,
+                          APISnackBar(
+                            context: context,
                             stateNotifier: ApiState.noProvider((_) {
                               return e.callback().then((value) async {
                                 ref.invalidate(CollectionProvider.all);
@@ -166,13 +175,9 @@ class _MainAppbarState extends ConsumerState<MainAppbar> {
           title: 'Settings',
           icon: const Icon(Icons.settings),
           breakpoints: {0: ActionState.overflow},
-          onTap: (context) {
-
-          },
+          onTap: (context) {},
         ),
       ],
     );
   }
-
-
 }

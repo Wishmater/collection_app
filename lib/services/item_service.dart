@@ -5,12 +5,9 @@ import 'package:collection_app/services/collection_service.dart';
 import 'package:collection_app/util/persistence.dart';
 import 'package:dartx/dartx.dart';
 
-
 final itemService = ItemService();
 
 class ItemService {
-
-
   // GETS
 
   /// expensive, prefer to search per-collection ideally
@@ -18,25 +15,19 @@ class ItemService {
     return collectionService.getAllCollections().flatMap((e) => e.items);
   }
 
-  List<Item> getItemsWithTag(Tag tag, {
-    Collection? collection,
-  }) {
-    return getItemsWithTags([tag],
-      collection: collection,
-    );
+  List<Item> getItemsWithTag(Tag tag, {Collection? collection}) {
+    return getItemsWithTags([tag], collection: collection);
   }
 
-  List<Item> getItemsWithTags(Iterable<Tag> tags, {
-    Collection? collection,
-  }) {
+  List<Item> getItemsWithTags(Iterable<Tag> tags, {Collection? collection}) {
     final items = collection?.items ?? getAllItems();
     return items.where((item) => tags.all((tag) => item.tags.contains(tag))).toList();
   }
 
-
   // MUTATIONS
 
-  bool addItem(Item item, {
+  bool addItem(
+    Item item, {
     bool checkIfAlreadyExists = true,
     bool saveToDb = true,
   }) {
@@ -52,7 +43,9 @@ class ItemService {
     }
     if (done) {
       for (final tag in item.tags) {
-        collectionService.addTagToCollection(item.collection, tag,
+        collectionService.addTagToCollection(
+          item.collection,
+          tag,
           saveToDb: saveToDb,
         );
       }
@@ -63,21 +56,31 @@ class ItemService {
     return done;
   }
 
-  bool saveItem(Item item, {
-    bool replaceInList = false, /// usually not necessary, because we work by mutating the same object
+  bool saveItem(
+    Item item, {
+    bool replaceInList = false,
+
+    /// usually not necessary, because we work by mutating the same object
     bool saveToDb = true,
   }) {
     if (replaceInList) {
-      final index = item.collection.items.indexWhere((e) => e.id==item.id);
-      if (index<0) throw Exception('Trying to save item, but item not found in Collection: $item');
+      final index = item.collection.items.indexWhere((e) => e.id == item.id);
+      if (index < 0)
+        throw Exception(
+          'Trying to save item, but item not found in Collection: $item',
+        );
     }
     if (saveToDb) {
-      Persistence.saveItem(item); // TODO 3 PERFORMANCE, in some cases (or all cases?), we can skip updating the relations in db (like tags)
+      Persistence.saveItem(
+        item,
+      ); // TODO 3 PERFORMANCE, in some cases (or all cases?), we can skip updating the relations in db (like tags)
     }
     return true;
   }
 
-  bool addTagToItem(Item item, Tag tag, {
+  bool addTagToItem(
+    Item item,
+    Tag tag, {
     bool checkIfAlreadyExists = true,
     bool saveToDb = true,
   }) {
@@ -92,17 +95,23 @@ class ItemService {
       done = true;
     }
     if (done) {
-      collectionService.addTagToCollection(item.collection, tag,
+      collectionService.addTagToCollection(
+        item.collection,
+        tag,
         saveToDb: saveToDb,
       );
       if (saveToDb) {
-        Persistence.saveItem(item); // TODO 3 PERFORMANCE, save only item - tags relations
+        Persistence.saveItem(
+          item,
+        ); // TODO 3 PERFORMANCE, save only item - tags relations
       }
     }
     return done;
   }
 
-  bool addItemToAlbum(Item item, Item album, {
+  bool addItemToAlbum(
+    Item item,
+    Item album, {
     bool checkIfAlreadyExists = true,
     bool saveToDb = true,
   }) {
@@ -120,10 +129,11 @@ class ItemService {
     }
     if (done) {
       if (saveToDb) {
-        Persistence.saveItem(album); // TODO 3 PERFORMANCE, save only item - tags relations
+        Persistence.saveItem(
+          album,
+        ); // TODO 3 PERFORMANCE, save only item - tags relations
       }
     }
     return done;
   }
-
 }

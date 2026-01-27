@@ -6,9 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/util/copied_flutter_widgets/my_tooltip.dart';
 
-
 class FiltersWidget extends StatelessWidget {
-
   const FiltersWidget({super.key});
 
   @override
@@ -20,73 +18,95 @@ class FiltersWidget extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SizedBox(height: 6,),
+          const SizedBox(height: 6),
           Consumer(
             builder: (context, ref, child) {
-              final filterRatingMin = ref.watch(AppStateProvider.filterRatingMin);
-              final filterRatingMax = ref.watch(AppStateProvider.filterRatingMax);
-              final filterRatingNull = ref.watch(AppStateProvider.filterRatingNull);
-              final color = Color.alphaBlend(Colors.yellow.withOpacity(0.6), Theme.of(context).canvasColor);
+              final filterRatingMin = ref.watch(
+                AppStateProvider.filterRatingMin,
+              );
+              final filterRatingMax = ref.watch(
+                AppStateProvider.filterRatingMax,
+              );
+              final filterRatingNull = ref.watch(
+                AppStateProvider.filterRatingNull,
+              );
+              final color = Color.alphaBlend(
+                Colors.yellow.withOpacity(0.6),
+                Theme.of(context).canvasColor,
+              );
               return Wrap(
                 children: [
-                  const SizedBox(
-                    width: 56,
-                    child: Text('Rating:'),
-                  ),
+                  const SizedBox(width: 56, child: Text('Rating:')),
                   IntervalRatingBar(
-                    min: 1, max: 10,
+                    min: 1,
+                    max: 10,
                     color: filterRatingNull ? Theme.of(context).disabledColor : color,
-                    from: filterRatingMin, to: filterRatingMax,
-                    onFromChanged: filterRatingNull ? null : (value) {
-                      ref.read(AppStateProvider.filterRatingMin.notifier).state = value;
-                    },
-                    onToChanged: filterRatingNull ? null : (value) {
-                      ref.read(AppStateProvider.filterRatingMax.notifier).state = value;
-                    },
+                    from: filterRatingMin,
+                    to: filterRatingMax,
+                    onFromChanged: filterRatingNull
+                        ? null
+                        : (value) {
+                            ref
+                                    .read(
+                                      AppStateProvider.filterRatingMin.notifier,
+                                    )
+                                    .state =
+                                value;
+                          },
+                    onToChanged: filterRatingNull
+                        ? null
+                        : (value) {
+                            ref
+                                    .read(
+                                      AppStateProvider.filterRatingMax.notifier,
+                                    )
+                                    .state =
+                                value;
+                          },
                     widgetBuilder: (context, value, {required selected, color}) {
                       return AnimatedContainer(
-                        width: value==10 ? 24 : 18, height: 24,
+                        width: value == 10 ? 24 : 18,
+                        height: 24,
                         duration: const Duration(milliseconds: 100),
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          color: selected ? color!.withOpacity(color.opacity*0.6) : null,
+                          color: selected ? color!.withOpacity(color.opacity * 0.6) : null,
                           borderRadius: BorderRadius.horizontal(
-                            left: filterRatingMin==value ? const Radius.circular(6) : Radius.zero,
-                            right: filterRatingMax==value ? const Radius.circular(6) : Radius.zero,
+                            left: filterRatingMin == value ? const Radius.circular(6) : Radius.zero,
+                            right: filterRatingMax == value ? const Radius.circular(6) : Radius.zero,
                           ),
                         ),
-                        child: Text(value.toString(),
+                        child: Text(
+                          value.toString(),
                           style: textStyle.copyWith(
                             fontWeight: FontWeight.w900,
-                            color: selected
-                                ? textStyle.color!.withOpacity(0.8)
-                                : color,
+                            color: selected ? textStyle.color!.withOpacity(0.8) : color,
                           ),
                         ),
                       );
                     },
                   ),
-                  const SizedBox(width: 12,),
+                  const SizedBox(width: 12),
                   InkWell(
                     onTap: () {
                       ref.read(AppStateProvider.filterRatingNull.notifier).state = !filterRatingNull;
                     },
                     child: AnimatedContainer(
-                      width: 38, height: 24,
+                      width: 38,
+                      height: 24,
                       duration: const Duration(milliseconds: 100),
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: filterRatingNull
-                            ? color.withOpacity(color.opacity*0.6)
-                            : null,
-                        borderRadius: const BorderRadius.all(Radius.circular(6)),
+                        color: filterRatingNull ? color.withOpacity(color.opacity * 0.6) : null,
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(6),
+                        ),
                       ),
-                      child: Text('null',
+                      child: Text(
+                        'null',
                         style: textStyle.copyWith(
                           fontWeight: FontWeight.w900,
-                          color: filterRatingNull
-                              ? textStyle.color!.withOpacity(0.8)
-                              : color,
+                          color: filterRatingNull ? textStyle.color!.withOpacity(0.8) : color,
                         ),
                       ),
                     ),
@@ -95,71 +115,104 @@ class FiltersWidget extends StatelessWidget {
               );
             },
           ),
-          const SizedBox(height: 4,),
+          const SizedBox(height: 4),
           Consumer(
             builder: (context, ref, child) {
-              final filterExplorePriorityMin = ref.watch(AppStateProvider.filterExplorePriorityMin);
-              final filterExplorePriorityMax = ref.watch(AppStateProvider.filterExplorePriorityMax);
-              final filterExplorePriorityNull = ref.watch(AppStateProvider.filterExplorePriorityNull);
-              final color = Color.alphaBlend(Colors.purple.withOpacity(0.8), Theme.of(context).canvasColor);
+              final filterExplorePriorityMin = ref.watch(
+                AppStateProvider.filterExplorePriorityMin,
+              );
+              final filterExplorePriorityMax = ref.watch(
+                AppStateProvider.filterExplorePriorityMax,
+              );
+              final filterExplorePriorityNull = ref.watch(
+                AppStateProvider.filterExplorePriorityNull,
+              );
+              final color = Color.alphaBlend(
+                Colors.purple.withOpacity(0.8),
+                Theme.of(context).canvasColor,
+              );
               return Wrap(
                 children: [
-                  const SizedBox(
-                    width: 56,
-                    child: Text('Priority:'),
-                  ),
+                  const SizedBox(width: 56, child: Text('Priority:')),
                   IntervalRatingBar(
-                    min: -6, max: 3,
+                    min: -6,
+                    max: 3,
                     color: filterExplorePriorityNull ? Theme.of(context).disabledColor : color,
-                    from: filterExplorePriorityMin, to: filterExplorePriorityMax,
-                    onFromChanged: filterExplorePriorityNull ? null : (value) {
-                      ref.read(AppStateProvider.filterExplorePriorityMin.notifier).state = value;
-                    },
-                    onToChanged: filterExplorePriorityNull ? null : (value) {
-                      ref.read(AppStateProvider.filterExplorePriorityMax.notifier).state = value;
-                    },
+                    from: filterExplorePriorityMin,
+                    to: filterExplorePriorityMax,
+                    onFromChanged: filterExplorePriorityNull
+                        ? null
+                        : (value) {
+                            ref
+                                    .read(
+                                      AppStateProvider.filterExplorePriorityMin.notifier,
+                                    )
+                                    .state =
+                                value;
+                          },
+                    onToChanged: filterExplorePriorityNull
+                        ? null
+                        : (value) {
+                            ref
+                                    .read(
+                                      AppStateProvider.filterExplorePriorityMax.notifier,
+                                    )
+                                    .state =
+                                value;
+                          },
                     widgetBuilder: (context, value, {required selected, color}) {
-                      final textStyle = Theme.of(context).textTheme.titleMedium!;
+                      final textStyle = Theme.of(
+                        context,
+                      ).textTheme.titleMedium!;
                       Widget result = Container(
-                        width: 18, height: 24,
+                        width: 18,
+                        height: 24,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          color: selected ? color!.withOpacity(color.opacity*0.6) : null,
+                          color: selected ? color!.withOpacity(color.opacity * 0.6) : null,
                           borderRadius: BorderRadius.horizontal(
-                            left: filterExplorePriorityMin==value ? const Radius.circular(6) : Radius.zero,
-                            right: filterExplorePriorityMax==value ? const Radius.circular(6) : Radius.zero,
+                            left: filterExplorePriorityMin == value ? const Radius.circular(6) : Radius.zero,
+                            right: filterExplorePriorityMax == value ? const Radius.circular(6) : Radius.zero,
                           ),
                         ),
                         child: Stack(
                           children: [
-                            Text(value.abs().toString(),
+                            Text(
+                              value.abs().toString(),
                               style: textStyle.copyWith(
                                 fontWeight: FontWeight.w900,
-                                color: selected
-                                    ? textStyle.color!.withOpacity(0.8)
-                                    : color,
+                                color: selected ? textStyle.color!.withOpacity(0.8) : color,
                               ),
                             ),
-                            if (value<0)
+                            if (value < 0)
                               Positioned(
-                                bottom: 1, left: -1, right: -1, height: 3,
+                                bottom: 1,
+                                left: -1,
+                                right: -1,
+                                height: 3,
                                 child: ColoredBox(
                                   color: selected
                                       ? textStyle.color!.withOpacity(0.6)
-                                      : color!.withOpacity(color.opacity*0.8),
+                                      : color!.withOpacity(
+                                          color.opacity * 0.8,
+                                        ),
                                 ),
                               ),
                           ],
                         ),
                       );
-                      if (value==-1) {
+                      if (value == -1) {
                         result = Row(
                           children: [
                             result,
                             Padding(
-                              padding: const EdgeInsets.only(top: 4, right: 1),
+                              padding: const EdgeInsets.only(
+                                top: 4,
+                                right: 1,
+                              ),
                               child: Container(
-                                width: 5, height: 3,
+                                width: 5,
+                                height: 3,
                                 color: Theme.of(context).dividerColor,
                               ),
                             ),
@@ -169,27 +222,32 @@ class FiltersWidget extends StatelessWidget {
                       return result;
                     },
                   ),
-                  const SizedBox(width: 12,),
+                  const SizedBox(width: 12),
                   InkWell(
                     onTap: () {
-                      ref.read(AppStateProvider.filterExplorePriorityNull.notifier).state = !filterExplorePriorityNull;
+                      ref
+                              .read(
+                                AppStateProvider.filterExplorePriorityNull.notifier,
+                              )
+                              .state =
+                          !filterExplorePriorityNull;
                     },
                     child: AnimatedContainer(
-                      width: 38, height: 24,
+                      width: 38,
+                      height: 24,
                       duration: const Duration(milliseconds: 100),
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: filterExplorePriorityNull
-                            ? color.withOpacity(color.opacity*0.6)
-                            : null,
-                        borderRadius: const BorderRadius.all(Radius.circular(6)),
+                        color: filterExplorePriorityNull ? color.withOpacity(color.opacity * 0.6) : null,
+                        borderRadius: const BorderRadius.all(
+                          Radius.circular(6),
+                        ),
                       ),
-                      child: Text('null',
+                      child: Text(
+                        'null',
                         style: textStyle.copyWith(
                           fontWeight: FontWeight.w900,
-                          color: filterExplorePriorityNull
-                              ? textStyle.color!.withOpacity(0.8)
-                              : color,
+                          color: filterExplorePriorityNull ? textStyle.color!.withOpacity(0.8) : color,
                         ),
                       ),
                     ),
@@ -198,19 +256,27 @@ class FiltersWidget extends StatelessWidget {
               );
             },
           ),
-          const SizedBox(height: 2,),
+          const SizedBox(height: 2),
           Consumer(
             builder: (context, ref, child) {
-              final filterIncludingCollections = ref.watch(AppStateProvider.filterIncludingCollections);
-              final filterExcludingCollections = ref.watch(AppStateProvider.filterExcludingCollections);
+              final filterIncludingCollections = ref.watch(
+                AppStateProvider.filterIncludingCollections,
+              );
+              final filterExcludingCollections = ref.watch(
+                AppStateProvider.filterExcludingCollections,
+              );
               // TODO 2 implement including / excluding collections
               return const SizedBox.shrink();
             },
           ),
           Consumer(
             builder: (context, ref, child) {
-              final filterIncludingTags = ref.watch(AppStateProvider.filterIncludingTags);
-              final filterExcludingTags = ref.watch(AppStateProvider.filterExcludingTags);
+              final filterIncludingTags = ref.watch(
+                AppStateProvider.filterIncludingTags,
+              );
+              final filterExcludingTags = ref.watch(
+                AppStateProvider.filterExcludingTags,
+              );
               if (filterIncludingTags.isEmpty && filterExcludingTags.isEmpty) {
                 return const SizedBox.shrink();
               }
@@ -218,58 +284,73 @@ class FiltersWidget extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 4,),
+                  const SizedBox(height: 4),
                   if (filterIncludingTags.isNotEmpty)
                     Wrap(
                       spacing: 8,
                       runSpacing: 4,
                       runAlignment: WrapAlignment.center,
                       children: [
-                        Text('Including\nTags:',
+                        Text(
+                          'Including\nTags:',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             height: 1,
-                            color: Color.alphaBlend(Colors.green.withOpacity(0.5), Theme.of(context).textTheme.bodyMedium!.color!,),
+                            color: Color.alphaBlend(
+                              Colors.green.withOpacity(0.5),
+                              Theme.of(context).textTheme.bodyMedium!.color!,
+                            ),
                           ),
                         ),
-                        ...filterIncludingTags.map((e) => buildTagChip(context, ref, e, isIncluding: true)),
+                        ...filterIncludingTags.map(
+                          (e) => buildTagChip(context, ref, e, isIncluding: true),
+                        ),
                       ],
                     ),
-                  if (filterIncludingTags.isNotEmpty && filterExcludingTags.isNotEmpty)
-                    const SizedBox(height: 8,),
+                  if (filterIncludingTags.isNotEmpty && filterExcludingTags.isNotEmpty) const SizedBox(height: 8),
                   if (filterExcludingTags.isNotEmpty)
                     Wrap(
                       spacing: 8,
                       runSpacing: 4,
                       runAlignment: WrapAlignment.center,
                       children: [
-                        Text('Excluding\nTags:',
+                        Text(
+                          'Excluding\nTags:',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             height: 1,
-                            color: Color.alphaBlend(Colors.red.withOpacity(0.5), Theme.of(context).textTheme.bodyMedium!.color!,),
+                            color: Color.alphaBlend(
+                              Colors.red.withOpacity(0.5),
+                              Theme.of(context).textTheme.bodyMedium!.color!,
+                            ),
                           ),
                         ),
-                        ...filterExcludingTags.map((e) => buildTagChip(context, ref, e, isIncluding: false)),
+                        ...filterExcludingTags.map(
+                          (e) => buildTagChip(context, ref, e, isIncluding: false),
+                        ),
                       ],
                     ),
-                  const SizedBox(height: 4,),
+                  const SizedBox(height: 4),
                 ],
               );
             },
           ),
-          const SizedBox(height: 4,),
+          const SizedBox(height: 4),
         ],
       ),
     );
   }
 
-  Widget buildTagChip(BuildContext context, WidgetRef ref, Tag tag, {
+  Widget buildTagChip(
+    BuildContext context,
+    WidgetRef ref,
+    Tag tag, {
     required bool isIncluding,
   }) {
     return Chip(
       deleteIconColor: Theme.of(context).iconTheme.color,
-      label: AutoSizeText(tag.name,
+      label: AutoSizeText(
+        tag.name,
         overflowReplacement: TooltipFromZero(
           message: tag.name,
           child: Text(tag.name),
@@ -287,5 +368,4 @@ class FiltersWidget extends StatelessWidget {
       },
     );
   }
-
 }

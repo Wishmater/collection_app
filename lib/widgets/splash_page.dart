@@ -9,18 +9,14 @@ import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:hive/hive.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
-
 class PageSplash extends ConsumerStatefulWidget {
-
   const PageSplash({super.key});
 
   @override
   PageSplashState createState() => PageSplashState();
-
 }
 
 class PageSplashState extends ConsumerState<PageSplash> {
-
   @override
   void initState() {
     super.initState();
@@ -30,7 +26,7 @@ class PageSplashState extends ConsumerState<PageSplash> {
   }
 
   Future<void> init() async {
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async{
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       sqfliteFfiInit();
 
       final collectionsBox = await Hive.openBox<List<dynamic>>('collections');
@@ -41,11 +37,10 @@ class PageSplashState extends ConsumerState<PageSplash> {
       }
       collectionsData = collectionsData.sortedByDescending((e) => e.$3);
       for (final e in collectionsData) {
-        final collection = Collection(
-          name: e.$2,
-          baseDirectory: e.$1,
-        );
-        CollectionProvider.addCollection(ref, collection,
+        final collection = Collection(name: e.$2, baseDirectory: e.$1);
+        CollectionProvider.addCollection(
+          ref,
+          collection,
           checkIfAlreadyExists: false,
           saveToDb: false,
         );
@@ -66,18 +61,19 @@ class PageSplashState extends ConsumerState<PageSplash> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text("Initializing...",
+          const Text(
+            "Initializing...",
             style: TextStyle(fontSize: 18),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 6,),
+          const SizedBox(height: 6),
           Container(
             width: 256,
             decoration: const BoxDecoration(
               borderRadius: BorderRadius.all(Radius.circular(32)),
             ),
             clipBehavior: Clip.antiAlias,
-            child: LinearProgressIndicator(color: theme.colorScheme.primary,),
+            child: LinearProgressIndicator(color: theme.colorScheme.primary),
           ),
         ],
       ),
@@ -87,11 +83,7 @@ class PageSplashState extends ConsumerState<PageSplash> {
     return ScaffoldFromZero(
       mainScrollController: scrollController,
       appbarType: AppbarType.none,
-      body: Align(
-        alignment: goldenRatioVerticalAlignment,
-        child: result,
-      ),
+      body: Align(alignment: goldenRatioVerticalAlignment, child: result),
     );
   }
-
 }

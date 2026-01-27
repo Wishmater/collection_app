@@ -66,6 +66,11 @@ dev_dependencies:
   sqflite_common_ffi: ^2.4.0
 
 
+dependency_overrides:
+  intl: ^0.20.2    # apparently packages before 1.0 break on every minor version, which makes it pretty much unusable
+  archive: ^4.0.7  # old excel fork forces 3.3.7 which has security issues, we should if features implemented by us are already available in excel package and migrate
+
+
 flutter:
   uses-material-design: true
 

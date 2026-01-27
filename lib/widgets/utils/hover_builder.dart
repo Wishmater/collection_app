@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
-
 class HoverBuilder extends StatefulWidget {
-
   final WidgetBuilder defaultBuilder;
   final WidgetBuilder hoveredBuilder;
 
@@ -28,11 +26,9 @@ class HoverBuilder extends StatefulWidget {
 
   @override
   State<HoverBuilder> createState() => _HoverBuilderState();
-
 }
 
 class _HoverBuilderState extends State<HoverBuilder> {
-
   bool isHovered = false;
 
   @override
@@ -58,11 +54,8 @@ class _HoverBuilderState extends State<HoverBuilder> {
         switchOutCurve: widget.switchOutCurve,
         transitionBuilder: widget.transitionBuilder,
         layoutBuilder: widget.layoutBuilder,
-        child: isHovered
-            ? widget.hoveredBuilder(context)
-            : widget.defaultBuilder(context),
+        child: isHovered ? widget.hoveredBuilder(context) : widget.defaultBuilder(context),
       ),
     );
   }
-
 }

@@ -5,22 +5,25 @@ import 'package:collection_app/providers/collection_provider.dart';
 import 'package:dartx/dartx_io.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-
 abstract class AppStateProvider {
-
   static const mainPageMinColumnWidth = 256.0;
   static const mainPageDefaultTagsColumnWidth = 320.0;
   static const mainPageDefaultItemsColumnWidth = 512.0;
 
-
   static final tagsColumnWidth = StateNotifierProvider<LimitingNumStateNotifier<double>, double>((ref) {
-    return LimitingNumStateNotifier<double>(mainPageDefaultTagsColumnWidth, min: mainPageMinColumnWidth);
+    return LimitingNumStateNotifier<double>(
+      mainPageDefaultTagsColumnWidth,
+      min: mainPageMinColumnWidth,
+    );
   });
 
   static final showItemViewInMainPage = StateProvider((ref) => true);
 
   static final itemsColumnWidth = StateNotifierProvider<LimitingNumStateNotifier<double>, double>((ref) {
-    return LimitingNumStateNotifier<double>(mainPageDefaultItemsColumnWidth, min: mainPageMinColumnWidth);
+    return LimitingNumStateNotifier<double>(
+      mainPageDefaultItemsColumnWidth,
+      min: mainPageMinColumnWidth,
+    );
   });
 
   static final selectedTag = StateProvider<Tag?>((ref) => null);
@@ -31,9 +34,13 @@ abstract class AppStateProvider {
 
   static final filterExcludingTags = StateProvider((ref) => <Tag>[]);
 
-  static final filterIncludingCollections = StateProvider((ref) => <Collection>[]);
+  static final filterIncludingCollections = StateProvider(
+    (ref) => <Collection>[],
+  );
 
-  static final filterExcludingCollections = StateProvider((ref) => <Collection>[]);
+  static final filterExcludingCollections = StateProvider(
+    (ref) => <Collection>[],
+  );
 
   static final filterRatingNull = StateProvider<bool>((ref) => false);
   static final filterRatingMin = StateProvider<int?>((ref) => null);
@@ -46,11 +53,15 @@ abstract class AppStateProvider {
   static final itemSearchQuery = StateProvider<String?>((ref) => null);
 
   static final itemsWithCurrentFilters = StateProvider((ref) {
-    final filterIncludingCollections = ref.watch(AppStateProvider.filterIncludingCollections);
+    final filterIncludingCollections = ref.watch(
+      AppStateProvider.filterIncludingCollections,
+    );
     final List<Collection> collections = filterIncludingCollections.isNotEmpty
         ? filterIncludingCollections
         : ref.watch(CollectionProvider.all);
-    final filterExcludingCollections = ref.watch(AppStateProvider.filterExcludingCollections);
+    final filterExcludingCollections = ref.watch(
+      AppStateProvider.filterExcludingCollections,
+    );
     for (final e in filterExcludingCollections) {
       collections.remove(e);
     }
@@ -63,9 +74,15 @@ abstract class AppStateProvider {
     final filterRatingNull = ref.watch(AppStateProvider.filterRatingNull);
     final filterRatingMin = ref.watch(AppStateProvider.filterRatingMin);
     final filterRatingMax = ref.watch(AppStateProvider.filterRatingMax);
-    final filterExplorePriorityNull = ref.watch(AppStateProvider.filterExplorePriorityNull);
-    final filterExplorePriorityMin = ref.watch(AppStateProvider.filterExplorePriorityMin);
-    final filterExplorePriorityMax = ref.watch(AppStateProvider.filterExplorePriorityMax);
+    final filterExplorePriorityNull = ref.watch(
+      AppStateProvider.filterExplorePriorityNull,
+    );
+    final filterExplorePriorityMin = ref.watch(
+      AppStateProvider.filterExplorePriorityMin,
+    );
+    final filterExplorePriorityMax = ref.watch(
+      AppStateProvider.filterExplorePriorityMax,
+    );
     final itemSearchQuery = ref.watch(AppStateProvider.itemSearchQuery)?.toLowerCase();
     for (final e in collections.flatMap((e) => e.items)) {
       if (filterIncludingTags.isNotEmpty && !e.tags.containsAll(filterIncludingTags)) {
@@ -75,62 +92,54 @@ abstract class AppStateProvider {
         continue;
       }
       if (filterRatingNull) {
-        if (e.rating!=null) {
+        if (e.rating != null) {
           continue;
         }
       } else {
-        if (filterRatingMin!=null && (e.rating==null || e.rating! < filterRatingMin)) {
+        if (filterRatingMin != null && (e.rating == null || e.rating! < filterRatingMin)) {
           continue;
         }
-        if (filterRatingMax!=null && (e.rating==null || e.rating! > filterRatingMax)) {
+        if (filterRatingMax != null && (e.rating == null || e.rating! > filterRatingMax)) {
           continue;
         }
       }
       if (filterExplorePriorityNull) {
-        if (e.explorePriority!=null) {
+        if (e.explorePriority != null) {
           continue;
         }
       } else {
-        if (filterExplorePriorityMin!=null
-            && (e.explorePriority==null || e.explorePriority! < filterExplorePriorityMin)) {
+        if (filterExplorePriorityMin != null &&
+            (e.explorePriority == null || e.explorePriority! < filterExplorePriorityMin)) {
           continue;
         }
-        if (filterExplorePriorityMax!=null
-            && (e.explorePriority==null || e.explorePriority! > filterExplorePriorityMax)) {
+        if (filterExplorePriorityMax != null &&
+            (e.explorePriority == null || e.explorePriority! > filterExplorePriorityMax)) {
           continue;
         }
       }
-      if (itemSearchQuery!=null && !e.name.toLowerCase().contains(itemSearchQuery)) {
+      if (itemSearchQuery != null && !e.name.toLowerCase().contains(itemSearchQuery)) {
         continue;
       }
       result.add(e);
     }
     return result;
   });
-
 }
 
-
-
 class LimitingNumStateNotifier<T extends num> extends StateNotifier<T> {
-
   final T? min;
   final T? max;
 
-  LimitingNumStateNotifier(super._state, {
-    this.min,
-    this.max,
-  });
+  LimitingNumStateNotifier(super._state, {this.min, this.max});
 
   @override
   set state(T value) {
-    if (min!=null && value<min!) value = min!;
-    if (max!=null && value>max!) value = max!;
+    if (min != null && value < min!) value = min!;
+    if (max != null && value > max!) value = max!;
     super.state = value;
   }
 
   void setState(T value) => state = value;
 
   void add(T value) => state = (state + value) as T;
-
 }

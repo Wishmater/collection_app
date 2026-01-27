@@ -139,13 +139,14 @@ class MultiTapListener extends StatefulWidget {
   final Widget? child;
 
   /// Constructs a [MultiTapListener].
-  const MultiTapListener(
-      {this.onTap,
-        this.onDoubleTap,
-        this.onTripleTap,
-        this.recognitionWindow,
-        this.child,
-        super.key,});
+  const MultiTapListener({
+    this.onTap,
+    this.onDoubleTap,
+    this.onTripleTap,
+    this.recognitionWindow,
+    this.child,
+    super.key,
+  });
 
   @override
   State<MultiTapListener> createState() => _MultiTapListenerState();

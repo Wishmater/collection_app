@@ -4,13 +4,10 @@ import 'package:collection_app/services/collection_service.dart';
 import 'package:collection_app/util/persistence.dart';
 import 'package:dartx/dartx.dart';
 
-
 final tagService = TagService();
 
 class TagService {
-
   final List<Tag> _all = [];
-
 
   // GETS
 
@@ -19,29 +16,28 @@ class TagService {
   }
 
   Iterable<Tag> getRoots() {
-    return _all.where((e) => e.parentTag==null);
+    return _all.where((e) => e.parentTag == null);
   }
 
   Tag? getTagByName(String name) {
-    return _all.firstOrNullWhere((e) => e.name==name);
+    return _all.firstOrNullWhere((e) => e.name == name);
   }
 
   /// the tag passed in will be used to check the name, or to create it if not found
   Tag getTagByNameOrCreate(Tag tag, Collection collection) {
     var result = getTagByName(tag.name);
-    if (result==null) {
+    if (result == null) {
       result = tag;
-      addTag(result, collection,
-        checkIfAlreadyExists: false,
-      );
+      addTag(result, collection, checkIfAlreadyExists: false);
     }
     return result;
   }
 
-
   // MUTATIONS
 
-  bool addTag(Tag tag, Collection collection, {
+  bool addTag(
+    Tag tag,
+    Collection collection, {
     bool checkIfAlreadyExists = true,
     bool saveToDb = true,
   }) {
@@ -49,28 +45,20 @@ class TagService {
       return false;
     }
     _all.add(tag);
-    if (tag.parentTag!=null) {
-      addChild(tag.parentTag!, tag,
-        saveToDb: false,
-      );
+    if (tag.parentTag != null) {
+      addChild(tag.parentTag!, tag, saveToDb: false);
     }
-    addChildren(tag, tag.childTags,
-      saveToDb: saveToDb,
-    );
-    addSecondaryChildren(tag.secondaryParentTags, [tag],
-      saveToDb: false,
-    );
+    addChildren(tag, tag.childTags, saveToDb: saveToDb);
+    addSecondaryChildren(tag.secondaryParentTags, [tag], saveToDb: false);
     // TODO 2 PERFORMANCE, we could just save the new relations directly and call this with saveToDb: false
-    addSecondaryChildren([tag], tag.secondaryChildTags,
-      saveToDb: saveToDb,
-    );
-    collectionService.addTagToCollection(collection, tag,
-      saveToDb: saveToDb,
-    );
+    addSecondaryChildren([tag], tag.secondaryChildTags, saveToDb: saveToDb);
+    collectionService.addTagToCollection(collection, tag, saveToDb: saveToDb);
     return true;
   }
 
-  bool addChild(Tag parent, Tag child, {
+  bool addChild(
+    Tag parent,
+    Tag child, {
     bool checkIfAlreadyExists = true,
     bool saveToDb = true,
   }) {
@@ -80,7 +68,7 @@ class TagService {
         parent.childTags.add(child);
         done = true;
       }
-      if (child.parentTag!=parent) {
+      if (child.parentTag != parent) {
         child.parentTag = parent;
         done = true;
       }
@@ -96,16 +84,16 @@ class TagService {
     return done;
   }
 
-  bool addChildren(Tag parent, Iterable<Tag> children, {
+  bool addChildren(
+    Tag parent,
+    Iterable<Tag> children, {
     bool checkIfAlreadyExists = true,
     bool saveToDb = true,
   }) {
     if (checkIfAlreadyExists) {
       bool done = false;
       for (final child in children) {
-        done = addChild(parent, child,
-          saveToDb: saveToDb,
-        ) || done;
+        done = addChild(parent, child, saveToDb: saveToDb) || done;
       }
       return done;
     } else {
@@ -123,7 +111,9 @@ class TagService {
     }
   }
 
-  bool addSecondaryChild(Tag parent, Tag child, {
+  bool addSecondaryChild(
+    Tag parent,
+    Tag child, {
     bool checkIfAlreadyExists = true,
     bool saveToDb = true,
   }) {
@@ -149,7 +139,9 @@ class TagService {
     return done;
   }
 
-  bool addSecondaryChildren(Iterable<Tag> parents, Iterable<Tag> children, {
+  bool addSecondaryChildren(
+    Iterable<Tag> parents,
+    Iterable<Tag> children, {
     bool checkIfAlreadyExists = true,
     bool saveToDb = true,
   }) {
@@ -157,9 +149,7 @@ class TagService {
       bool done = false;
       for (final parent in parents) {
         for (final child in children) {
-          done = addSecondaryChild(parent, child,
-            saveToDb: saveToDb,
-          ) || done;
+          done = addSecondaryChild(parent, child, saveToDb: saveToDb) || done;
         }
       }
       return done;
@@ -179,5 +169,4 @@ class TagService {
       return true;
     }
   }
-
 }

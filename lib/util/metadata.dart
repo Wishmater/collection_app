@@ -6,13 +6,14 @@ import 'package:mlog/mlog.dart';
 import 'package:video_player_platform_interface/video_player_platform_interface.dart';
 import 'package:video_player_win/video_player_win.dart';
 
-
 abstract class MetadataUtils {
-
   static Future<Item> loadMetadata(Item item) async {
     final filepath = item.getAbsoluteFilePath();
-    if (filepath==null) {
-      log(LgLvl.warning, 'Trying to load metadata for item without path: $item');
+    if (filepath == null) {
+      log(
+        LgLvl.warning,
+        'Trying to load metadata for item without path: $item',
+      );
       return item;
     }
     log(LgLvl.info, 'Loading metadata for: $item');
@@ -28,7 +29,7 @@ abstract class MetadataUtils {
       case ItemType.video:
         final controller = WinVideoPlayerController.file(file);
         controller.videoEventStream.listen((event) {
-          if (event.eventType==VideoEventType.initialized) {
+          if (event.eventType == VideoEventType.initialized) {
             item.duration = event.duration;
             item.resolutionWidth = event.size?.width.round();
             item.resolutionHeight = event.size?.height.round();
@@ -48,9 +49,8 @@ abstract class MetadataUtils {
       case ItemType.unknown:
         log(LgLvl.warning, 'Unknown type for extension $extension: $item');
       case ItemType.album:
-        // TODO 1 implement loading metadata for album (probably nothing and just aggregate children when they are updated). Maybe when told to update album, just update all children
+      // TODO 1 implement loading metadata for album (probably nothing and just aggregate children when they are updated). Maybe when told to update album, just update all children
     }
     return item;
   }
-
 }

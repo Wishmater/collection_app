@@ -1,5 +1,3 @@
-
-
 enum LgType {
   script('script', '[SCRIPT]'),
   db('database', '[DB]');

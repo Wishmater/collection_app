@@ -4,13 +4,11 @@ import 'package:collection_app/util/persistence.dart';
 import 'package:collection_app/util/database_helper.dart';
 import 'package:hive/hive.dart';
 
-
 final collectionService = CollectionService();
 
 class CollectionService {
-
-  final List<Collection> _all = []; // TODO 2 PERFORMANCE maybe create a map from ID(name) to collection for faster search
-
+  final List<Collection> _all =
+      []; // TODO 2 PERFORMANCE maybe create a map from ID(name) to collection for faster search
 
   // GETS
 
@@ -18,10 +16,10 @@ class CollectionService {
     return List.unmodifiable(_all);
   }
 
-
   // MUTATIONS
 
-  bool addCollection(Collection collection, {
+  bool addCollection(
+    Collection collection, {
     bool checkIfAlreadyExists = true,
     bool saveToDb = true,
   }) {
@@ -45,13 +43,15 @@ class CollectionService {
 
   bool removeCollection(Collection collection) {
     final index = _all.indexOf(collection);
-    if (index<0) return false;
+    if (index < 0) return false;
     DbHelper.closeDbForCollection(collection);
     _all.removeAt(index);
     return true;
   }
 
-  bool addTagToCollection(Collection collection, Tag tag, {
+  bool addTagToCollection(
+    Collection collection,
+    Tag tag, {
     bool checkIfAlreadyExists = true,
     bool saveToDb = true,
   }) {
@@ -64,5 +64,4 @@ class CollectionService {
     }
     return true;
   }
-
 }

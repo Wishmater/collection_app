@@ -19,32 +19,33 @@ import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
 import 'package:mlog/mlog.dart';
 
-
 void main() async {
   await initLogging();
-  // TODO 2 implement proper handling of flutter errors in mlog
+  // TODO: 2 implement proper handling of flutter errors in mlog
   if (kReleaseMode) {
     FlutterError.onError = (FlutterErrorDetails details) {
-      log(LgLvl.error, 'FLUTTER ERROR CAUGHT BY LOGGER',
+      log(
+        LgLvl.error,
+        'FLUTTER ERROR CAUGHT BY LOGGER',
         e: details.exception,
         st: details.stack,
         details: details,
       );
     };
   }
-  runZonedGuarded(startApp,
-        (dynamic error, StackTrace stackTrace) {
-      log(LgLvl.error, 'TOP LEVEL RUN ZONE GUARDED ERROR',
-        e: error,
-        st: stackTrace,
-      );
-    },
-  );
+  runZonedGuarded(startApp, (dynamic error, StackTrace stackTrace) {
+    log(
+      LgLvl.error,
+      'TOP LEVEL RUN ZONE GUARDED ERROR',
+      e: error,
+      st: stackTrace,
+    );
+  });
 }
 
 Future<void> initLogging() async {
   LogOptions.instance.relevantStackTraceLineOffset = 2;
-  if (kReleaseMode){
+  if (kReleaseMode) {
     try {
       initLoggingDebug();
       // await initLoggingRelease(); // TODO 3 implement release logging, maybe create a package with MPG stuff
@@ -66,33 +67,38 @@ Future<void> initLogging() async {
 }
 
 void initLoggingDebug() {
-  log = (LgLvl level, Object? msg, {
-    Object? type,
-    Object? e,
-    StackTrace? st,
-    int extraTraceLineOffset = 0,
-    FlutterErrorDetails? details,
-  }) {
-    if (level.value > LogOptions.instance.getLvlForType(type).value) {
-      return;
-    }
-    final message = defaultLogGetString(level, msg,
-      e: e,
-      st: st,
-      extraTraceLineOffset: extraTraceLineOffset,
-      type: type,
-      details: details,
-    );
-    if (message!=null) {
-      if (PlatformExtended.isAndroid) {
-        // TODO 3 better logging handling in Android
-        // in android, stdout.writeln doesn't show in dev console
-        print(message); // ignore: avoid_print
-      } else {
-        stdout.writeln(message);
-      }
-    }
-  };
+  log =
+      (
+        LgLvl level,
+        Object? msg, {
+        Object? type,
+        Object? e,
+        StackTrace? st,
+        int extraTraceLineOffset = 0,
+        FlutterErrorDetails? details,
+      }) {
+        if (level.value > LogOptions.instance.getLvlForType(type).value) {
+          return;
+        }
+        final message = defaultLogGetString(
+          level,
+          msg,
+          e: e,
+          st: st,
+          extraTraceLineOffset: extraTraceLineOffset,
+          type: type,
+          details: details,
+        );
+        if (message != null) {
+          if (PlatformExtended.isAndroid) {
+            // TODO 3 better logging handling in Android
+            // in android, stdout.writeln doesn't show in dev console
+            print(message); // ignore: avoid_print
+          } else {
+            stdout.writeln(message);
+          }
+        }
+      };
 }
 
 /// this method needs to be called inside the final flutter zone
@@ -102,13 +108,15 @@ Future<void> startApp() async {
   FromZeroAppContentWrapper.appNameForCloseConfirmation = 'Collection App';
   // WindowBar.logoImageAssetsPath = 'assets/images/logo.png'; // TODO 2 re-add when we get a logo
   await initHive(kReleaseMode ? 'collection_app' : 'collection_app_debug');
-  PlatformExtended.customDownloadsDirectory = Hive.box<dynamic>('settings').get('download_folder');
+  PlatformExtended.customDownloadsDirectory = Hive.box<dynamic>(
+    'settings',
+  ).get('download_folder');
   themeParametersProvider = ChangeNotifierProvider((ref) {
     return ThemeParameters();
   });
   fromZeroThemeParametersProvider = themeParametersProvider;
   RendererBinding.instance.deferFirstFrame();
-  runApp(const App(),);
+  runApp(const App());
   if (!kIsWeb && Platform.isWindows) {
     if (kReleaseMode) {
       try {
@@ -134,6 +142,7 @@ Future<void> startApp() async {
     }
   }
 }
+
 void _reportWindowError(Object e, StackTrace st) {
   File logFile = File('cutrans_3.0_log_window.txt')..createSync(recursive: true);
   final logFileWrite = logFile.openWrite();
@@ -142,19 +151,14 @@ void _reportWindowError(Object e, StackTrace st) {
   logFileWrite.writeln(st.toString());
 }
 
-
-
 class App extends StatefulWidget {
-
   const App({super.key});
 
   @override
   State<App> createState() => _AppState();
-
 }
 
 class _AppState extends State<App> with WidgetsBindingObserver {
-
   final GlobalKey<NavigatorState> navigatorKey = GlobalKey();
   late final GoRouter router = GoRouter(
     initialLocation: '/splash',
@@ -201,21 +205,17 @@ class _AppState extends State<App> with WidgetsBindingObserver {
             title: 'Collection App',
             routerConfig: router,
             debugShowCheckedModeBanner: false,
-            supportedLocales: const [
-              Locale('en'),
-            ],
+            supportedLocales: const [Locale('en')],
             localizationsDelegates: const [
               ...GlobalMaterialLocalizations.delegates,
               FromZeroLocalizations.delegate,
-//              AppLocalizations.delegate,
+              //              AppLocalizations.delegate,
             ],
             shortcuts: {
               ...WidgetsApp.defaultShortcuts,
               ...fromZeroDefaultShortcuts,
             },
-            actions: {
-              ...WidgetsApp.defaultActions,
-            },
+            actions: {...WidgetsApp.defaultActions},
             themeMode: ThemeMode.dark,
             // themeMode: themeParameters.themeMode,
             theme: themeParameters.lightTheme,
@@ -223,9 +223,7 @@ class _AppState extends State<App> with WidgetsBindingObserver {
             builder: (context, child) {
               return FromZeroAppContentWrapper(
                 goRouter: router,
-                child: DbProcessIndicatorOverlay(
-                  child: child!,
-                ),
+                child: DbProcessIndicatorOverlay(child: child!),
               );
             },
           );
@@ -233,5 +231,4 @@ class _AppState extends State<App> with WidgetsBindingObserver {
       ),
     );
   }
-
 }

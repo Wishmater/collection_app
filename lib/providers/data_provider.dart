@@ -6,16 +6,12 @@ import 'package:collection_app/util/metadata.dart';
 import 'package:collection_app/util/thumbnail.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 
-
 abstract class DataProvider {
-
   static final thumbnail = ApiProviderFamily<File?, Item>((ref, item) {
     return ApiState(ref, (apiState) {
       return ThumbnailUtils.ensureThumbnailCreated(item);
     });
-  },
-    disposeDelay: const Duration(seconds: 60),
-  );
+  }, disposeDelay: const Duration(seconds: 60));
 
   static final metadata = ApiProviderFamily<Item, Item>((ref, item) {
     return ApiState(ref, (apiState) async {
@@ -23,8 +19,5 @@ abstract class DataProvider {
       ItemProvider.saveItem(AnyRef(ref: ref), result);
       return result;
     });
-  },
-    disposeDelay: const Duration(seconds: 60),
-  );
-
+  }, disposeDelay: const Duration(seconds: 60));
 }

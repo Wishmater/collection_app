@@ -3,10 +3,10 @@ import 'package:collection_app/models/tag.dart';
 import 'package:collection_app/util/database_helper.dart';
 import 'package:path/path.dart' as p;
 
-
 class Item {
+  Collection collection;
 
-  Collection collection; /// reverse link
+  /// reverse link
   int id;
   String name;
   DateTime added;
@@ -26,9 +26,15 @@ class Item {
   DateTime? fileCreated;
   DateTime? fileModified;
   int? filesize;
-  int? resolutionWidth; /// only on types: image, video
-  int? resolutionHeight; /// only on types: image, video
-  Duration? duration; /// only on types: video, audio
+  int? resolutionWidth;
+
+  /// only on types: image, video
+  int? resolutionHeight;
+
+  /// only on types: image, video
+  Duration? duration;
+
+  /// only on types: video, audio
 
   Item({
     required this.collection,
@@ -47,22 +53,25 @@ class Item {
     this.fileCreated,
     this.fileModified,
     this.filesize,
-    this.resolutionWidth, /// only on types: image, video
-    this.resolutionHeight, /// only on types: image, video
-    this.duration, /// only on types: video, audio
-    List<Item>? albumChildren,
-  })  : id = id ?? DbHelper.getNextItemIdForCollection(collection),
-        added = added ?? DateTime.now(),
-        tags = tags ?? [],
-        albumChildren = albumChildren ?? (itemType==ItemType.album ? [] : null);
+    this.resolutionWidth,
 
+    /// only on types: image, video
+    this.resolutionHeight,
+
+    /// only on types: image, video
+    this.duration,
+
+    /// only on types: video, audio
+    List<Item>? albumChildren,
+  }) : id = id ?? DbHelper.getNextItemIdForCollection(collection),
+       added = added ?? DateTime.now(),
+       tags = tags ?? [],
+       albumChildren = albumChildren ?? (itemType == ItemType.album ? [] : null);
 
   @override
-  bool operator ==(Object other) => identical(this, other)
-      || other is Item
-          && runtimeType == other.runtimeType
-          && id == other.id
-          && collection == other.collection;
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Item && runtimeType == other.runtimeType && id == other.id && collection == other.collection;
 
   @override
   int get hashCode => collection.hashCode ^ id.hashCode;
@@ -70,24 +79,26 @@ class Item {
   @override
   String toString() => '(Item: $name)';
 
-
-  bool get hasMetadata => metadataLastUpdated!=null;
+  bool get hasMetadata => metadataLastUpdated != null;
 
   String? getAbsoluteFilePath() {
-    if (filePath==null) return null;
-    if (collection.baseDirectory==null) return filePath;
+    if (filePath == null) return null;
+    if (collection.baseDirectory == null) return filePath;
     return p.join(collection.baseDirectory!, filePath);
   }
 
   String? getAbsoluteFilePathForThumbnail() {
-    if (filePath==null || collection.baseDirectory==null) return null;
-    String result = p.join(collection.baseDirectory!, '.collection_app', 'thumbnails', filePath);
+    if (filePath == null || collection.baseDirectory == null) return null;
+    String result = p.join(
+      collection.baseDirectory!,
+      '.collection_app',
+      'thumbnails',
+      filePath,
+    );
     result = p.setExtension(result, '.jpg');
     return result;
   }
-
 }
-
 
 enum ItemType {
   // IMPORTANT: since the index of the enum is used for serialization when saving to DB
@@ -100,7 +111,18 @@ enum ItemType {
 
   static const imageExtensions = ['.png', '.jpg', '.jpeg', '.webp', '.bmp'];
   // TODO 3 test GIF files, should we treat them as videos or as images?
-  static const videoExtensions = ['.mp4', '.mkv', '.gif', '.mpg', '.mpeg', '.webm', '.avi', '.rmvb', '.wmv', '.mov'];
+  static const videoExtensions = [
+    '.mp4',
+    '.mkv',
+    '.gif',
+    '.mpg',
+    '.mpeg',
+    '.webm',
+    '.avi',
+    '.rmvb',
+    '.wmv',
+    '.mov',
+  ];
   static const audioExtensions = ['.mp3', '.wav'];
   static ItemType inferFromExtension(String extension) {
     if (!extension.startsWith('.')) extension = '.$extension';

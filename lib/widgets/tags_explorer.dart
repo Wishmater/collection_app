@@ -5,12 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 
-
 class TagsExplorerV1 extends ConsumerWidget {
-
-  const TagsExplorerV1({
-    super.key,
-  });
+  const TagsExplorerV1({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -22,37 +18,28 @@ class TagsExplorerV1 extends ConsumerWidget {
       child: SingleChildScrollView(
         controller: scrollController,
         child: Column(
-          children: [
-            for (final e in rootTags)
-              TabExplorerItem(tag: e,),
-          ],
+          children: [for (final e in rootTags) TabExplorerItem(tag: e)],
         ),
       ),
     );
   }
-
 }
 
-
-
 class TabExplorerItem extends ConsumerWidget {
-
   static const childrenSeparation = 20.0;
 
   final Tag tag;
   final int indentCount;
 
-  const TabExplorerItem({
-    required this.tag,
-    this.indentCount = 0,
-    super.key,
-  });
+  const TabExplorerItem({required this.tag, this.indentCount = 0, super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     // TODO 1 we need a good way to listen changes in the tag without having to have the provider rebuild
     return ExpansionTileFromZero(
-      actionPadding: EdgeInsets.only(left: 10 + childrenSeparation * indentCount),
+      actionPadding: EdgeInsets.only(
+        left: 10 + childrenSeparation * indentCount,
+      ),
       expandedAlignment: Alignment.topCenter,
       title: Consumer(
         builder: (context, ref, child) {
@@ -60,8 +47,10 @@ class TabExplorerItem extends ConsumerWidget {
           final selectedTag = ref.watch(AppStateProvider.selectedTag);
           // TODO 1 show secondary parent tags
           return DrawerMenuButtonFromZero(
-            contentPadding: EdgeInsets.only(left: childrenSeparation * indentCount),
-            selected: selectedTag==tag,
+            contentPadding: EdgeInsets.only(
+              left: childrenSeparation * indentCount,
+            ),
+            selected: selectedTag == tag,
             title: tag.name,
           );
         },
@@ -72,7 +61,9 @@ class TabExplorerItem extends ConsumerWidget {
           title: 'Filter including tag',
           icon: const Icon(Icons.filter_alt_outlined),
           onTap: (context) {
-            final notifier = ref.read(AppStateProvider.filterIncludingTags.notifier);
+            final notifier = ref.read(
+              AppStateProvider.filterIncludingTags.notifier,
+            );
             if (!notifier.state.contains(tag)) {
               notifier.state = [...notifier.state, tag];
             }
@@ -82,7 +73,9 @@ class TabExplorerItem extends ConsumerWidget {
           title: 'Filter excluding tag',
           icon: const Icon(Icons.filter_alt_off_outlined),
           onTap: (context) {
-            final notifier = ref.read(AppStateProvider.filterExcludingTags.notifier);
+            final notifier = ref.read(
+              AppStateProvider.filterExcludingTags.notifier,
+            );
             if (!notifier.state.contains(tag)) {
               notifier.state = [...notifier.state, tag];
             }
@@ -122,7 +115,7 @@ class TabExplorerItem extends ConsumerWidget {
       ],
       onExpansionChanged: (expanding) {
         final selectedTagState = ref.read(AppStateProvider.selectedTag.state);
-        if (selectedTagState.state==tag) {
+        if (selectedTagState.state == tag) {
           return true;
         } else {
           selectedTagState.state = tag;
@@ -130,11 +123,7 @@ class TabExplorerItem extends ConsumerWidget {
         }
       },
       children: [
-        for (final e in tag.childTags)
-          TabExplorerItem(
-            tag: e,
-            indentCount: indentCount+1,
-          ),
+        for (final e in tag.childTags) TabExplorerItem(tag: e, indentCount: indentCount + 1),
       ],
     );
   }

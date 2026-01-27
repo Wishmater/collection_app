@@ -7,7 +7,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   desktop_drop
   pasteboard
   permission_handler_windows
-  screen_retriever
+  screen_retriever_windows
   url_launcher_windows
   video_player_win
   window_manager

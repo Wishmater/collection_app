@@ -12,9 +12,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:intl/intl.dart';
 
-
 class ItemDetailsView extends ConsumerStatefulWidget {
-
   final Item item;
   final bool isMainScrollbar;
 
@@ -26,18 +24,18 @@ class ItemDetailsView extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<ItemDetailsView> createState() => _ItemDetailsViewState();
-
 }
 
 class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
-
   StreamSubscription<Item>? _itemsUpdateSubscription;
 
   @override
   void initState() {
     super.initState();
-    _itemsUpdateSubscription = ItemProvider.updatedItemIdsStream.listen((Item item) {
-      if (item==widget.item) setState(() {});
+    _itemsUpdateSubscription = ItemProvider.updatedItemIdsStream.listen((
+      Item item,
+    ) {
+      if (item == widget.item) setState(() {});
     });
   }
 
@@ -52,32 +50,33 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
     final scrollController = ScrollController();
     Widget visualization;
     final dateFormat = DateFormat('yyyy MMMM dd - hh:mm:ss');
-    switch(widget.item.itemType!) {
+    switch (widget.item.itemType!) {
       case ItemType.image:
         visualization = Center(
-          child: Text('Visualization widget for images not implemented',
+          child: Text(
+            'Visualization widget for images not implemented',
             style: Theme.of(context).textTheme.titleMedium,
           ),
         );
       case ItemType.video:
-      // thumbnail = VideoLiveThumbnail(
-      //   filePath: widget.item.getAbsoluteFilePath()!,
-      // );
-        visualization = VideoCachedThumbnail(
-          item: widget.item,
-        );
+        // thumbnail = VideoLiveThumbnail(
+        //   filePath: widget.item.getAbsoluteFilePath()!,
+        // );
+        visualization = VideoCachedThumbnail(item: widget.item);
       case ItemType.audio:
         visualization = Center(
-          child: Text('Visualization widget for audio not implemented',
+          child: Text(
+            'Visualization widget for audio not implemented',
             style: Theme.of(context).textTheme.titleMedium,
           ),
         );
       case ItemType.unknown:
         visualization = const ErrorSign(title: '');
       case ItemType.album:
-      // TODO 1 implement visualization for album
+        // TODO 1 implement visualization for album
         visualization = Center(
-          child: Text('Visualization widget for albums not implemented',
+          child: Text(
+            'Visualization widget for albums not implemented',
             style: Theme.of(context).textTheme.titleMedium,
           ),
         );
@@ -91,9 +90,12 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
         slivers: [
           SliverToBoxAdapter(
             child: AppbarFromZero(
-              key: ValueKey(widget.item.name), // fixes weird behaviour in OverflowScroll when switching items
+              key: ValueKey(
+                widget.item.name,
+              ), // fixes weird behaviour in OverflowScroll when switching items
               title: OverflowScroll(
-                child: Text(widget.item.name,
+                child: Text(
+                  widget.item.name,
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
@@ -111,18 +113,15 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
               ],
             ),
           ),
-          const SliverToBoxAdapter(child: SizedBox(height: 8,),),
+          const SliverToBoxAdapter(child: SizedBox(height: 8)),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: AspectRatio(
-                aspectRatio: 16/9,
-                child: visualization,
-              ),
+              child: AspectRatio(aspectRatio: 16 / 9, child: visualization),
             ),
           ),
 
-          const SliverToBoxAdapter(child: SizedBox(height: 24,),),
+          const SliverToBoxAdapter(child: SizedBox(height: 24)),
 
           // priority 1 data
           SliverToBoxAdapter(
@@ -134,64 +133,85 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
                     alignment: Alignment.centerLeft,
                     children: <Widget>[
                       if (previousChildren.isNotEmpty) previousChildren.last,
-                      if (currentChild!=null) currentChild,
+                      if (currentChild != null) currentChild,
                     ],
                   );
                 },
                 defaultBuilder: (context) {
-                  return Text(widget.item.rating?.toString()??'',
+                  return Text(
+                    widget.item.rating?.toString() ?? '',
                     style: Theme.of(context).textTheme.titleMedium!.copyWith(
                       fontWeight: FontWeight.w900,
-                      color: Color.alphaBlend(Colors.yellow.withOpacity(0.6), Theme.of(context).canvasColor),
+                      color: Color.alphaBlend(
+                        Colors.yellow.withOpacity(0.6),
+                        Theme.of(context).canvasColor,
+                      ),
                       height: 1.28,
                     ),
                   );
                 },
                 hoveredBuilder: (context) {
-                  final color = Color.alphaBlend(Colors.yellow.withOpacity(0.6), Theme.of(context).canvasColor);
+                  final color = Color.alphaBlend(
+                    Colors.yellow.withOpacity(0.6),
+                    Theme.of(context).canvasColor,
+                  );
                   final textStyle = Theme.of(context).textTheme.titleMedium!;
                   return IntervalRatingBar(
-                    min: 1, max: 10,
+                    min: 1,
+                    max: 10,
                     color: color,
-                    from: widget.item.rating, to: widget.item.rating,
+                    from: widget.item.rating,
+                    to: widget.item.rating,
                     onFromChanged: (value) {
-                      if (widget.item.rating==value) return;
+                      if (widget.item.rating == value) return;
                       widget.item.rating = value;
-                      ItemProvider.saveItem(AnyRef(widgetRef: ref), widget.item);
+                      ItemProvider.saveItem(
+                        AnyRef(widgetRef: ref),
+                        widget.item,
+                      );
                     },
                     onToChanged: (value) {
-                      if (widget.item.rating==value) return;
+                      if (widget.item.rating == value) return;
                       widget.item.rating = value;
-                      ItemProvider.saveItem(AnyRef(widgetRef: ref), widget.item);
+                      ItemProvider.saveItem(
+                        AnyRef(widgetRef: ref),
+                        widget.item,
+                      );
                     },
                     widgetBuilder: (context, value, {required selected, color}) {
                       return Stack(
                         clipBehavior: Clip.none,
                         children: [
                           Positioned(
-                            left: 0, right: 0, top: -2, bottom: -2,
+                            left: 0,
+                            right: 0,
+                            top: -2,
+                            bottom: -2,
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 100),
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
-                                color: selected ? color!.withOpacity(color.opacity*0.6) : null,
+                                color: selected
+                                    ? color!.withOpacity(
+                                        color.opacity * 0.6,
+                                      )
+                                    : null,
                                 borderRadius: BorderRadius.horizontal(
-                                  left: widget.item.rating==value ? const Radius.circular(6) : Radius.zero,
-                                  right: widget.item.rating==value ? const Radius.circular(6) : Radius.zero,
+                                  left: widget.item.rating == value ? const Radius.circular(6) : Radius.zero,
+                                  right: widget.item.rating == value ? const Radius.circular(6) : Radius.zero,
                                 ),
                               ),
                             ),
                           ),
                           Container(
-                            width: value==10 ? 24 : 18,
+                            width: value == 10 ? 24 : 18,
                             alignment: Alignment.center,
-                            child: Text(value.toString(),
+                            child: Text(
+                              value.toString(),
                               style: textStyle.copyWith(
                                 fontWeight: FontWeight.w900,
                                 height: 1.28,
-                                color: selected
-                                    ? textStyle.color!.withOpacity(0.8)
-                                    : color,
+                                color: selected ? textStyle.color!.withOpacity(0.8) : color,
                               ),
                             ),
                           ),
@@ -212,50 +232,72 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
                     alignment: Alignment.centerLeft,
                     children: <Widget>[
                       if (previousChildren.isNotEmpty) previousChildren.last,
-                      if (currentChild!=null) currentChild,
+                      if (currentChild != null) currentChild,
                     ],
                   );
                 },
                 defaultBuilder: (context) {
-                  return Text(widget.item.explorePriority?.toString()??'',
+                  return Text(
+                    widget.item.explorePriority?.toString() ?? '',
                     style: Theme.of(context).textTheme.titleMedium!.copyWith(
                       fontWeight: FontWeight.w900,
-                      color: Color.alphaBlend(Colors.purple.withOpacity(0.8), Theme.of(context).canvasColor),
+                      color: Color.alphaBlend(
+                        Colors.purple.withOpacity(0.8),
+                        Theme.of(context).canvasColor,
+                      ),
                       height: 1.28,
                     ),
                   );
                 },
                 hoveredBuilder: (context) {
-                  final color = Color.alphaBlend(Colors.purple.withOpacity(0.8), Theme.of(context).canvasColor);
+                  final color = Color.alphaBlend(
+                    Colors.purple.withOpacity(0.8),
+                    Theme.of(context).canvasColor,
+                  );
                   final textStyle = Theme.of(context).textTheme.titleMedium!;
                   return IntervalRatingBar(
-                    min: -6, max: 3,
+                    min: -6,
+                    max: 3,
                     color: color,
-                    from: widget.item.explorePriority, to: widget.item.explorePriority,
+                    from: widget.item.explorePriority,
+                    to: widget.item.explorePriority,
                     onFromChanged: (value) {
-                      if (widget.item.explorePriority==value) return;
+                      if (widget.item.explorePriority == value) return;
                       widget.item.explorePriority = value;
-                      ItemProvider.saveItem(AnyRef(widgetRef: ref), widget.item);
+                      ItemProvider.saveItem(
+                        AnyRef(widgetRef: ref),
+                        widget.item,
+                      );
                     },
                     onToChanged: (value) {
-                      if (widget.item.explorePriority==value) return;
+                      if (widget.item.explorePriority == value) return;
                       widget.item.explorePriority = value;
-                      ItemProvider.saveItem(AnyRef(widgetRef: ref), widget.item);
+                      ItemProvider.saveItem(
+                        AnyRef(widgetRef: ref),
+                        widget.item,
+                      );
                     },
                     widgetBuilder: (context, value, {required selected, color}) {
                       Widget result = Stack(
                         clipBehavior: Clip.none,
                         children: [
                           Positioned(
-                            left: 0, right: 0, top: -2, bottom: -2,
+                            left: 0,
+                            right: 0,
+                            top: -2,
+                            bottom: -2,
                             child: AnimatedContainer(
                               duration: const Duration(milliseconds: 100),
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
-                                color: selected ? color!.withOpacity(color.opacity*0.6) : null,
+                                color: selected
+                                    ? color!.withOpacity(
+                                        color.opacity * 0.6,
+                                      )
+                                    : null,
                                 borderRadius: BorderRadius.horizontal(
-                                  left: widget.item.explorePriority==value ? const Radius.circular(6) : Radius.zero,
-                                  right: widget.item.explorePriority==value ? const Radius.circular(6) : Radius.zero,
+                                  left: widget.item.explorePriority == value ? const Radius.circular(6) : Radius.zero,
+                                  right: widget.item.explorePriority == value ? const Radius.circular(6) : Radius.zero,
                                 ),
                               ),
                             ),
@@ -265,22 +307,28 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
                             alignment: Alignment.center,
                             child: Stack(
                               children: [
-                                Text(value.abs().toString(),
+                                Text(
+                                  value.abs().toString(),
                                   style: textStyle.copyWith(
                                     fontWeight: FontWeight.w900,
                                     height: 1.28,
-                                    color: selected
-                                        ? textStyle.color!.withOpacity(0.8)
-                                        : color,
+                                    color: selected ? textStyle.color!.withOpacity(0.8) : color,
                                   ),
                                 ),
-                                if (value<0)
+                                if (value < 0)
                                   Positioned(
-                                    bottom: 1, left: -1, right: -1, height: 3,
+                                    bottom: 1,
+                                    left: -1,
+                                    right: -1,
+                                    height: 3,
                                     child: ColoredBox(
                                       color: selected
-                                          ? textStyle.color!.withOpacity(0.6)
-                                          : color!.withOpacity(color.opacity*0.8),
+                                          ? textStyle.color!.withOpacity(
+                                              0.6,
+                                            )
+                                          : color!.withOpacity(
+                                              color.opacity * 0.8,
+                                            ),
                                     ),
                                   ),
                               ],
@@ -288,14 +336,18 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
                           ),
                         ],
                       );
-                      if (value==-1) {
+                      if (value == -1) {
                         result = Row(
                           children: [
                             result,
                             Padding(
-                              padding: const EdgeInsets.only(top: 4, right: 1),
+                              padding: const EdgeInsets.only(
+                                top: 4,
+                                right: 1,
+                              ),
                               child: Container(
-                                width: 5, height: 3,
+                                width: 5,
+                                height: 3,
                                 color: Theme.of(context).dividerColor,
                               ),
                             ),
@@ -313,25 +365,29 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
           SliverToBoxAdapter(
             child: DetailsValueWidget(
               title: const Text('Tags'),
-              value: Text(widget.item.tags.map((e) => e.name).reduce((v, e) => '$v, $e')),
+              value: Text(
+                widget.item.tags.map((e) => e.name).reduce((v, e) => '$v, $e'),
+              ),
             ),
           ),
-          if (widget.item.duration!=null)
+          if (widget.item.duration != null)
             SliverToBoxAdapter(
               child: DetailsValueWidget(
                 title: const Text('Duration'),
                 value: Text(_printDuration(widget.item.duration!)),
               ),
             ),
-          if (widget.item.resolutionWidth!=null && widget.item.resolutionHeight!=null)
+          if (widget.item.resolutionWidth != null && widget.item.resolutionHeight != null)
             SliverToBoxAdapter(
               child: DetailsValueWidget(
                 title: const Text('Resolution'),
-                value: Text('${widget.item.resolutionWidth} x ${widget.item.resolutionHeight}'),
+                value: Text(
+                  '${widget.item.resolutionWidth} x ${widget.item.resolutionHeight}',
+                ),
               ),
             ),
 
-          const SliverToBoxAdapter(child: SizedBox(height: 24,),),
+          const SliverToBoxAdapter(child: SizedBox(height: 24)),
 
           // priority 2 data
           SliverToBoxAdapter(
@@ -346,14 +402,14 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
               value: Text(dateFormat.format(widget.item.added)),
             ),
           ),
-          if (widget.item.lastModified!=null)
+          if (widget.item.lastModified != null)
             SliverToBoxAdapter(
               child: DetailsValueWidget(
                 title: const Text('Item Modified'),
                 value: Text(dateFormat.format(widget.item.lastModified!)),
               ),
             ),
-          if (widget.item.lastSeen!=null)
+          if (widget.item.lastSeen != null)
             SliverToBoxAdapter(
               child: DetailsValueWidget(
                 title: const Text('Last Seen'),
@@ -361,38 +417,40 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
               ),
             ),
 
-          const SliverToBoxAdapter(child: SizedBox(height: 24,),),
+          const SliverToBoxAdapter(child: SizedBox(height: 24)),
 
           // file metadata
-          if (widget.item.metadataLastUpdated!=null)
+          if (widget.item.metadataLastUpdated != null)
             SliverToBoxAdapter(
               child: DetailsValueWidget(
                 title: const Text('Metadata'),
-                value: Text(dateFormat.format(widget.item.metadataLastUpdated!)),
+                value: Text(
+                  dateFormat.format(widget.item.metadataLastUpdated!),
+                ),
               ),
             ),
-          if (widget.item.filesize!=null)
+          if (widget.item.filesize != null)
             SliverToBoxAdapter(
               child: DetailsValueWidget(
                 title: const Text('File Size'),
                 value: Text(_getFileSize(widget.item.filesize!)),
               ),
             ),
-          if (widget.item.fileCreated!=null)
+          if (widget.item.fileCreated != null)
             SliverToBoxAdapter(
               child: DetailsValueWidget(
                 title: const Text('File Created'),
                 value: Text(dateFormat.format(widget.item.fileCreated!)),
               ),
             ),
-          if (widget.item.fileModified!=null)
+          if (widget.item.fileModified != null)
             SliverToBoxAdapter(
               child: DetailsValueWidget(
                 title: const Text('File Mod.'),
                 value: Text(dateFormat.format(widget.item.fileModified!)),
               ),
             ),
-          if (filePath!=null)
+          if (filePath != null)
             SliverToBoxAdapter(
               child: DetailsValueWidget(
                 title: const Text('File Path'),
@@ -400,18 +458,14 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
               ),
             ),
 
-          const SliverToBoxAdapter(child: SizedBox(height: 48,),),
-
+          const SliverToBoxAdapter(child: SizedBox(height: 48)),
         ],
       ),
     );
   }
 }
 
-
-
 class DetailsValueWidget extends StatelessWidget {
-
   final Widget title;
   final Widget value;
 
@@ -428,28 +482,22 @@ class DetailsValueWidget extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 84,
-            child: title,
-          ),
-          const SizedBox(width: 6,),
-          Expanded(
-            child: value,
-          ),
+          SizedBox(width: 84, child: title),
+          const SizedBox(width: 6),
+          Expanded(child: value),
         ],
       ),
     );
   }
-
 }
-
 
 String _printDuration(Duration duration) {
   String twoDigits(int n) => n.toString().padLeft(2, "0");
   String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60).abs());
   String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60).abs());
-  return "${duration.inHours==0 ? '' : '${twoDigits(duration.inHours)}:'}$twoDigitMinutes:$twoDigitSeconds";
+  return "${duration.inHours == 0 ? '' : '${twoDigits(duration.inHours)}:'}$twoDigitMinutes:$twoDigitSeconds";
 }
+
 String _getFileSize(int bytes, [int decimals = 1]) {
   if (bytes <= 0) return "0 B";
   const suffixes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];

@@ -14,17 +14,12 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-
 class ItemCardsExplorer extends ConsumerWidget {
-
   static const verticalSpacing = 15.0;
   static const horizontalSpacing = 20.0;
   final bool isMainScrollbar;
 
-  const ItemCardsExplorer({
-    this.isMainScrollbar = false,
-    super.key,
-  });
+  const ItemCardsExplorer({this.isMainScrollbar = false, super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -38,9 +33,10 @@ class ItemCardsExplorer extends ConsumerWidget {
         itemCount: items.length,
         maxCrossAxisExtent: 256,
         padding: const EdgeInsets.only(
-          left: horizontalSpacing/2, right: horizontalSpacing/2,
-          bottom: verticalSpacing/2,
-          top: verticalSpacing/2 + ItemExplorerAppbar.toolbarHeight - 4,
+          left: horizontalSpacing / 2,
+          right: horizontalSpacing / 2,
+          bottom: verticalSpacing / 2,
+          top: verticalSpacing / 2 + ItemExplorerAppbar.toolbarHeight - 4,
         ),
         // crossAxisSpacing: horizontalSpacing,
         // mainAxisSpacing: verticalSpacing,
@@ -51,33 +47,27 @@ class ItemCardsExplorer extends ConsumerWidget {
       ),
     );
   }
-
 }
 
-
-
 class ItemCardsWidget extends ConsumerStatefulWidget {
-
   final Item item;
 
-  const ItemCardsWidget({
-    required this.item,
-    super.key,
-  });
+  const ItemCardsWidget({required this.item, super.key});
 
   @override
   ConsumerState<ItemCardsWidget> createState() => _ItemCardsWidgetState();
-
 }
-class _ItemCardsWidgetState extends ConsumerState<ItemCardsWidget> {
 
+class _ItemCardsWidgetState extends ConsumerState<ItemCardsWidget> {
   StreamSubscription<Item>? _itemsUpdateSubscription;
 
   @override
   void initState() {
     super.initState();
-    _itemsUpdateSubscription = ItemProvider.updatedItemIdsStream.listen((Item item) {
-      if (item==widget.item) setState(() {});
+    _itemsUpdateSubscription = ItemProvider.updatedItemIdsStream.listen((
+      Item item,
+    ) {
+      if (item == widget.item) setState(() {});
     });
   }
 
@@ -96,9 +86,13 @@ class _ItemCardsWidgetState extends ConsumerState<ItemCardsWidget> {
         dataBuilder: buildContent,
         loadingBuilder: (context, progress) {
           return AspectRatio(
-            aspectRatio: 16/9,
-            child: SizedBox(width: double.infinity,
-              child: ApiProviderBuilder.defaultLoadingBuilder(context, progress),
+            aspectRatio: 16 / 9,
+            child: SizedBox(
+              width: double.infinity,
+              child: ApiProviderBuilder.defaultLoadingBuilder(
+                context,
+                progress,
+              ),
             ),
           );
         },
@@ -109,10 +103,11 @@ class _ItemCardsWidgetState extends ConsumerState<ItemCardsWidget> {
 
   Widget buildContent(BuildContext context, Item item) {
     Widget thumbnail;
-    switch(item.itemType!) {
+    switch (item.itemType!) {
       case ItemType.image:
         thumbnail = Center(
-          child: Text('Thumbnail widget for images not implemented',
+          child: Text(
+            'Thumbnail widget for images not implemented',
             style: Theme.of(context).textTheme.titleMedium,
           ),
         );
@@ -120,12 +115,11 @@ class _ItemCardsWidgetState extends ConsumerState<ItemCardsWidget> {
         // thumbnail = VideoLiveThumbnail(
         //   filePath: widget.item.getAbsoluteFilePath()!,
         // );
-        thumbnail = VideoCachedThumbnail(
-          item: item,
-        );
+        thumbnail = VideoCachedThumbnail(item: item);
       case ItemType.audio:
         thumbnail = Center(
-          child: Text('Thumbnail widget for audio not implemented',
+          child: Text(
+            'Thumbnail widget for audio not implemented',
             style: Theme.of(context).textTheme.titleMedium,
           ),
         );
@@ -134,12 +128,13 @@ class _ItemCardsWidgetState extends ConsumerState<ItemCardsWidget> {
       case ItemType.album:
         // TODO 1 implement visualization for album
         thumbnail = Center(
-          child: Text('Thumbnail widget for albums not implemented',
+          child: Text(
+            'Thumbnail widget for albums not implemented',
             style: Theme.of(context).textTheme.titleMedium,
           ),
         );
     }
-    if (item.duration!=null) {
+    if (item.duration != null) {
       thumbnail = Stack(
         children: [
           thumbnail,
@@ -147,12 +142,20 @@ class _ItemCardsWidgetState extends ConsumerState<ItemCardsWidget> {
             bottom: -0.5, // fixes an ugly rendering bug on windows
             right: 0,
             child: Container(
-              padding: const EdgeInsets.only(left: 5, right: 2.5, top: 2, bottom: 1.5),
+              padding: const EdgeInsets.only(
+                left: 5,
+                right: 2.5,
+                top: 2,
+                bottom: 1.5,
+              ),
               decoration: BoxDecoration(
-                borderRadius: const BorderRadius.only(topLeft: Radius.circular(4)),
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(4),
+                ),
                 color: Theme.of(context).canvasColor.withOpacity(0.6),
               ),
-              child: Text(_printDuration(item.duration!),
+              child: Text(
+                _printDuration(item.duration!),
                 style: Theme.of(context).textTheme.labelMedium,
               ),
             ),
@@ -160,11 +163,13 @@ class _ItemCardsWidgetState extends ConsumerState<ItemCardsWidget> {
         ],
       );
     }
-    final isSelected = ref.watch(AppStateProvider.selectedItem.select((v) => v==item));
+    final isSelected = ref.watch(
+      AppStateProvider.selectedItem.select((v) => v == item),
+    );
     Widget result = MultiTapListener(
       onDoubleTap: () {
         final filePath = item.getAbsoluteFilePath();
-        if (filePath!=null) {
+        if (filePath != null) {
           launch(filePath);
         }
       },
@@ -175,20 +180,19 @@ class _ItemCardsWidgetState extends ConsumerState<ItemCardsWidget> {
         },
         child: Container(
           padding: const EdgeInsets.symmetric(
-            horizontal: ItemCardsExplorer.horizontalSpacing/2,
-            vertical: ItemCardsExplorer.verticalSpacing/2,
+            horizontal: ItemCardsExplorer.horizontalSpacing / 2,
+            vertical: ItemCardsExplorer.verticalSpacing / 2,
           ),
-          decoration: !isSelected ? null : BoxDecoration(
-            color: Colors.blueAccent.withOpacity(0.2),
-            borderRadius: const BorderRadius.all(Radius.circular(6)),
-          ),
+          decoration: !isSelected
+              ? null
+              : BoxDecoration(
+                  color: Colors.blueAccent.withOpacity(0.2),
+                  borderRadius: const BorderRadius.all(Radius.circular(6)),
+                ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              AspectRatio(
-                aspectRatio: 16/9,
-                child: thumbnail,
-              ),
+              AspectRatio(aspectRatio: 16 / 9, child: thumbnail),
               Text(item.name),
               // TODO 1 show tags
               // TODO 1 show explore priority
@@ -205,7 +209,7 @@ class _ItemCardsWidgetState extends ConsumerState<ItemCardsWidget> {
           icon: const Icon(Icons.file_open),
           onTap: (context) {
             final filePath = item.getAbsoluteFilePath();
-            if (filePath!=null) {
+            if (filePath != null) {
               launch(filePath);
             }
           },
@@ -215,7 +219,7 @@ class _ItemCardsWidgetState extends ConsumerState<ItemCardsWidget> {
           icon: const Icon(Icons.folder),
           onTap: (context) {
             final filePath = item.getAbsoluteFilePath();
-            if (filePath!=null) {
+            if (filePath != null) {
               launch(File(filePath).parent.absolute.path);
             }
           },
@@ -224,13 +228,11 @@ class _ItemCardsWidgetState extends ConsumerState<ItemCardsWidget> {
       child: result,
     );
   }
-
 }
-
 
 String _printDuration(Duration duration) {
   String twoDigits(int n) => n.toString().padLeft(2, "0");
   String twoDigitMinutes = twoDigits(duration.inMinutes.remainder(60).abs());
   String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60).abs());
-  return "${duration.inHours==0 ? '' : '${twoDigits(duration.inHours)}:'}$twoDigitMinutes:$twoDigitSeconds";
+  return "${duration.inHours == 0 ? '' : '${twoDigits(duration.inHours)}:'}$twoDigitMinutes:$twoDigitSeconds";
 }

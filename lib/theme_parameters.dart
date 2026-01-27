@@ -2,12 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 
-
 late final ChangeNotifierProvider<ThemeParameters> themeParametersProvider;
 
 class ThemeParameters extends ThemeParametersFromZero {
-
-
   @override
   ThemeData get defaultLightTheme => clearLightTheme;
 
@@ -22,15 +19,9 @@ class ThemeParameters extends ThemeParametersFromZero {
           fontSize: 24,
           fontWeight: FontWeight.w600,
         ),
-        toolbarTextStyle: const TextStyle(
-          color: Colors.black,
-        ),
-        actionsIconTheme: const IconThemeData(
-          color: Colors.black,
-        ),
-        iconTheme: const IconThemeData(
-          color: Colors.black,
-        ),
+        toolbarTextStyle: const TextStyle(color: Colors.black),
+        actionsIconTheme: const IconThemeData(color: Colors.black),
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
     );
   }
@@ -61,14 +52,18 @@ class ThemeParameters extends ThemeParametersFromZero {
       dividerColor: lightDividerColor,
       splashFactory: InkSparkle.splashFactory,
       cardTheme: const CardTheme(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+        ),
         color: lightForegroundColor,
         surfaceTintColor: lightForegroundColor,
         elevation: 5,
       ),
       dialogBackgroundColor: lightForegroundColor,
       dialogTheme: const DialogTheme(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+        ),
         backgroundColor: lightForegroundColor,
         surfaceTintColor: lightForegroundColor,
       ),
@@ -80,15 +75,9 @@ class ThemeParameters extends ThemeParametersFromZero {
           fontSize: 24,
           fontWeight: FontWeight.w600,
         ),
-        toolbarTextStyle: TextStyle(
-          color: Colors.white,
-        ),
-        actionsIconTheme: IconThemeData(
-          color: Colors.white,
-        ),
-        iconTheme: IconThemeData(
-          color: Colors.white,
-        ),
+        toolbarTextStyle: TextStyle(color: Colors.white),
+        actionsIconTheme: IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       scrollbarTheme: ScrollbarThemeData(
         crossAxisMargin: 0,
@@ -98,9 +87,7 @@ class ThemeParameters extends ThemeParametersFromZero {
         trackVisibility: MaterialStateProperty.resolveWith((states) {
           return states.contains(MaterialState.hovered);
         }),
-        thumbVisibility: PlatformExtended.isDesktop
-            ? const MaterialStatePropertyAll(true)
-            : null,
+        thumbVisibility: PlatformExtended.isDesktop ? const MaterialStatePropertyAll(true) : null,
         trackColor: MaterialStateProperty.resolveWith((states) {
           return const Color.fromRGBO(255, 255, 255, 0.4);
         }),
@@ -114,25 +101,16 @@ class ThemeParameters extends ThemeParametersFromZero {
           return const Color.fromRGBO(153, 153, 153, 1); // 0.4
         }),
       ),
-      dividerTheme: DividerThemeData(
-        color: lightDividerColor,
-      ),
-      listTileTheme: const ListTileThemeData(
-        horizontalTitleGap: 12,
-      ),
+      dividerTheme: DividerThemeData(color: lightDividerColor),
+      listTileTheme: const ListTileThemeData(horizontalTitleGap: 12),
       tooltipTheme: TooltipThemeData(
         decoration: BoxDecoration(
           color: lightForegroundColor.withOpacity(0.9),
           borderRadius: const BorderRadius.all(Radius.circular(16)),
-          border: Border.all(
-            color: darkForegroundColor.withOpacity(0.33),
-          ),
+          border: Border.all(color: darkForegroundColor.withOpacity(0.33)),
         ),
         padding: const EdgeInsets.fromLTRB(12, 4, 12, 6),
-        textStyle: const TextStyle(
-          fontSize: 16,
-          color: Colors.black,
-        ),
+        textStyle: const TextStyle(fontSize: 16, color: Colors.black),
       ),
     );
     return theme.copyWith(
@@ -145,8 +123,6 @@ class ThemeParameters extends ThemeParametersFromZero {
       ),
     );
   }
-
-
 
   @override
   ThemeData get defaultDarkTheme => clearDarkTheme;
@@ -192,14 +168,18 @@ class ThemeParameters extends ThemeParametersFromZero {
       dividerColor: darkDividerColor,
       splashFactory: InkSparkle.splashFactory,
       cardTheme: const CardTheme(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+        ),
         color: darkForegroundColor,
         surfaceTintColor: darkForegroundColor,
         elevation: 5,
       ),
       // dialogBackgroundColor: darkForegroundColor,
       dialogTheme: const DialogTheme(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+        ),
         backgroundColor: darkForegroundColor,
         surfaceTintColor: darkForegroundColor,
       ),
@@ -211,15 +191,9 @@ class ThemeParameters extends ThemeParametersFromZero {
           fontSize: 24,
           fontWeight: FontWeight.w600,
         ),
-        toolbarTextStyle: TextStyle(
-          color: Colors.white,
-        ),
-        actionsIconTheme: IconThemeData(
-          color: Colors.white,
-        ),
-        iconTheme: IconThemeData(
-          color: Colors.white,
-        ),
+        toolbarTextStyle: TextStyle(color: Colors.white),
+        actionsIconTheme: IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       scrollbarTheme: ScrollbarThemeData(
         crossAxisMargin: 0,
@@ -229,9 +203,7 @@ class ThemeParameters extends ThemeParametersFromZero {
         trackVisibility: MaterialStateProperty.resolveWith((states) {
           return states.contains(MaterialState.hovered);
         }),
-        thumbVisibility: PlatformExtended.isDesktop
-            ? const MaterialStatePropertyAll(true)
-            : null,
+        thumbVisibility: PlatformExtended.isDesktop ? const MaterialStatePropertyAll(true) : null,
         trackColor: MaterialStateProperty.resolveWith((states) {
           return const Color.fromRGBO(255, 255, 255, 0.1);
         }),
@@ -249,22 +221,13 @@ class ThemeParameters extends ThemeParametersFromZero {
         decoration: BoxDecoration(
           color: darkForegroundColor.withOpacity(0.9),
           borderRadius: const BorderRadius.all(Radius.circular(16)),
-          border: Border.all(
-            color: lightForegroundColor.withOpacity(0.33),
-          ),
+          border: Border.all(color: lightForegroundColor.withOpacity(0.33)),
         ),
         padding: const EdgeInsets.fromLTRB(12, 4, 12, 6),
-        textStyle: const TextStyle(
-          fontSize: 16,
-          color: Colors.white,
-        ),
+        textStyle: const TextStyle(fontSize: 16, color: Colors.white),
       ),
-      dividerTheme: DividerThemeData(
-        color: darkDividerColor,
-      ),
-      listTileTheme: const ListTileThemeData(
-        horizontalTitleGap: 12,
-      ),
+      dividerTheme: DividerThemeData(color: darkDividerColor),
+      listTileTheme: const ListTileThemeData(horizontalTitleGap: 12),
       switchTheme: SwitchThemeData(
         trackColor: MaterialStateProperty.resolveWith((states) {
           if (states.contains(MaterialState.selected)) {
@@ -275,82 +238,66 @@ class ThemeParameters extends ThemeParametersFromZero {
       ),
     );
     return theme.copyWith(
-      colorScheme: theme.colorScheme.copyWith(
-        outline: darkDividerColor,
-      ),
+      colorScheme: theme.colorScheme.copyWith(outline: darkDividerColor),
       textTheme: theme.textTheme.copyWith(
         labelSmall: theme.textTheme.labelSmall!.copyWith(
-          color: theme.textTheme.labelSmall!.color==Colors.white
-              ? darkTextColor
-              : theme.textTheme.labelSmall!.color,
+          color: theme.textTheme.labelSmall!.color == Colors.white ? darkTextColor : theme.textTheme.labelSmall!.color,
         ),
         labelMedium: theme.textTheme.labelMedium!.copyWith(
-          color: theme.textTheme.labelMedium!.color==Colors.white
+          color: theme.textTheme.labelMedium!.color == Colors.white
               ? darkTextColor
               : theme.textTheme.labelMedium!.color,
         ),
         labelLarge: theme.textTheme.labelLarge!.copyWith(
-          color: theme.textTheme.labelLarge!.color==Colors.white
-              ? darkTextColor
-              : theme.textTheme.labelLarge!.color,
+          color: theme.textTheme.labelLarge!.color == Colors.white ? darkTextColor : theme.textTheme.labelLarge!.color,
         ),
         bodySmall: theme.textTheme.bodySmall!.copyWith(
-          color: theme.textTheme.bodySmall!.color==Colors.white
-              ? darkTextColor
-              : theme.textTheme.bodySmall!.color,
+          color: theme.textTheme.bodySmall!.color == Colors.white ? darkTextColor : theme.textTheme.bodySmall!.color,
         ),
         bodyMedium: theme.textTheme.bodyMedium!.copyWith(
-          color: theme.textTheme.bodyMedium!.color==Colors.white
-              ? darkTextColor
-              : theme.textTheme.bodyMedium!.color,
+          color: theme.textTheme.bodyMedium!.color == Colors.white ? darkTextColor : theme.textTheme.bodyMedium!.color,
         ),
         bodyLarge: theme.textTheme.bodyLarge!.copyWith(
-          color: theme.textTheme.bodyLarge!.color==Colors.white
-              ? darkTextColor
-              : theme.textTheme.bodyLarge!.color,
+          color: theme.textTheme.bodyLarge!.color == Colors.white ? darkTextColor : theme.textTheme.bodyLarge!.color,
         ),
         titleSmall: theme.textTheme.titleSmall!.copyWith(
-          color: theme.textTheme.titleSmall!.color==Colors.white
-              ? darkTextColor
-              : theme.textTheme.titleSmall!.color,
+          color: theme.textTheme.titleSmall!.color == Colors.white ? darkTextColor : theme.textTheme.titleSmall!.color,
         ),
         titleMedium: theme.textTheme.titleMedium!.copyWith(
-          color: theme.textTheme.titleMedium!.color==Colors.white
+          color: theme.textTheme.titleMedium!.color == Colors.white
               ? darkTextColor
               : theme.textTheme.titleMedium!.color,
         ),
         titleLarge: theme.textTheme.titleLarge!.copyWith(
-          color: theme.textTheme.titleLarge!.color==Colors.white
-              ? darkTextColor
-              : theme.textTheme.titleLarge!.color,
+          color: theme.textTheme.titleLarge!.color == Colors.white ? darkTextColor : theme.textTheme.titleLarge!.color,
         ),
         headlineSmall: theme.textTheme.headlineSmall!.copyWith(
-          color: theme.textTheme.headlineSmall!.color==Colors.white
+          color: theme.textTheme.headlineSmall!.color == Colors.white
               ? darkTextColor
               : theme.textTheme.headlineSmall!.color,
         ),
         headlineMedium: theme.textTheme.headlineMedium!.copyWith(
-          color: theme.textTheme.headlineMedium!.color==Colors.white
+          color: theme.textTheme.headlineMedium!.color == Colors.white
               ? darkTextColor
               : theme.textTheme.headlineMedium!.color,
         ),
         headlineLarge: theme.textTheme.headlineLarge!.copyWith(
-          color: theme.textTheme.headlineLarge!.color==Colors.white
+          color: theme.textTheme.headlineLarge!.color == Colors.white
               ? darkTextColor
               : theme.textTheme.headlineLarge!.color,
         ),
         displaySmall: theme.textTheme.displaySmall!.copyWith(
-          color: theme.textTheme.displaySmall!.color==Colors.white
+          color: theme.textTheme.displaySmall!.color == Colors.white
               ? darkTextColor
               : theme.textTheme.displaySmall!.color,
         ),
         displayMedium: theme.textTheme.displayMedium!.copyWith(
-          color: theme.textTheme.displayMedium!.color==Colors.white
+          color: theme.textTheme.displayMedium!.color == Colors.white
               ? darkTextColor
               : theme.textTheme.displayMedium!.color,
         ),
         displayLarge: theme.textTheme.displayLarge!.copyWith(
-          color: theme.textTheme.displayLarge!.color==Colors.white
+          color: theme.textTheme.displayLarge!.color == Colors.white
               ? darkTextColor
               : theme.textTheme.displayLarge!.color,
         ),
@@ -362,10 +309,7 @@ class ThemeParameters extends ThemeParametersFromZero {
           fontWeight: FontWeight.w600,
         ),
       ),
-      iconTheme: theme.iconTheme.copyWith(
-        color: darkIconColor,
-      ),
+      iconTheme: theme.iconTheme.copyWith(color: darkIconColor),
     );
   }
-
 }
