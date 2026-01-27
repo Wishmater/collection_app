@@ -52,7 +52,7 @@ class _MainAppbarState extends ConsumerState<MainAppbar> {
                         title: 'Open Collection...',
                         icon: const Icon(Icons.create_new_folder),
                         onTap: (context) async {
-                          final path = await FilePicker.getDirectoryPath(
+                          final path = await FilePicker.platform.getDirectoryPath(
                             dialogTitle: 'Open Collection...',
                             lockParentWindow: true,
                           );
