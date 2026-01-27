@@ -12,7 +12,7 @@ class ThemeParameters extends ThemeParametersFromZero {
     final opaqueLightTheme = this.opaqueLightTheme;
     return opaqueLightTheme.copyWith(
       appBarTheme: AppBarTheme(
-        color: opaqueLightTheme.cardColor,
+        backgroundColor: opaqueLightTheme.cardColor,
         scrolledUnderElevation: 0,
         titleTextStyle: const TextStyle(
           color: Colors.black,
@@ -41,17 +41,19 @@ class ThemeParameters extends ThemeParametersFromZero {
       ),
       // primaryColorDark: const Color.fromRGBO(0, 0, 100, 1),
       // primaryColorLight: const Color.fromRGBO(0, 0, 140, 1),
-      indicatorColor: lightSplashColor,
-      focusColor: lightSplashColor.withOpacity(0.1),
-      hoverColor: lightSplashColor.withOpacity(0.05),
-      highlightColor: lightSplashColor.withOpacity(0.05),
-      splashColor: lightSplashColor.withOpacity(0.1),
+      focusColor: lightSplashColor.withValues(alpha: 0.1),
+      hoverColor: lightSplashColor.withValues(alpha: 0.05),
+      highlightColor: lightSplashColor.withValues(alpha: 0.05),
+      splashColor: lightSplashColor.withValues(alpha: 0.1),
       canvasColor: lightBackgroundColor,
       scaffoldBackgroundColor: lightBackgroundColor,
       cardColor: lightForegroundColor,
       dividerColor: lightDividerColor,
       splashFactory: InkSparkle.splashFactory,
-      cardTheme: const CardTheme(
+      tabBarTheme: TabBarThemeData(
+        indicatorColor: lightSplashColor,
+      ),
+      cardTheme: const CardThemeData(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(12)),
         ),
@@ -59,8 +61,7 @@ class ThemeParameters extends ThemeParametersFromZero {
         surfaceTintColor: lightForegroundColor,
         elevation: 5,
       ),
-      dialogBackgroundColor: lightForegroundColor,
-      dialogTheme: const DialogTheme(
+      dialogTheme: const DialogThemeData(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(12)),
         ),
@@ -68,7 +69,7 @@ class ThemeParameters extends ThemeParametersFromZero {
         surfaceTintColor: lightForegroundColor,
       ),
       appBarTheme: const AppBarTheme(
-        color: Color.fromRGBO(0, 0, 100, 1),
+        backgroundColor: Color.fromRGBO(0, 0, 100, 1),
         scrolledUnderElevation: 0,
         titleTextStyle: TextStyle(
           color: Colors.white,
@@ -84,18 +85,18 @@ class ThemeParameters extends ThemeParametersFromZero {
         mainAxisMargin: 0,
         minThumbLength: 128,
         interactive: true,
-        trackVisibility: MaterialStateProperty.resolveWith((states) {
-          return states.contains(MaterialState.hovered);
+        trackVisibility: WidgetStateProperty.resolveWith((states) {
+          return states.contains(WidgetState.hovered);
         }),
-        thumbVisibility: PlatformExtended.isDesktop ? const MaterialStatePropertyAll(true) : null,
-        trackColor: MaterialStateProperty.resolveWith((states) {
+        thumbVisibility: PlatformExtended.isDesktop ? const WidgetStatePropertyAll(true) : null,
+        trackColor: WidgetStateProperty.resolveWith((states) {
           return const Color.fromRGBO(255, 255, 255, 0.4);
         }),
-        thumbColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.dragged)) {
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.dragged)) {
             return const Color.fromRGBO(101, 101, 101, 1); // 0.6
           }
-          if (states.contains(MaterialState.hovered)) {
+          if (states.contains(WidgetState.hovered)) {
             return const Color.fromRGBO(127, 127, 127, 1); // 0.5
           }
           return const Color.fromRGBO(153, 153, 153, 1); // 0.4
@@ -105,9 +106,9 @@ class ThemeParameters extends ThemeParametersFromZero {
       listTileTheme: const ListTileThemeData(horizontalTitleGap: 12),
       tooltipTheme: TooltipThemeData(
         decoration: BoxDecoration(
-          color: lightForegroundColor.withOpacity(0.9),
+          color: lightForegroundColor.withValues(alpha: 0.9),
           borderRadius: const BorderRadius.all(Radius.circular(16)),
-          border: Border.all(color: darkForegroundColor.withOpacity(0.33)),
+          border: Border.all(color: darkForegroundColor.withValues(alpha: 0.33)),
         ),
         padding: const EdgeInsets.fromLTRB(12, 4, 12, 6),
         textStyle: const TextStyle(fontSize: 16, color: Colors.black),
@@ -131,7 +132,7 @@ class ThemeParameters extends ThemeParametersFromZero {
     final opaqueDarkTheme = this.opaqueDarkTheme;
     return opaqueDarkTheme.copyWith(
       appBarTheme: opaqueDarkTheme.appBarTheme.copyWith(
-        color: opaqueDarkTheme.cardColor,
+        backgroundColor: opaqueDarkTheme.cardColor,
       ),
     );
   }
@@ -157,17 +158,19 @@ class ThemeParameters extends ThemeParametersFromZero {
       // primaryColor: const Color.fromRGBO(0, 0, 35, 1),
       // primaryColorDark: const Color.fromRGBO(0, 0, 15, 1),
       // primaryColorLight: const Color.fromRGBO(0, 0, 55, 1),
-      indicatorColor: darkSplashColor,
-      focusColor: darkSplashColor.withOpacity(0.1),
-      hoverColor: darkSplashColor.withOpacity(0.05),
-      highlightColor: darkSplashColor.withOpacity(0.05),
-      splashColor: darkSplashColor.withOpacity(0.1),
+      focusColor: darkSplashColor.withValues(alpha: 0.1),
+      hoverColor: darkSplashColor.withValues(alpha: 0.05),
+      highlightColor: darkSplashColor.withValues(alpha: 0.05),
+      splashColor: darkSplashColor.withValues(alpha: 0.1),
       canvasColor: darkBackgroundColor,
       scaffoldBackgroundColor: darkBackgroundColor,
       cardColor: darkForegroundColor,
       dividerColor: darkDividerColor,
+      tabBarTheme: TabBarThemeData(
+        indicatorColor: darkSplashColor,
+      ),
       splashFactory: InkSparkle.splashFactory,
-      cardTheme: const CardTheme(
+      cardTheme: const CardThemeData(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(12)),
         ),
@@ -176,7 +179,7 @@ class ThemeParameters extends ThemeParametersFromZero {
         elevation: 5,
       ),
       // dialogBackgroundColor: darkForegroundColor,
-      dialogTheme: const DialogTheme(
+      dialogTheme: const DialogThemeData(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.all(Radius.circular(12)),
         ),
@@ -184,7 +187,7 @@ class ThemeParameters extends ThemeParametersFromZero {
         surfaceTintColor: darkForegroundColor,
       ),
       appBarTheme: const AppBarTheme(
-        color: Color.fromRGBO(0, 0, 35, 1),
+        backgroundColor: Color.fromRGBO(0, 0, 35, 1),
         scrolledUnderElevation: 0,
         titleTextStyle: TextStyle(
           color: Colors.white,
@@ -200,18 +203,18 @@ class ThemeParameters extends ThemeParametersFromZero {
         mainAxisMargin: 0,
         minThumbLength: 128,
         interactive: true,
-        trackVisibility: MaterialStateProperty.resolveWith((states) {
-          return states.contains(MaterialState.hovered);
+        trackVisibility: WidgetStateProperty.resolveWith((states) {
+          return states.contains(WidgetState.hovered);
         }),
-        thumbVisibility: PlatformExtended.isDesktop ? const MaterialStatePropertyAll(true) : null,
-        trackColor: MaterialStateProperty.resolveWith((states) {
+        thumbVisibility: PlatformExtended.isDesktop ? const WidgetStatePropertyAll(true) : null,
+        trackColor: WidgetStateProperty.resolveWith((states) {
           return const Color.fromRGBO(255, 255, 255, 0.1);
         }),
-        thumbColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.dragged)) {
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.dragged)) {
             return const Color.fromRGBO(153, 153, 153, 1); // 0.4
           }
-          if (states.contains(MaterialState.hovered)) {
+          if (states.contains(WidgetState.hovered)) {
             return const Color.fromRGBO(127, 127, 127, 1); // 0.5
           }
           return const Color.fromRGBO(101, 101, 101, 1); // 0.6
@@ -219,9 +222,9 @@ class ThemeParameters extends ThemeParametersFromZero {
       ),
       tooltipTheme: TooltipThemeData(
         decoration: BoxDecoration(
-          color: darkForegroundColor.withOpacity(0.9),
+          color: darkForegroundColor.withValues(alpha: 0.9),
           borderRadius: const BorderRadius.all(Radius.circular(16)),
-          border: Border.all(color: lightForegroundColor.withOpacity(0.33)),
+          border: Border.all(color: lightForegroundColor.withValues(alpha: 0.33)),
         ),
         padding: const EdgeInsets.fromLTRB(12, 4, 12, 6),
         textStyle: const TextStyle(fontSize: 16, color: Colors.white),
@@ -229,8 +232,8 @@ class ThemeParameters extends ThemeParametersFromZero {
       dividerTheme: DividerThemeData(color: darkDividerColor),
       listTileTheme: const ListTileThemeData(horizontalTitleGap: 12),
       switchTheme: SwitchThemeData(
-        trackColor: MaterialStateProperty.resolveWith((states) {
-          if (states.contains(MaterialState.selected)) {
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
             return Colors.blue.shade900;
           }
           return Colors.grey.shade900;

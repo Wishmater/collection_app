@@ -50,7 +50,7 @@ class TagService {
     }
     addChildren(tag, tag.childTags, saveToDb: saveToDb);
     addSecondaryChildren(tag.secondaryParentTags, [tag], saveToDb: false);
-    // TODO 2 PERFORMANCE, we could just save the new relations directly and call this with saveToDb: false
+    // PERF: 2, we could just save the new relations directly and call this with saveToDb: false
     addSecondaryChildren([tag], tag.secondaryChildTags, saveToDb: saveToDb);
     collectionService.addTagToCollection(collection, tag, saveToDb: saveToDb);
     return true;
@@ -78,7 +78,7 @@ class TagService {
       done = true;
     }
     if (saveToDb && done) {
-      // TODO 2 PERFORMANCE here we could just add the single child relation, instead of saving the entire tag
+      // PERF: 2 here we could just add the single child relation, instead of saving the entire tag
       Persistence.saveTagToAllCollections(child);
     }
     return done;
@@ -103,7 +103,7 @@ class TagService {
       }
       if (saveToDb) {
         for (final child in children) {
-          // TODO 2 PERFORMANCE here we could just add the single child relation, instead of saving the entire tag
+          // PERF: 2 here we could just add the single child relation, instead of saving the entire tag
           Persistence.saveTagToAllCollections(child);
         }
       }
@@ -133,7 +133,7 @@ class TagService {
       done = true;
     }
     if (saveToDb && done) {
-      // TODO 2 PERFORMANCE here we could just add the single child relation, instead of saving the entire tag
+      // PERF: 2 here we could just add the single child relation, instead of saving the entire tag
       Persistence.saveTagToAllCollections(child);
     }
     return done;
@@ -162,7 +162,7 @@ class TagService {
       }
       if (saveToDb) {
         for (final child in children) {
-          // TODO 2 PERFORMANCE here we could just add the single child relation, instead of saving the entire tag
+          // PERF: 2 here we could just add the single child relation, instead of saving the entire tag
           Persistence.saveTagToAllCollections(child);
         }
       }

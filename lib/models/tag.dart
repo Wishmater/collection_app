@@ -6,17 +6,17 @@ class Tag {
   Tag? parentTag;
 
   /// reverse link
-  /// // TODO 2 PERFORMANCE maybe create a map from ID(name) to tag for faster search
+  /// // PERF: 2 maybe create a map from ID(name) to tag for faster search
   List<Tag> childTags;
-  // TODO 2 PERFORMANCE maybe create a map from ID(name) to tag for faster search
+  // PERF: 2 maybe create a map from ID(name) to tag for faster search
   List<Tag> secondaryParentTags;
 
   /// reverse link
-  // TODO 2 PERFORMANCE maybe create a map from ID(name) to tag for faster search
+  // PERF: 2 maybe create a map from ID(name) to tag for faster search
   List<Tag> secondaryChildTags;
   List<String> aliases;
 
-  // TODO 1 validate (assert?) that there are no cycles in the graph of tags
+  // TODO: 1 validate (assert?) that there are no cycles in the graph of tags
   Tag({
     this.name = '',
     DateTime? added,

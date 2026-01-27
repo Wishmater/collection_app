@@ -47,7 +47,7 @@ class PageSplashState extends ConsumerState<PageSplash> {
       }
       await DbHelper.waitForAllDbOperationsToFinish();
 
-      if (context.mounted) {
+      if (mounted) {
         RouteMain().go(context);
       }
     });

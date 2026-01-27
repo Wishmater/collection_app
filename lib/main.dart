@@ -3,9 +3,7 @@ import 'dart:io';
 
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:collection_app/router.dart';
-import 'package:collection_app/services/collection_service.dart';
 import 'package:collection_app/theme_parameters.dart';
-import 'package:collection_app/util/database_helper.dart';
 import 'package:collection_app/util/logging.dart';
 import 'package:collection_app/widgets/utils/db_process_indicator_overlay.dart';
 import 'package:flutter/foundation.dart';
@@ -48,9 +46,8 @@ Future<void> initLogging() async {
   if (kReleaseMode) {
     try {
       initLoggingDebug();
-      // await initLoggingRelease(); // TODO 3 implement release logging, maybe create a package with MPG stuff
+      // await initLoggingRelease(); // TODO: 3 implement release logging, maybe create a package with MPG stuff
     } catch (_) {
-      //TODO ??? how to report that I can't report ???
       initLoggingDebug();
     }
   } else {
@@ -70,10 +67,11 @@ void initLoggingDebug() {
   log =
       (
         LgLvl level,
-        Object? msg, {
+        String? msg, {
         Object? type,
         Object? e,
         StackTrace? st,
+        Map<String, Object>? data,
         int extraTraceLineOffset = 0,
         FlutterErrorDetails? details,
       }) {
@@ -91,7 +89,7 @@ void initLoggingDebug() {
         );
         if (message != null) {
           if (PlatformExtended.isAndroid) {
-            // TODO 3 better logging handling in Android
+            // TODO: 3 better logging handling in Android
             // in android, stdout.writeln doesn't show in dev console
             print(message); // ignore: avoid_print
           } else {
@@ -106,7 +104,7 @@ Future<void> startApp() async {
   initAppConfigWebSensitive();
   FromZeroAppContentWrapper.windowsProcessName = 'collection_app.exe';
   FromZeroAppContentWrapper.appNameForCloseConfirmation = 'Collection App';
-  // WindowBar.logoImageAssetsPath = 'assets/images/logo.png'; // TODO 2 re-add when we get a logo
+  // WindowBar.logoImageAssetsPath = 'assets/images/logo.png'; // TODO: 2 re-add when we get a logo
   await initHive(kReleaseMode ? 'collection_app' : 'collection_app_debug');
   PlatformExtended.customDownloadsDirectory = Hive.box<dynamic>(
     'settings',

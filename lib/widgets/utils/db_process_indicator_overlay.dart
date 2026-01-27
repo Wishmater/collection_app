@@ -36,7 +36,7 @@ class DbProcessIndicatorOverlay extends StatelessWidget {
                         fontWeight: FontWeight.w100,
                         color: Theme.of(
                           context,
-                        ).textTheme.labelSmall!.color!.withOpacity(0.8),
+                        ).textTheme.labelSmall!.color!.withValues(alpha: 0.8),
                       ),
                     ),
                   ],

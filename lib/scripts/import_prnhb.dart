@@ -82,7 +82,7 @@ Future<void> importPrnhb({bool clearDb = true}) async {
         type: LgType.script,
       );
     } else {
-      // TODO 2 PERFORMANCE it would be faster if there was a way to add all items at once :)
+      // PERF: 2 it would be faster if there was a way to add all items at once :)
       bool needsSaving = false;
       if (entry.value.rating != null && (item.rating == null || item.rating! < entry.value.rating!)) {
         item.rating = entry.value.rating;
@@ -96,13 +96,13 @@ Future<void> importPrnhb({bool clearDb = true}) async {
       if (needsSaving) {
         itemService.saveItem(
           item,
-        ); // TODO 2 PERFORMANCE save to db only base data, not relations
+        ); // PERF: 2 save to db only base data, not relations
       }
       for (final tag in entry.value.tags) {
         itemService.addTagToItem(
           item,
           tag,
-        ); // TODO 2 PERFORMANCE to db only tag relations
+        ); // PERF: 2 to db only tag relations
       }
     }
   }
@@ -114,7 +114,7 @@ Future<void> importPrnhb({bool clearDb = true}) async {
     '\ndb saving will be executed in the background...',
     type: LgType.script,
   );
-  // TODO 3 PERFORMANCE it would be WAY more performant to not add the save operations individually, and instead save the entire collection as a single batch at the end
+  // PERF: 3 it would be WAY more performant to not add the save operations individually, and instead save the entire collection as a single batch at the end
   return;
 }
 

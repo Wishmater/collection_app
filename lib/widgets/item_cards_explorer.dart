@@ -126,7 +126,7 @@ class _ItemCardsWidgetState extends ConsumerState<ItemCardsWidget> {
       case ItemType.unknown:
         thumbnail = const ErrorSign(title: '');
       case ItemType.album:
-        // TODO 1 implement visualization for album
+        // TODO: 1 implement visualization for album
         thumbnail = Center(
           child: Text(
             'Thumbnail widget for albums not implemented',
@@ -152,7 +152,7 @@ class _ItemCardsWidgetState extends ConsumerState<ItemCardsWidget> {
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(4),
                 ),
-                color: Theme.of(context).canvasColor.withOpacity(0.6),
+                color: Theme.of(context).canvasColor.withValues(alpha: 0.6),
               ),
               child: Text(
                 _printDuration(item.duration!),
@@ -170,6 +170,7 @@ class _ItemCardsWidgetState extends ConsumerState<ItemCardsWidget> {
       onDoubleTap: () {
         final filePath = item.getAbsoluteFilePath();
         if (filePath != null) {
+          // ignore: deprecated_member_use // TODO: 2 implement and use a single from_zero_ui openFile function
           launch(filePath);
         }
       },
@@ -186,7 +187,7 @@ class _ItemCardsWidgetState extends ConsumerState<ItemCardsWidget> {
           decoration: !isSelected
               ? null
               : BoxDecoration(
-                  color: Colors.blueAccent.withOpacity(0.2),
+                  color: Colors.blueAccent.withValues(alpha: 0.2),
                   borderRadius: const BorderRadius.all(Radius.circular(6)),
                 ),
           child: Column(
@@ -194,9 +195,9 @@ class _ItemCardsWidgetState extends ConsumerState<ItemCardsWidget> {
             children: [
               AspectRatio(aspectRatio: 16 / 9, child: thumbnail),
               Text(item.name),
-              // TODO 1 show tags
-              // TODO 1 show explore priority
-              // TODO 1 show rating
+              // TODO: 1 show tags
+              // TODO: 1 show explore priority
+              // TODO: 1 show rating
             ],
           ),
         ),
@@ -210,6 +211,7 @@ class _ItemCardsWidgetState extends ConsumerState<ItemCardsWidget> {
           onTap: (context) {
             final filePath = item.getAbsoluteFilePath();
             if (filePath != null) {
+              // ignore: deprecated_member_use // TODO: 2 implement and use a single from_zero_ui openFile function
               launch(filePath);
             }
           },
@@ -220,6 +222,7 @@ class _ItemCardsWidgetState extends ConsumerState<ItemCardsWidget> {
           onTap: (context) {
             final filePath = item.getAbsoluteFilePath();
             if (filePath != null) {
+              // ignore: deprecated_member_use // TODO: 2 implement and use a single from_zero_ui openFile function
               launch(File(filePath).parent.absolute.path);
             }
           },

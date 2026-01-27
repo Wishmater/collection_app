@@ -7,7 +7,7 @@ import 'package:collection_app/services/item_service.dart';
 import 'package:collection_app/services/tag_service.dart';
 import 'package:collection_app/util/database_helper.dart';
 import 'package:collection_app/util/util.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqflite/sqflite.dart';
 
 abstract class Persistence {
   static Future<void> saveCollection(Collection collection) async {
@@ -57,8 +57,8 @@ abstract class Persistence {
     Tag tag,
     Collection collection,
   ) async {
-    // TODO 2 PERFORMANCE make each of the queries optional
-    // TODO 3 PERFORMANCE allow to add/remove specific relations instead of saving all of them
+    // PERF: 2 make each of the queries optional
+    // PERF: 3 allow to add/remove specific relations instead of saving all of them
     // we need to pre-build the args arrays with the primitive values, otherwise
     // we are vulnerable to a race condition if the item object properties are
     // modified before db operation gets to execute
@@ -124,8 +124,8 @@ abstract class Persistence {
   }
 
   static Future<void> saveItem(Item item) async {
-    // TODO 2 PERFORMANCE make each of the queries optional
-    // TODO 3 PERFORMANCE allow to add/remove specific relations instead of saving all of them
+    // PERF: 2 make each of the queries optional
+    // PERF: 3 allow to add/remove specific relations instead of saving all of them
     // we need to pre-build the args arrays with the primitive values, otherwise
     // we are vulnerable to a race condition if the item object properties are
     // modified before db operation gets to execute
@@ -215,18 +215,12 @@ abstract class Persistence {
       select * from collection
     ''');
     collection.name = collectionQuery[0]['name']! as String;
-    collection.added = DbHelper.datetimeFormat.parse(
-      collectionQuery[0]['added']! as String,
-    );
-    collection.lastSeen = DbHelper.datetimeFormat.tryParse(
-      collectionQuery[0]['lastSeen'] as String?,
-    );
-    collection.lastModified = DbHelper.datetimeFormat.tryParse(
-      collectionQuery[0]['lastModified'] as String?,
-    );
+    collection.added = DbHelper.datetimeFormat.parse(collectionQuery[0]['added']! as String);
+    collection.lastSeen = DbHelper.datetimeFormat.tryParseN(collectionQuery[0]['lastSeen'] as String?);
+    collection.lastModified = DbHelper.datetimeFormat.tryParseN(collectionQuery[0]['lastModified'] as String?);
     collection.baseDirectory = collectionQuery[0]['baseDirectory'] as String?;
     // LOAD TAGS
-    // TODO 2 PERFORMANCE play around more with json_group_array, to reduce query count
+    // PERF: 2 play around more with json_group_array, to reduce query count
     final tagQuery = await db.rawQuery(/*language=SQLite*/ '''
       select tag.*
               -- json_group_array(tA.alias) as aliases, 
@@ -250,12 +244,8 @@ abstract class Persistence {
       final tag = Tag(
         name: tagName,
         added: DbHelper.datetimeFormat.parse(query['added']! as String),
-        lastSeen: DbHelper.datetimeFormat.tryParse(
-          query['lastSeen'] as String?,
-        ),
-        lastModified: DbHelper.datetimeFormat.tryParse(
-          query['lastModified'] as String?,
-        ),
+        lastSeen: DbHelper.datetimeFormat.tryParseN(query['lastSeen'] as String?),
+        lastModified: DbHelper.datetimeFormat.tryParseN(query['lastModified'] as String?),
         aliases: aliasesQuery.map((e) => e['alias']! as String).toList(),
       );
       tags[tag.name] = tag;
@@ -286,7 +276,7 @@ abstract class Persistence {
       );
     }
     // LOAD ITEMS
-    // TODO 2 PERFORMANCE play around more with json_group_array, to reduce query count
+    // PERF: 2 play around more with json_group_array, to reduce query count
     final itemQuery = await db.rawQuery(/*language=SQLite*/ '''
       select item.*
               -- json_group_array(iT.tagName) as tags
@@ -309,26 +299,16 @@ abstract class Persistence {
         id: itemId,
         name: query['name']! as String,
         added: DbHelper.datetimeFormat.parse(query['added']! as String),
-        lastSeen: DbHelper.datetimeFormat.tryParse(
-          query['lastSeen'] as String?,
-        ),
-        lastModified: DbHelper.datetimeFormat.tryParse(
-          query['lastModified'] as String?,
-        ),
+        lastSeen: DbHelper.datetimeFormat.tryParseN(query['lastSeen'] as String?),
+        lastModified: DbHelper.datetimeFormat.tryParseN(query['lastModified'] as String?),
         filePath: query['filePath'] as String?,
         explorePriority: query['explorePriority'] as int?,
         rating: query['rating'] as int?,
         tags: secondaryParentsQuery.map((e) => tags[e['tagName']! as String]!).toList(),
         itemType: query['itemType'] == null ? null : ItemType.values[query['itemType']! as int],
-        metadataLastUpdated: DbHelper.datetimeFormat.tryParse(
-          query['metadataLastUpdated'] as String?,
-        ),
-        fileCreated: DbHelper.datetimeFormat.tryParse(
-          query['fileCreated'] as String?,
-        ),
-        fileModified: DbHelper.datetimeFormat.tryParse(
-          query['fileModified'] as String?,
-        ),
+        metadataLastUpdated: DbHelper.datetimeFormat.tryParseN(query['metadataLastUpdated'] as String?),
+        fileCreated: DbHelper.datetimeFormat.tryParseN(query['fileCreated'] as String?),
+        fileModified: DbHelper.datetimeFormat.tryParseN(query['fileModified'] as String?),
         filesize: query['filesize'] as int?,
         resolutionWidth: query['resolutionWidth'] as int?,
         resolutionHeight: query['resolutionHeight'] as int?,

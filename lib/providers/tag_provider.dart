@@ -17,7 +17,7 @@ abstract class TagProvider {
   static final one = StateProviderFamily((ref, String name) {
     return ref.watch(all).firstWhere((e) => e.name == name);
   });
-  // TODO 1 do the same thing with streams we didi in items to update widgets that represent one collection
+  // TODO: 1 do the same thing with streams we didi in items to update widgets that represent one collection
 
   // MUTATIONS
 
@@ -37,22 +37,22 @@ abstract class TagProvider {
       if (tag.parentTag != null) {
         ref.invalidate(
           one.call(tag.parentTag!.name),
-        ); // TODO 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
+        ); // TODO: 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
       }
       for (final e in tag.childTags) {
         ref.invalidate(
           one.call(e.name),
-        ); // TODO 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
+        ); // TODO: 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
       }
       for (final e in tag.secondaryParentTags) {
         ref.invalidate(
           one.call(e.name),
-        ); // TODO 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
+        ); // TODO: 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
       }
       for (final e in tag.secondaryChildTags) {
         ref.invalidate(
           one.call(e.name),
-        ); // TODO 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
+        ); // TODO: 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
       }
     }
     return added;
@@ -72,10 +72,10 @@ abstract class TagProvider {
     if (added) {
       ref.invalidate(
         one.call(parent.name),
-      ); // TODO 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
+      ); // TODO: 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
       ref.invalidate(
         one.call(child.name),
-      ); // TODO 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
+      ); // TODO: 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
     }
     return added;
   }
@@ -94,11 +94,11 @@ abstract class TagProvider {
     if (added) {
       ref.invalidate(
         one.call(parent.name),
-      ); // TODO 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
+      ); // TODO: 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
       for (final e in children) {
         ref.invalidate(
           one.call(e.name),
-        ); // TODO 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
+        ); // TODO: 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
       }
     }
     return added;
@@ -118,10 +118,10 @@ abstract class TagProvider {
     if (added) {
       ref.invalidate(
         one.call(parent.name),
-      ); // TODO 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
+      ); // TODO: 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
       ref.invalidate(
         one.call(child.name),
-      ); // TODO 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
+      ); // TODO: 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
     }
     return added;
   }
@@ -141,12 +141,12 @@ abstract class TagProvider {
       for (final e in parents) {
         ref.invalidate(
           one.call(e.name),
-        ); // TODO 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
+        ); // TODO: 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
       }
       for (final e in children) {
         ref.invalidate(
           one.call(e.name),
-        ); // TODO 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
+        ); // TODO: 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
       }
     }
     return added;

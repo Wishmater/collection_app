@@ -31,7 +31,7 @@ class FiltersWidget extends StatelessWidget {
                 AppStateProvider.filterRatingNull,
               );
               final color = Color.alphaBlend(
-                Colors.yellow.withOpacity(0.6),
+                Colors.yellow.withValues(alpha: 0.6),
                 Theme.of(context).canvasColor,
               );
               return Wrap(
@@ -70,7 +70,7 @@ class FiltersWidget extends StatelessWidget {
                         duration: const Duration(milliseconds: 100),
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          color: selected ? color!.withOpacity(color.opacity * 0.6) : null,
+                          color: selected ? color!.withValues(alpha: color.a * 0.6) : null,
                           borderRadius: BorderRadius.horizontal(
                             left: filterRatingMin == value ? const Radius.circular(6) : Radius.zero,
                             right: filterRatingMax == value ? const Radius.circular(6) : Radius.zero,
@@ -80,7 +80,7 @@ class FiltersWidget extends StatelessWidget {
                           value.toString(),
                           style: textStyle.copyWith(
                             fontWeight: FontWeight.w900,
-                            color: selected ? textStyle.color!.withOpacity(0.8) : color,
+                            color: selected ? textStyle.color!.withValues(alpha: 0.8) : color,
                           ),
                         ),
                       );
@@ -97,7 +97,7 @@ class FiltersWidget extends StatelessWidget {
                       duration: const Duration(milliseconds: 100),
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: filterRatingNull ? color.withOpacity(color.opacity * 0.6) : null,
+                        color: filterRatingNull ? color.withValues(alpha: color.a * 0.6) : null,
                         borderRadius: const BorderRadius.all(
                           Radius.circular(6),
                         ),
@@ -106,7 +106,7 @@ class FiltersWidget extends StatelessWidget {
                         'null',
                         style: textStyle.copyWith(
                           fontWeight: FontWeight.w900,
-                          color: filterRatingNull ? textStyle.color!.withOpacity(0.8) : color,
+                          color: filterRatingNull ? textStyle.color!.withValues(alpha: 0.8) : color,
                         ),
                       ),
                     ),
@@ -128,7 +128,7 @@ class FiltersWidget extends StatelessWidget {
                 AppStateProvider.filterExplorePriorityNull,
               );
               final color = Color.alphaBlend(
-                Colors.purple.withOpacity(0.8),
+                Colors.purple.withValues(alpha: 0.8),
                 Theme.of(context).canvasColor,
               );
               return Wrap(
@@ -169,7 +169,7 @@ class FiltersWidget extends StatelessWidget {
                         height: 24,
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
-                          color: selected ? color!.withOpacity(color.opacity * 0.6) : null,
+                          color: selected ? color!.withValues(alpha: color.a * 0.6) : null,
                           borderRadius: BorderRadius.horizontal(
                             left: filterExplorePriorityMin == value ? const Radius.circular(6) : Radius.zero,
                             right: filterExplorePriorityMax == value ? const Radius.circular(6) : Radius.zero,
@@ -181,7 +181,7 @@ class FiltersWidget extends StatelessWidget {
                               value.abs().toString(),
                               style: textStyle.copyWith(
                                 fontWeight: FontWeight.w900,
-                                color: selected ? textStyle.color!.withOpacity(0.8) : color,
+                                color: selected ? textStyle.color!.withValues(alpha: 0.8) : color,
                               ),
                             ),
                             if (value < 0)
@@ -192,9 +192,9 @@ class FiltersWidget extends StatelessWidget {
                                 height: 3,
                                 child: ColoredBox(
                                   color: selected
-                                      ? textStyle.color!.withOpacity(0.6)
-                                      : color!.withOpacity(
-                                          color.opacity * 0.8,
+                                      ? textStyle.color!.withValues(alpha: 0.6)
+                                      : color!.withValues(
+                                          alpha: color.a * 0.8,
                                         ),
                                 ),
                               ),
@@ -238,7 +238,7 @@ class FiltersWidget extends StatelessWidget {
                       duration: const Duration(milliseconds: 100),
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
-                        color: filterExplorePriorityNull ? color.withOpacity(color.opacity * 0.6) : null,
+                        color: filterExplorePriorityNull ? color.withValues(alpha: color.a * 0.6) : null,
                         borderRadius: const BorderRadius.all(
                           Radius.circular(6),
                         ),
@@ -247,7 +247,7 @@ class FiltersWidget extends StatelessWidget {
                         'null',
                         style: textStyle.copyWith(
                           fontWeight: FontWeight.w900,
-                          color: filterExplorePriorityNull ? textStyle.color!.withOpacity(0.8) : color,
+                          color: filterExplorePriorityNull ? textStyle.color!.withValues(alpha: 0.8) : color,
                         ),
                       ),
                     ),
@@ -259,13 +259,9 @@ class FiltersWidget extends StatelessWidget {
           const SizedBox(height: 2),
           Consumer(
             builder: (context, ref, child) {
-              final filterIncludingCollections = ref.watch(
-                AppStateProvider.filterIncludingCollections,
-              );
-              final filterExcludingCollections = ref.watch(
-                AppStateProvider.filterExcludingCollections,
-              );
               // TODO 2 implement including / excluding collections
+              // final filterIncludingCollections = ref.watch(AppStateProvider.filterIncludingCollections);
+              // final filterExcludingCollections = ref.watch(AppStateProvider.filterExcludingCollections);
               return const SizedBox.shrink();
             },
           ),
@@ -297,7 +293,7 @@ class FiltersWidget extends StatelessWidget {
                           style: TextStyle(
                             height: 1,
                             color: Color.alphaBlend(
-                              Colors.green.withOpacity(0.5),
+                              Colors.green.withValues(alpha: 0.5),
                               Theme.of(context).textTheme.bodyMedium!.color!,
                             ),
                           ),
@@ -320,7 +316,7 @@ class FiltersWidget extends StatelessWidget {
                           style: TextStyle(
                             height: 1,
                             color: Color.alphaBlend(
-                              Colors.red.withOpacity(0.5),
+                              Colors.red.withValues(alpha: 0.5),
                               Theme.of(context).textTheme.bodyMedium!.color!,
                             ),
                           ),

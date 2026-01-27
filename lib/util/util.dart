@@ -6,8 +6,8 @@ extension DateFormatTry on DateFormat {
     return format(dateTime);
   }
 
-  DateTime? tryParse(String? string) {
+  DateTime? tryParseN(String? string) {
     if (string == null) return null;
-    return parse(string);
+    return tryParse(string);
   }
 }

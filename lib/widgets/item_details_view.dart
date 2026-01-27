@@ -73,7 +73,7 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
       case ItemType.unknown:
         visualization = const ErrorSign(title: '');
       case ItemType.album:
-        // TODO 1 implement visualization for album
+        // TODO: 1 implement visualization for album
         visualization = Center(
           child: Text(
             'Visualization widget for albums not implemented',
@@ -99,7 +99,7 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
-              backgroundColor: Theme.of(context).canvasColor.withOpacity(0.7),
+              backgroundColor: Theme.of(context).canvasColor.withValues(alpha: 0.7),
               actions: [
                 ActionFromZero(
                   title: 'Close details view',
@@ -143,7 +143,7 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
                     style: Theme.of(context).textTheme.titleMedium!.copyWith(
                       fontWeight: FontWeight.w900,
                       color: Color.alphaBlend(
-                        Colors.yellow.withOpacity(0.6),
+                        Colors.yellow.withValues(alpha: 0.6),
                         Theme.of(context).canvasColor,
                       ),
                       height: 1.28,
@@ -152,7 +152,7 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
                 },
                 hoveredBuilder: (context) {
                   final color = Color.alphaBlend(
-                    Colors.yellow.withOpacity(0.6),
+                    Colors.yellow.withValues(alpha: 0.6),
                     Theme.of(context).canvasColor,
                   );
                   final textStyle = Theme.of(context).textTheme.titleMedium!;
@@ -192,8 +192,8 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
                                 color: selected
-                                    ? color!.withOpacity(
-                                        color.opacity * 0.6,
+                                    ? color!.withValues(alpha: 
+                                        color.a * 0.6,
                                       )
                                     : null,
                                 borderRadius: BorderRadius.horizontal(
@@ -211,7 +211,7 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
                               style: textStyle.copyWith(
                                 fontWeight: FontWeight.w900,
                                 height: 1.28,
-                                color: selected ? textStyle.color!.withOpacity(0.8) : color,
+                                color: selected ? textStyle.color!.withValues(alpha: 0.8) : color,
                               ),
                             ),
                           ),
@@ -242,7 +242,7 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
                     style: Theme.of(context).textTheme.titleMedium!.copyWith(
                       fontWeight: FontWeight.w900,
                       color: Color.alphaBlend(
-                        Colors.purple.withOpacity(0.8),
+                        Colors.purple.withValues(alpha: 0.8),
                         Theme.of(context).canvasColor,
                       ),
                       height: 1.28,
@@ -251,7 +251,7 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
                 },
                 hoveredBuilder: (context) {
                   final color = Color.alphaBlend(
-                    Colors.purple.withOpacity(0.8),
+                    Colors.purple.withValues(alpha: 0.8),
                     Theme.of(context).canvasColor,
                   );
                   final textStyle = Theme.of(context).textTheme.titleMedium!;
@@ -291,8 +291,8 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
                                 color: selected
-                                    ? color!.withOpacity(
-                                        color.opacity * 0.6,
+                                    ? color!.withValues(alpha: 
+                                        color.a * 0.6,
                                       )
                                     : null,
                                 borderRadius: BorderRadius.horizontal(
@@ -312,7 +312,7 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
                                   style: textStyle.copyWith(
                                     fontWeight: FontWeight.w900,
                                     height: 1.28,
-                                    color: selected ? textStyle.color!.withOpacity(0.8) : color,
+                                    color: selected ? textStyle.color!.withValues(alpha: 0.8) : color,
                                   ),
                                 ),
                                 if (value < 0)
@@ -323,11 +323,11 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
                                     height: 3,
                                     child: ColoredBox(
                                       color: selected
-                                          ? textStyle.color!.withOpacity(
+                                          ? textStyle.color!.withValues(alpha: 
                                               0.6,
                                             )
-                                          : color!.withOpacity(
-                                              color.opacity * 0.8,
+                                          : color!.withValues(alpha: 
+                                              color.a * 0.8,
                                             ),
                                     ),
                                   ),
@@ -361,7 +361,7 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
               ),
             ),
           ),
-          // TODO 1 we can make a WAY cuter implementation of tags displaying
+          // TODO: 1 we can make a WAY cuter implementation of tags displaying
           SliverToBoxAdapter(
             child: DetailsValueWidget(
               title: const Text('Tags'),

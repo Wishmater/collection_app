@@ -14,7 +14,7 @@ class ItemExplorerAppbar extends ConsumerWidget {
     final items = ref.watch(AppStateProvider.itemsWithCurrentFilters);
     return AppbarFromZero(
       toolbarHeight: toolbarHeight,
-      backgroundColor: Theme.of(context).canvasColor.withOpacity(0.7),
+      backgroundColor: Theme.of(context).canvasColor.withValues(alpha: 0.7),
       title: Text(
         '${NumberFormat.decimalPattern().format(items.length)} items',
         style: Theme.of(context).textTheme.titleSmall,

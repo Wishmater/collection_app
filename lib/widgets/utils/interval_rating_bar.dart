@@ -46,10 +46,9 @@ class IntervalRatingBar extends StatelessWidget {
           willMoveFrom = fromDiff <= toDiff;
         }
         return DragTarget<bool>(
-          onWillAccept: onFromChanged == null || onToChanged == null
+          onWillAcceptWithDetails: onFromChanged == null || onToChanged == null
               ? null
               : (data) {
-                  if (data == null) return false;
                   if (from == null || to == null) {
                     onFromChanged!(value);
                     onToChanged!(value);
@@ -57,7 +56,7 @@ class IntervalRatingBar extends StatelessWidget {
                     onFromChanged!(value);
                   } else if (value > to!) {
                     onToChanged!(value);
-                  } else if (data) {
+                  } else if (data.data) {
                     onFromChanged!(value);
                   } else {
                     onToChanged!(value);

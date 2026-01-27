@@ -13,8 +13,8 @@ class Item {
   DateTime? lastSeen;
   DateTime? lastModified;
   String? filePath;
-  // List<String> sourceUrls; // TODO 2 maybe implement this in the future...
-  List<Tag> tags; // TODO 2 PERFORMANCE maybe create a map from ID(name) to tag for faster search
+  // List<String> sourceUrls; // TODO: 2 maybe implement this in the future...
+  List<Tag> tags; // PERF: 2 maybe create a map from ID(name) to tag for faster search
   int? explorePriority;
   int? rating;
   List<Item>? albumChildren; // only not null if itemType==ItemType.album
@@ -110,7 +110,7 @@ enum ItemType {
   album;
 
   static const imageExtensions = ['.png', '.jpg', '.jpeg', '.webp', '.bmp'];
-  // TODO 3 test GIF files, should we treat them as videos or as images?
+  // TODO: 3 test GIF files, should we treat them as videos or as images?
   static const videoExtensions = [
     '.mp4',
     '.mkv',

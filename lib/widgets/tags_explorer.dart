@@ -10,7 +10,7 @@ class TagsExplorerV1 extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // TODO 2 performance this probably needs to be done with slivers in order to be performant
+    // TODO: 2 performance this probably needs to be done with slivers in order to be performant
     final rootTags = ref.watch(TagProvider.roots);
     final scrollController = ScrollController();
     return ScrollbarFromZero(
@@ -35,7 +35,7 @@ class TabExplorerItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // TODO 1 we need a good way to listen changes in the tag without having to have the provider rebuild
+    // TODO: 1 we need a good way to listen changes in the tag without having to have the provider rebuild
     return ExpansionTileFromZero(
       actionPadding: EdgeInsets.only(
         left: 10 + childrenSeparation * indentCount,
@@ -43,9 +43,9 @@ class TabExplorerItem extends ConsumerWidget {
       expandedAlignment: Alignment.topCenter,
       title: Consumer(
         builder: (context, ref, child) {
-          // TODO 3 prevent animation when selecting button from repeating
+          // TODO: 3 prevent animation when selecting button from repeating
           final selectedTag = ref.watch(AppStateProvider.selectedTag);
-          // TODO 1 show secondary parent tags
+          // TODO: 1 show secondary parent tags
           return DrawerMenuButtonFromZero(
             contentPadding: EdgeInsets.only(
               left: childrenSeparation * indentCount,
@@ -56,7 +56,7 @@ class TabExplorerItem extends ConsumerWidget {
         },
       ),
       contextMenuActions: [
-        // TODO 1 make this remove the tag
+        // TODO: 1 make this remove the tag
         ActionFromZero(
           title: 'Filter including tag',
           icon: const Icon(Icons.filter_alt_outlined),

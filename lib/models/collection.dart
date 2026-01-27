@@ -8,15 +8,15 @@ class Collection {
   DateTime? lastSeen;
   DateTime? lastModified;
   String? baseDirectory;
-  // TODO 2 PERFORMANCE maybe create a map from ID to item for faster search
+  // PERF: 2 maybe create a map from ID to item for faster search
   List<Item> items;
-  // TODO 2 PERFORMANCE maybe create a map from ID(name) to tag for faster search
+  // PERF: 2 maybe create a map from ID(name) to tag for faster search
   List<Tag> tags;
 
   /// backlink, contains all present in at least 1 item of this collection
 
   Collection({
-    this.name = 'New Collection', // TODO 1 validate no repeated collection/tag names (probably in DAO)
+    this.name = 'New Collection', // TODO: 1 validate no repeated collection/tag names (probably in DAO)
     DateTime? added,
     this.lastSeen,
     this.lastModified,

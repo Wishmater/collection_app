@@ -1,22 +1,23 @@
 import 'dart:async';
 import 'dart:io';
+
 import 'package:collection_app/models/collection.dart';
-import 'package:collection_app/util/persistence.dart';
 import 'package:collection_app/util/database_backup.dart';
 import 'package:collection_app/util/logging.dart';
+import 'package:collection_app/util/persistence.dart';
 import 'package:dartx/dartx_io.dart';
 import 'package:flutter/material.dart'; // for ValueNotifier :))
 import 'package:from_zero_ui/from_zero_ui.dart'; // for log :))
 import 'package:intl/intl.dart';
 import 'package:mlog/mlog.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'package:sqflite/sqflite.dart';
 import 'package:uuid/uuid.dart';
 
 typedef DbOperation<T> = Future<T> Function(Database database, String operationId);
 
 abstract class DbHelper {
   static const _dbVersion = 3;
-  // TODO 1 when exiting the app, show an "are you sure message if there are DB operations pending"
+  // TODO: 1 when exiting the app, show an "are you sure message if there are DB operations pending"
   static final Map<Collection, Database> openDatabases = {};
   static final Map<Collection, int> nextItemId = {};
   static final datetimeFormat = DateFormat('yyyy-MM-dd hh:mm:ss');
@@ -167,34 +168,32 @@ abstract class DbHelper {
         ]); // hide folder
       }
     }
-    final dbExists = await databaseFactoryFfi.databaseExists(dbPath);
-    final db = await databaseFactoryFfi.openDatabase(
+    final dbExists = await databaseExists(dbPath);
+    final db = await openDatabase(
       dbPath,
-      options: OpenDatabaseOptions(
-        version: _dbVersion,
-        singleInstance:
-            false, // if we leave this true, there are weird bugs that cause onCreate/onUpdate to be skipped, especially when hot restarting
-        onConfigure: (db) async {
-          // Add support for cascade delete
-          await db.execute("PRAGMA foreign_keys = ON");
-        },
-        onCreate: (db, version) async {
-          log(
-            LgLvl.info,
-            'Creating db for collection ${collection.name} at $dbPath',
-            type: LgType.db,
-          );
-          return Persistence.applySchemaMigration(db, 0, _dbVersion);
-        },
-        onUpgrade: (db, oldVersion, newVersion) async {
-          log(
-            LgLvl.info,
-            'Upgrading db for collection ${collection.name} at $dbPath from ver $oldVersion to $newVersion',
-            type: LgType.db,
-          );
-          return Persistence.applySchemaMigration(db, oldVersion, _dbVersion);
-        },
-      ),
+      version: _dbVersion,
+      singleInstance:
+          false, // if we leave this true, there are weird bugs that cause onCreate/onUpdate to be skipped, especially when hot restarting
+      onConfigure: (db) async {
+        // Add support for cascade delete
+        await db.execute("PRAGMA foreign_keys = ON");
+      },
+      onCreate: (db, version) async {
+        log(
+          LgLvl.info,
+          'Creating db for collection ${collection.name} at $dbPath',
+          type: LgType.db,
+        );
+        return Persistence.applySchemaMigration(db, 0, _dbVersion);
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        log(
+          LgLvl.info,
+          'Upgrading db for collection ${collection.name} at $dbPath from ver $oldVersion to $newVersion',
+          type: LgType.db,
+        );
+        return Persistence.applySchemaMigration(db, oldVersion, _dbVersion);
+      },
     );
     openDatabases[collection] = db;
     if (dbExists) {

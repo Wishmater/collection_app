@@ -27,7 +27,7 @@ abstract class ItemProvider {
   static void invalidateOne(AnyRef ref, Item item) {
     ref.invalidate(
       one.call((item.collection, item.id)),
-    ); // TODO 2 PERFORMANCE: this triggers the provider to re-search the item list. Ideally we just notify listeners if replaceInList==false.
+    ); // PERF: 2: this triggers the provider to re-search the item list. Ideally we just notify listeners if replaceInList==false.
     _updatedItemIdsStreamController.add(item);
   }
 
@@ -45,7 +45,7 @@ abstract class ItemProvider {
       ref.invalidate(all);
       ref.invalidate(
         CollectionProvider.one.call(item.collection.name),
-      ); // TODO 2 PERFORMANCE: this triggers the provider to re-search in the list of all items. Ideally we just notify listeners.
+      ); // PERF: 2: this triggers the provider to re-search in the list of all items. Ideally we just notify listeners.
     }
     return added;
   }
@@ -80,7 +80,7 @@ abstract class ItemProvider {
       invalidateOne(ref, item);
       ref.invalidate(
         TagProvider.one.call(tag.name),
-      ); // TODO 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
+      ); // TODO: 2 performance: this triggers the provider to re-search in the list of al items. Ideally we just notify listeners.
     }
     return added;
   }

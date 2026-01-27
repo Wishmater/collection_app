@@ -12,7 +12,7 @@ abstract class CollectionProvider {
   static final one = StateProviderFamily((ref, String name) {
     return ref.watch(all).firstWhere((e) => e.name == name);
   });
-  // TODO 1 do the same thing with streams we did in items to update widgets that represent one tag
+  // TODO: 1 do the same thing with streams we did in items to update widgets that represent one tag
 
   // MUTATIONS
 
