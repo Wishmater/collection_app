@@ -16,9 +16,11 @@ import 'package:from_zero_ui/util/web_initial_config/web_initial_config.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
 import 'package:mlog/mlog.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() async {
   await initLogging();
+  databaseFactory = databaseFactoryFfi; // init sqflite // TODO: 3 maybe move this somewhere else?
   // TODO: 2 implement proper handling of flutter errors in mlog
   if (kReleaseMode) {
     FlutterError.onError = (FlutterErrorDetails details) {
