@@ -26,6 +26,7 @@ dependencies:
   flutter_riverpod: 2.0.0-dev.9 # can't update until cacheTime is re-added, lots of potential bugs to be fixed with this update, when updating, also try https://pub.dev/packages/riverpod_lint and https://pub.dev/packages/riverpod_generator
   hive: ^2.2.3
   hive_flutter: ^1.1.0
+  sqlite3: ^3.2.0
   sqflite: ^2.4.2
   sqflite_common_ffi: ^2.4.0
 
