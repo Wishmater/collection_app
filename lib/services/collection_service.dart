@@ -2,13 +2,14 @@ import 'package:collection_app/models/collection.dart';
 import 'package:collection_app/models/tag.dart';
 import 'package:collection_app/util/database_helper.dart';
 import 'package:collection_app/util/persistence.dart';
+import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:hive/hive.dart';
+import 'package:mlog/mlog.dart';
 
 final collectionService = CollectionService();
 
 class CollectionService {
-  final List<Collection> _all =
-      []; // PERF: 2 maybe create a map from ID(name) to collection for faster search
+  final List<Collection> _all = []; // PERF: 2 maybe create a map from ID(name) to collection for faster search
 
   // GETS
 
@@ -27,12 +28,26 @@ class CollectionService {
       return false;
     }
     _all.add(collection);
-    DbHelper.openDbForCollection(collection).then((_) {
+    Future<void> execute() async {
+      try {
+        await DbHelper.openDbForCollection(collection);
+      } catch (e, st) {
+        log(
+          LgLvl.error,
+          'Error while opening collection ${collection.name} from path ${collection.baseDirectory}',
+          e: e,
+          st: st,
+        );
+        removeCollection(collection);
+        // TODO: 2 remove collection that errored from recent?
+      }
       if (saveToDb) {
         Persistence.saveCollection(collection);
         saveCollectionToRecents(collection);
       }
-    });
+    }
+
+    execute();
     return true;
   }
 

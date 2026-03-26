@@ -150,61 +150,65 @@ abstract class DbHelper {
     final operationId = const Uuid().v4();
     activeDbOperations[operationId] = true;
     _onActiveOperationChanges();
-    await closeDbForCollection(collection);
-    dbPath ??= collection.getAbsoluteFilePathForDatabase();
-    if (dbPath == null) {
-      throw Exception(
-        "Collection path is null, and no custom database provided, so we don't know where to save the sqlite db :(",
-      );
-    }
-    final dbFile = File(dbPath);
-    final collectionDataRoot = dbFile.parent;
-    if (!await collectionDataRoot.exists()) {
-      await collectionDataRoot.create();
-      if (PlatformExtended.isWindows) {
-        await Process.run('attrib', [
-          '+h',
-          collectionDataRoot.absolute.path,
-        ]); // hide folder
+    try {
+      await closeDbForCollection(collection);
+      dbPath ??= collection.getAbsoluteFilePathForDatabase();
+      if (dbPath == null) {
+        throw Exception(
+          "Collection path is null, and no custom database provided, so we don't know where to save the sqlite db :(",
+        );
       }
-    }
-    final dbExists = await databaseExists(dbPath);
-    final db = await openDatabase(
-      dbPath,
-      version: _dbVersion,
-      singleInstance:
-          false, // if we leave this true, there are weird bugs that cause onCreate/onUpdate to be skipped, especially when hot restarting
-      onConfigure: (db) async {
-        // Add support for cascade delete
-        await db.execute("PRAGMA foreign_keys = ON");
-      },
-      onCreate: (db, version) async {
-        log(
-          LgLvl.info,
-          'Creating db for collection ${collection.name} at $dbPath',
-          type: LgType.db,
-        );
-        return Persistence.applySchemaMigration(db, 0, _dbVersion);
-      },
-      onUpgrade: (db, oldVersion, newVersion) async {
-        log(
-          LgLvl.info,
-          'Upgrading db for collection ${collection.name} at $dbPath from ver $oldVersion to $newVersion',
-          type: LgType.db,
-        );
-        return Persistence.applySchemaMigration(db, oldVersion, _dbVersion);
-      },
-    );
-    openDatabases[collection] = db;
-    if (dbExists) {
-      activeDbOperations[operationId] = false;
+      final dbFile = File(dbPath);
+      final collectionDataRoot = dbFile.parent;
+      if (!await collectionDataRoot.exists()) {
+        await collectionDataRoot.create();
+        if (PlatformExtended.isWindows) {
+          await Process.run('attrib', [
+            '+h',
+            collectionDataRoot.absolute.path,
+          ]); // hide folder
+        }
+      }
+      final dbExists = await databaseExists(dbPath);
+      final db = await openDatabase(
+        dbPath,
+        version: _dbVersion,
+        singleInstance:
+            false, // if we leave this true, there are weird bugs that cause onCreate/onUpdate to be skipped, especially when hot restarting
+        onConfigure: (db) async {
+          // Add support for cascade delete
+          await db.execute("PRAGMA foreign_keys = ON");
+        },
+        onCreate: (db, version) async {
+          log(
+            LgLvl.info,
+            'Creating db for collection ${collection.name} at $dbPath',
+            type: LgType.db,
+          );
+          return Persistence.applySchemaMigration(db, 0, _dbVersion);
+        },
+        onUpgrade: (db, oldVersion, newVersion) async {
+          log(
+            LgLvl.info,
+            'Upgrading db for collection ${collection.name} at $dbPath from ver $oldVersion to $newVersion',
+            type: LgType.db,
+          );
+          return Persistence.applySchemaMigration(db, oldVersion, _dbVersion);
+        },
+      );
+      openDatabases[collection] = db;
+      if (dbExists) {
+        activeDbOperations[operationId] = false;
+        _onActiveOperationChanges();
+        await Persistence.loadDataFromDb(collection, db);
+      } else {
+        nextItemId[collection] = 1;
+      }
+    } finally {
+      // TODO: 1 should all operations be try/finally like this (probably yes)
+      activeDbOperations.remove(operationId);
       _onActiveOperationChanges();
-      await Persistence.loadDataFromDb(collection, db);
-    } else {
-      nextItemId[collection] = 1;
     }
-    activeDbOperations.remove(operationId);
-    _onActiveOperationChanges();
   }
 
   static Future<void> closeDbForCollection(Collection collection) async {
