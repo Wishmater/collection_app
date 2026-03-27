@@ -4,7 +4,7 @@ import 'package:collection_app/models/item.dart';
 import 'package:collection_app/providers/app_state_provider.dart';
 import 'package:collection_app/providers/item_provider.dart';
 import 'package:collection_app/util/any_ref.dart';
-import 'package:collection_app/widgets/item_thumbnail/video_cached_thumbnail.dart';
+import 'package:collection_app/widgets/item_thumbnail/video_live_thumbnail.dart';
 import 'package:collection_app/widgets/utils/hover_builder.dart';
 import 'package:collection_app/widgets/utils/interval_rating_bar.dart';
 import 'package:flutter/material.dart';
@@ -59,10 +59,11 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
           ),
         );
       case ItemType.video:
-        // thumbnail = VideoLiveThumbnail(
-        //   filePath: widget.item.getAbsoluteFilePath()!,
-        // );
-        visualization = VideoCachedThumbnail(item: widget.item);
+        final filepath = widget.item.getAbsoluteFilePath()!;
+        visualization = VideoLiveThumbnail(
+          key: ValueKey(filepath),
+          filePath: filepath,
+        );
       case ItemType.audio:
         visualization = Center(
           child: Text(
@@ -192,8 +193,8 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
                                 color: selected
-                                    ? color!.withValues(alpha: 
-                                        color.a * 0.6,
+                                    ? color!.withValues(
+                                        alpha: color.a * 0.6,
                                       )
                                     : null,
                                 borderRadius: BorderRadius.horizontal(
@@ -291,8 +292,8 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
                               alignment: Alignment.center,
                               decoration: BoxDecoration(
                                 color: selected
-                                    ? color!.withValues(alpha: 
-                                        color.a * 0.6,
+                                    ? color!.withValues(
+                                        alpha: color.a * 0.6,
                                       )
                                     : null,
                                 borderRadius: BorderRadius.horizontal(
@@ -323,11 +324,11 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
                                     height: 3,
                                     child: ColoredBox(
                                       color: selected
-                                          ? textStyle.color!.withValues(alpha: 
-                                              0.6,
+                                          ? textStyle.color!.withValues(
+                                              alpha: 0.6,
                                             )
-                                          : color!.withValues(alpha: 
-                                              color.a * 0.8,
+                                          : color!.withValues(
+                                              alpha: color.a * 0.8,
                                             ),
                                     ),
                                   ),
@@ -366,7 +367,7 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
             child: DetailsValueWidget(
               title: const Text('Tags'),
               value: Text(
-                widget.item.tags.map((e) => e.name).reduce((v, e) => '$v, $e'),
+                widget.item.tags.map((e) => e.name).fold('', (v, e) => '$v, $e'),
               ),
             ),
           ),

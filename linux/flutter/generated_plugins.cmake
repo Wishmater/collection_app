@@ -5,6 +5,7 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   bitsdojo_window_linux
   desktop_drop
+  fvp
   pasteboard
   screen_retriever_linux
   url_launcher_linux

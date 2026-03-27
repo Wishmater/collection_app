@@ -2,7 +2,22 @@
 
 let
   build = import ./build.nix { inherit pkgs; };
-  sqliteLibPath = pkgs.lib.makeLibraryPath (with pkgs; [ sqlite ]);
+  libPath = pkgs.lib.makeLibraryPath (with pkgs; [
+
+    # sqflite / sqlite3 dependencies
+    sqlite
+
+    # video_players / fvp dependencies
+    ffmpeg
+    libpulseaudio
+    alsa-lib
+    lz4
+    libGL
+    libx11
+    libgbm
+    libdrm
+
+  ]);
 
 in pkgs.mkShell {
 
@@ -35,13 +50,24 @@ in pkgs.mkShell {
     libepoxy
     xorg.libXtst
 
+    # sqflite / sqlite3 dependencies
     sqlite
+
+    # video_players / fvp dependencies
+    ffmpeg
+    libpulseaudio
+    alsa-lib
+    lz4
+    libGL
+    libx11
+    libgbm
+    libdrm
 
   ];
 
-  NIX_LD_LIBRARY_PATH = sqliteLibPath;
+  NIX_LD_LIBRARY_PATH = libPath;
   shellHook = ''
-    export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:${sqliteLibPath}"
+    export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:${libPath}"
   '';
 
 }

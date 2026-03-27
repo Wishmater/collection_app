@@ -3,9 +3,7 @@ import 'package:collection_app/models/item.dart';
 import 'package:dartx/dartx_io.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:mlog/mlog.dart';
-// ignore: depend_on_referenced_packages // we will probably get rid of this lib anyways
-import 'package:video_player_platform_interface/video_player_platform_interface.dart';
-import 'package:video_player_win/video_player_win.dart';
+import 'package:video_player/video_player.dart';
 
 abstract class MetadataUtils {
   static Future<Item> loadMetadata(Item item) async {
@@ -24,19 +22,15 @@ abstract class MetadataUtils {
     item.itemType = ItemType.inferFromExtension(extension);
     final fileStats = await file.stat();
     item.filesize = fileStats.size;
-    item.fileCreated = fileStats.changed; // On Windows platforms, this is instead the file creation time.
+    item.fileCreated = PlatformExtended.isWindows ? fileStats.changed : null;
     item.fileModified = fileStats.modified;
     switch (item.itemType!) {
       case ItemType.video:
-        final controller = WinVideoPlayerController.file(file);
-        controller.videoEventStream.listen((event) {
-          if (event.eventType == VideoEventType.initialized) {
-            item.duration = event.duration;
-            item.resolutionWidth = event.size?.width.round();
-            item.resolutionHeight = event.size?.height.round();
-          }
-        });
+        final controller = VideoPlayerController.file(file);
         await controller.initialize();
+        item.duration = controller.value.duration;
+        item.resolutionWidth = controller.value.size.width.round();
+        item.resolutionHeight = controller.value.size.height.round();
         await controller.dispose();
       case ItemType.image:
         // TODO: 2 Implement loading metadata for images

@@ -42,7 +42,8 @@ dependencies:
   file_picker: ^10.1.9 # ideally, we would always use FilePickerFromZero, so we wouldn't need this dependency here
   bitsdojo_window: ^0.1.6 # ideally, we would do all window-related stuff with window_manager, and remove this dependency here
   window_manager: ^0.4.3
-  video_player_win: 2.3.10 # TODO: 1 can we replace this with a multi-platform solution?
+  video_player: ^2.9.3
+  fvp: ^0.35.2 # this is an implementation of video_player supporting all platforms, apparently
   resolve_windows_shortcut: ^2.0.0
 
   # * Specific Utility

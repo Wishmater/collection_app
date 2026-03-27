@@ -13,6 +13,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:from_zero_ui/from_zero_ui.dart';
 import 'package:from_zero_ui/util/web_initial_config/web_initial_config.dart';
+import 'package:fvp/fvp.dart' as fvp;
 import 'package:go_router/go_router.dart';
 import 'package:hive/hive.dart';
 import 'package:mlog/mlog.dart';
@@ -20,6 +21,11 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 void main() async {
   await initLogging();
+  fvp.registerWith(
+    options: {
+      'video.decoders': ['FFmpeg'], // Use software decoding, it crashes on linux otherwise
+    },
+  );
   databaseFactory = databaseFactoryFfi; // init sqflite // TODO: 3 maybe move this somewhere else?
   // TODO: 2 implement proper handling of flutter errors in mlog
   if (kReleaseMode) {
@@ -167,19 +173,6 @@ class _AppState extends State<App> with WidgetsBindingObserver {
     routes: GoRouteFromZero.getCleanRoutes(buildRoutes()),
   );
 
-  @override
-  void initState() {
-    super.initState();
-    RendererBinding.instance.allowFirstFrame();
-    // WidgetsBinding.instance.addObserver(this);
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-    // WidgetsBinding.instance.removeObserver(this);
-  }
-
   // @override
   // void didChangeAppLifecycleState(AppLifecycleState state) {
   //   // seems to not work on windows :)))
@@ -230,5 +223,18 @@ class _AppState extends State<App> with WidgetsBindingObserver {
         },
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    // WidgetsBinding.instance.removeObserver(this);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    RendererBinding.instance.allowFirstFrame();
+    // WidgetsBinding.instance.addObserver(this);
   }
 }
