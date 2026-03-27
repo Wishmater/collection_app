@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:collection_app/models/collection.dart';
 import 'package:collection_app/models/item.dart';
 import 'package:collection_app/providers/item_provider.dart';
+import 'package:collection_app/util/any_ref.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -291,7 +292,7 @@ class _AddItemDialogState extends ConsumerState<AddItemDialog> {
         filePath: file.relativePath,
         itemType: ItemType.inferFromExtension(p.extension(file.name)),
       );
-      if (ItemProvider.addItem(ref as Ref, item)) {
+      if (ItemProvider.addItem(AnyRef(widgetRef: ref), item)) {
         addedCount++;
       }
     }

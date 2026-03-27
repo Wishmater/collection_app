@@ -36,7 +36,7 @@ abstract class ItemProvider {
 
   // MUTATIONS
 
-  static bool addItem(Ref ref, Item item, {bool checkIfAlreadyExists = true}) {
+  static bool addItem(AnyRef ref, Item item, {bool checkIfAlreadyExists = true}) {
     final added = itemService.addItem(
       item,
       checkIfAlreadyExists: checkIfAlreadyExists,
