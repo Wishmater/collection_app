@@ -3,6 +3,7 @@ import 'package:collection_app/providers/app_state_provider.dart';
 import 'package:collection_app/providers/collection_provider.dart';
 import 'package:collection_app/providers/tag_provider.dart';
 import 'package:collection_app/scripts/_scripts.dart';
+import 'package:collection_app/widgets/add_item_dialog.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_font_icons/flutter_font_icons.dart';
@@ -128,6 +129,17 @@ class _MainAppbarState extends ConsumerState<MainAppbar> {
         ),
       ),
       actions: [
+        ActionFromZero(
+          title: 'Add',
+          icon: const Icon(Icons.add),
+          breakpoints: {0: ActionState.overflow},
+          onTap: (context) {
+            final collections = ref.read(AppStateProvider.filterIncludingCollections);
+            final allCollections = ref.read(CollectionProvider.all);
+            final targetCollections = collections.isNotEmpty ? collections : allCollections;
+            showAddCollectionPicker(context, ref, targetCollections);
+          },
+        ),
         ActionFromZero(
           title: 'Scripts',
           icon: const Icon(MaterialCommunityIcons.script_text),
