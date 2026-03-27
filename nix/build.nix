@@ -11,6 +11,7 @@ pkgs.flutter.buildFlutterApplication rec {
   pubspecLock = pkgs.lib.importJSON (src + "/pubspec.lock.json");
   gitHashes = pkgs.lib.importJSON (src + "/pubspecGitHashes.json");
 
+  # TODO: 1 test adding sqlite to release build
   nativeBuildInputs = with pkgs;
     [
 
