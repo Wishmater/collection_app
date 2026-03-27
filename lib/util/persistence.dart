@@ -218,7 +218,7 @@ abstract class Persistence {
     collection.added = DbHelper.datetimeFormat.parse(collectionQuery[0]['added']! as String);
     collection.lastSeen = DbHelper.datetimeFormat.tryParseN(collectionQuery[0]['lastSeen'] as String?);
     collection.lastModified = DbHelper.datetimeFormat.tryParseN(collectionQuery[0]['lastModified'] as String?);
-    collection.baseDirectory = collectionQuery[0]['baseDirectory'] as String?;
+    collection.baseDirectory ??= collectionQuery[0]['baseDirectory'] as String?;
     // LOAD TAGS
     // PERF: 2 play around more with json_group_array, to reduce query count
     final tagQuery = await db.rawQuery(/*language=SQLite*/ '''

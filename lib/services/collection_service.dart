@@ -39,7 +39,7 @@ class CollectionService {
           st: st,
         );
         removeCollection(collection);
-        // TODO: 2 remove collection that errored from recent?
+        removeCollectionFromRecents(collection);
       }
       if (saveToDb) {
         Persistence.saveCollection(collection);
@@ -54,6 +54,11 @@ class CollectionService {
   void saveCollectionToRecents(Collection collection) {
     final box = Hive.box<List<dynamic>>('collections');
     box.put(collection.baseDirectory, [collection.name, DateTime.now()]);
+  }
+
+  void removeCollectionFromRecents(Collection collection) {
+    final box = Hive.box<List<dynamic>>('collections');
+    box.delete(collection.baseDirectory);
   }
 
   bool removeCollection(Collection collection) {
