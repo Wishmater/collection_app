@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'dart:math' as math;
 import 'package:collection_app/models/item.dart';
+import 'package:collection_app/models/tag.dart';
 import 'package:collection_app/providers/app_state_provider.dart';
 import 'package:collection_app/providers/item_provider.dart';
+import 'package:collection_app/providers/tag_provider.dart';
 import 'package:collection_app/util/any_ref.dart';
 import 'package:collection_app/widgets/item_thumbnail/video_live_thumbnail.dart';
+import 'package:collection_app/widgets/tags_in_item_details.dart';
 import 'package:collection_app/widgets/utils/hover_builder.dart';
 import 'package:collection_app/widgets/utils/interval_rating_bar.dart';
 import 'package:flutter/material.dart';
@@ -128,247 +131,289 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
           SliverToBoxAdapter(
             child: DetailsValueWidget(
               title: const Text('Rating'),
-              value: HoverBuilder(
-                layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
-                  return Stack(
-                    alignment: Alignment.centerLeft,
-                    children: <Widget>[
-                      if (previousChildren.isNotEmpty) previousChildren.last,
-                      if (currentChild != null) currentChild,
-                    ],
-                  );
-                },
-                defaultBuilder: (context) {
-                  return Text(
-                    widget.item.rating?.toString() ?? '',
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      fontWeight: FontWeight.w900,
-                      color: Color.alphaBlend(
-                        Colors.yellow.withValues(alpha: 0.6),
-                        Theme.of(context).canvasColor,
-                      ),
-                      height: 1.28,
+              value: const SizedBox(),
+              defaultBuilder: (context) {
+                return Text(
+                  widget.item.rating?.toString() ?? '',
+                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    fontWeight: FontWeight.w900,
+                    color: Color.alphaBlend(
+                      Colors.yellow.withValues(alpha: 0.6),
+                      Theme.of(context).canvasColor,
                     ),
-                  );
-                },
-                hoveredBuilder: (context) {
-                  final color = Color.alphaBlend(
-                    Colors.yellow.withValues(alpha: 0.6),
-                    Theme.of(context).canvasColor,
-                  );
-                  final textStyle = Theme.of(context).textTheme.titleMedium!;
-                  return IntervalRatingBar(
-                    min: 1,
-                    max: 10,
-                    color: color,
-                    from: widget.item.rating,
-                    to: widget.item.rating,
-                    onFromChanged: (value) {
-                      if (widget.item.rating == value) return;
-                      widget.item.rating = value;
-                      ItemProvider.saveItem(
-                        AnyRef(widgetRef: ref),
-                        widget.item,
-                      );
-                    },
-                    onToChanged: (value) {
-                      if (widget.item.rating == value) return;
-                      widget.item.rating = value;
-                      ItemProvider.saveItem(
-                        AnyRef(widgetRef: ref),
-                        widget.item,
-                      );
-                    },
-                    widgetBuilder: (context, value, {required selected, color}) {
-                      return Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          Positioned(
-                            left: 0,
-                            right: 0,
-                            top: -2,
-                            bottom: -2,
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 100),
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: selected
-                                    ? color!.withValues(
-                                        alpha: color.a * 0.6,
-                                      )
-                                    : null,
-                                borderRadius: BorderRadius.horizontal(
-                                  left: widget.item.rating == value ? const Radius.circular(6) : Radius.zero,
-                                  right: widget.item.rating == value ? const Radius.circular(6) : Radius.zero,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Container(
-                            width: value == 10 ? 24 : 18,
+                    height: 1.28,
+                  ),
+                );
+              },
+              hoveredBuilder: (context) {
+                final color = Color.alphaBlend(
+                  Colors.yellow.withValues(alpha: 0.6),
+                  Theme.of(context).canvasColor,
+                );
+                final textStyle = Theme.of(context).textTheme.titleMedium!;
+                return IntervalRatingBar(
+                  min: 1,
+                  max: 10,
+                  color: color,
+                  from: widget.item.rating,
+                  to: widget.item.rating,
+                  onFromChanged: (value) {
+                    if (widget.item.rating == value) return;
+                    widget.item.rating = value;
+                    ItemProvider.saveItem(
+                      AnyRef(widgetRef: ref),
+                      widget.item,
+                    );
+                  },
+                  onToChanged: (value) {
+                    if (widget.item.rating == value) return;
+                    widget.item.rating = value;
+                    ItemProvider.saveItem(
+                      AnyRef(widgetRef: ref),
+                      widget.item,
+                    );
+                  },
+                  widgetBuilder: (context, value, {required selected, color}) {
+                    return Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          top: -2,
+                          bottom: -2,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 100),
                             alignment: Alignment.center,
-                            child: Text(
-                              value.toString(),
-                              style: textStyle.copyWith(
-                                fontWeight: FontWeight.w900,
-                                height: 1.28,
-                                color: selected ? textStyle.color!.withValues(alpha: 0.8) : color,
+                            decoration: BoxDecoration(
+                              color: selected
+                                  ? color!.withValues(
+                                      alpha: color.a * 0.6,
+                                    )
+                                  : null,
+                              borderRadius: BorderRadius.horizontal(
+                                left: widget.item.rating == value ? const Radius.circular(6) : Radius.zero,
+                                right: widget.item.rating == value ? const Radius.circular(6) : Radius.zero,
                               ),
                             ),
                           ),
-                        ],
-                      );
-                    },
-                  );
-                },
-              ),
+                        ),
+                        Container(
+                          width: value == 10 ? 24 : 18,
+                          alignment: Alignment.center,
+                          child: Text(
+                            value.toString(),
+                            style: textStyle.copyWith(
+                              fontWeight: FontWeight.w900,
+                              height: 1.28,
+                              color: selected ? textStyle.color!.withValues(alpha: 0.8) : color,
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                );
+              },
             ),
           ),
           SliverToBoxAdapter(
             child: DetailsValueWidget(
               title: const Text('Priority'),
-              value: HoverBuilder(
-                layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
-                  return Stack(
-                    alignment: Alignment.centerLeft,
-                    children: <Widget>[
-                      if (previousChildren.isNotEmpty) previousChildren.last,
-                      if (currentChild != null) currentChild,
-                    ],
-                  );
-                },
-                defaultBuilder: (context) {
-                  return Text(
-                    widget.item.explorePriority?.toString() ?? '',
-                    style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                      fontWeight: FontWeight.w900,
-                      color: Color.alphaBlend(
-                        Colors.purple.withValues(alpha: 0.8),
-                        Theme.of(context).canvasColor,
-                      ),
-                      height: 1.28,
+              value: const SizedBox(),
+              defaultBuilder: (context) {
+                return Text(
+                  widget.item.explorePriority?.toString() ?? '',
+                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    fontWeight: FontWeight.w900,
+                    color: Color.alphaBlend(
+                      Colors.purple.withValues(alpha: 0.8),
+                      Theme.of(context).canvasColor,
                     ),
-                  );
-                },
-                hoveredBuilder: (context) {
-                  final color = Color.alphaBlend(
-                    Colors.purple.withValues(alpha: 0.8),
-                    Theme.of(context).canvasColor,
-                  );
-                  final textStyle = Theme.of(context).textTheme.titleMedium!;
-                  return IntervalRatingBar(
-                    min: -6,
-                    max: 3,
-                    color: color,
-                    from: widget.item.explorePriority,
-                    to: widget.item.explorePriority,
-                    onFromChanged: (value) {
-                      if (widget.item.explorePriority == value) return;
-                      widget.item.explorePriority = value;
-                      ItemProvider.saveItem(
-                        AnyRef(widgetRef: ref),
-                        widget.item,
-                      );
-                    },
-                    onToChanged: (value) {
-                      if (widget.item.explorePriority == value) return;
-                      widget.item.explorePriority = value;
-                      ItemProvider.saveItem(
-                        AnyRef(widgetRef: ref),
-                        widget.item,
-                      );
-                    },
-                    widgetBuilder: (context, value, {required selected, color}) {
-                      Widget result = Stack(
-                        clipBehavior: Clip.none,
-                        children: [
-                          Positioned(
-                            left: 0,
-                            right: 0,
-                            top: -2,
-                            bottom: -2,
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 100),
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                color: selected
-                                    ? color!.withValues(
-                                        alpha: color.a * 0.6,
-                                      )
-                                    : null,
-                                borderRadius: BorderRadius.horizontal(
-                                  left: widget.item.explorePriority == value ? const Radius.circular(6) : Radius.zero,
-                                  right: widget.item.explorePriority == value ? const Radius.circular(6) : Radius.zero,
-                                ),
+                    height: 1.28,
+                  ),
+                );
+              },
+              hoveredBuilder: (context) {
+                final color = Color.alphaBlend(
+                  Colors.purple.withValues(alpha: 0.8),
+                  Theme.of(context).canvasColor,
+                );
+                final textStyle = Theme.of(context).textTheme.titleMedium!;
+                return IntervalRatingBar(
+                  min: -6,
+                  max: 3,
+                  color: color,
+                  from: widget.item.explorePriority,
+                  to: widget.item.explorePriority,
+                  onFromChanged: (value) {
+                    if (widget.item.explorePriority == value) return;
+                    widget.item.explorePriority = value;
+                    ItemProvider.saveItem(
+                      AnyRef(widgetRef: ref),
+                      widget.item,
+                    );
+                  },
+                  onToChanged: (value) {
+                    if (widget.item.explorePriority == value) return;
+                    widget.item.explorePriority = value;
+                    ItemProvider.saveItem(
+                      AnyRef(widgetRef: ref),
+                      widget.item,
+                    );
+                  },
+                  widgetBuilder: (context, value, {required selected, color}) {
+                    Widget result = Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          top: -2,
+                          bottom: -2,
+                          child: AnimatedContainer(
+                            duration: const Duration(milliseconds: 100),
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: selected
+                                  ? color!.withValues(
+                                      alpha: color.a * 0.6,
+                                    )
+                                  : null,
+                              borderRadius: BorderRadius.horizontal(
+                                left: widget.item.explorePriority == value ? const Radius.circular(6) : Radius.zero,
+                                right: widget.item.explorePriority == value ? const Radius.circular(6) : Radius.zero,
                               ),
                             ),
                           ),
-                          Container(
-                            width: 18,
-                            alignment: Alignment.center,
-                            child: Stack(
-                              children: [
-                                Text(
-                                  value.abs().toString(),
-                                  style: textStyle.copyWith(
-                                    fontWeight: FontWeight.w900,
-                                    height: 1.28,
-                                    color: selected ? textStyle.color!.withValues(alpha: 0.8) : color,
+                        ),
+                        Container(
+                          width: 18,
+                          alignment: Alignment.center,
+                          child: Stack(
+                            children: [
+                              Text(
+                                value.abs().toString(),
+                                style: textStyle.copyWith(
+                                  fontWeight: FontWeight.w900,
+                                  height: 1.28,
+                                  color: selected ? textStyle.color!.withValues(alpha: 0.8) : color,
+                                ),
+                              ),
+                              if (value < 0)
+                                Positioned(
+                                  bottom: 1,
+                                  left: -1,
+                                  right: -1,
+                                  height: 3,
+                                  child: ColoredBox(
+                                    color: selected
+                                        ? textStyle.color!.withValues(
+                                            alpha: 0.6,
+                                          )
+                                        : color!.withValues(
+                                            alpha: color.a * 0.8,
+                                          ),
                                   ),
                                 ),
-                                if (value < 0)
-                                  Positioned(
-                                    bottom: 1,
-                                    left: -1,
-                                    right: -1,
-                                    height: 3,
-                                    child: ColoredBox(
-                                      color: selected
-                                          ? textStyle.color!.withValues(
-                                              alpha: 0.6,
-                                            )
-                                          : color!.withValues(
-                                              alpha: color.a * 0.8,
-                                            ),
-                                    ),
-                                  ),
-                              ],
+                            ],
+                          ),
+                        ),
+                      ],
+                    );
+                    if (value == -1) {
+                      result = Row(
+                        children: [
+                          result,
+                          Padding(
+                            padding: const EdgeInsets.only(
+                              top: 4,
+                              right: 1,
+                            ),
+                            child: Container(
+                              width: 5,
+                              height: 3,
+                              color: Theme.of(context).dividerColor,
                             ),
                           ),
                         ],
                       );
-                      if (value == -1) {
-                        result = Row(
-                          children: [
-                            result,
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                top: 4,
-                                right: 1,
-                              ),
-                              child: Container(
-                                width: 5,
-                                height: 3,
-                                color: Theme.of(context).dividerColor,
-                              ),
-                            ),
-                          ],
-                        );
-                      }
-                      return result;
-                    },
-                  );
-                },
-              ),
+                    }
+                    return result;
+                  },
+                );
+              },
             ),
           ),
-          // TODO: 1 we can make a WAY cuter implementation of tags displaying
           SliverToBoxAdapter(
             child: DetailsValueWidget(
               title: const Text('Tags'),
-              value: Text(
-                widget.item.tags.map((e) => e.name).fold('', (v, e) => '$v, $e'),
-              ),
+              value: const SizedBox(),
+              defaultBuilder: (context) {
+                if (widget.item.tags.isEmpty) {
+                  return Text(
+                    'None',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context).textTheme.bodySmall?.color,
+                    ),
+                  );
+                }
+                return Wrap(
+                  spacing: 4,
+                  runSpacing: 4,
+                  children: widget.item.tags.map((tag) {
+                    return TagChip(
+                      tag: tag,
+                      onRemove: () {
+                        ItemProvider.removeTagFromItem(
+                          AnyRef(widgetRef: ref),
+                          widget.item,
+                          tag,
+                        );
+                      },
+                    );
+                  }).toList(),
+                );
+              },
+              hoveredBuilder: (context) {
+                return Wrap(
+                  spacing: 4,
+                  runSpacing: 4,
+                  children: [
+                    ...widget.item.tags.map((tag) {
+                      return TagChip(
+                        tag: tag,
+                        onRemove: () {
+                          ItemProvider.removeTagFromItem(
+                            AnyRef(widgetRef: ref),
+                            widget.item,
+                            tag,
+                          );
+                        },
+                      );
+                    }),
+                    AddTagButton(
+                      onTagSelected: (tag) {
+                        ItemProvider.addTagToItem(
+                          AnyRef(widgetRef: ref),
+                          widget.item,
+                          tag,
+                        );
+                      },
+                      onTagCreated: (name) {
+                        final newTag = Tag(name: name);
+                        TagProvider.addTag(ref, newTag, widget.item.collection);
+                        ItemProvider.addTagToItem(
+                          AnyRef(widgetRef: ref),
+                          widget.item,
+                          newTag,
+                        );
+                      },
+                      excludedTags: widget.item.tags,
+                    ),
+                  ],
+                );
+              },
             ),
           ),
           if (widget.item.duration != null)
@@ -469,15 +514,52 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
 class DetailsValueWidget extends StatelessWidget {
   final Widget title;
   final Widget value;
+  final WidgetBuilder? defaultBuilder;
+  final WidgetBuilder? hoveredBuilder;
 
   const DetailsValueWidget({
     required this.title,
     required this.value,
+    this.defaultBuilder,
+    this.hoveredBuilder,
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
+    if (defaultBuilder != null && hoveredBuilder != null) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        child: HoverBuilder(
+          layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
+            return Stack(
+              alignment: Alignment.centerLeft,
+              children: <Widget>[
+                if (previousChildren.isNotEmpty) previousChildren.last,
+                if (currentChild != null) currentChild,
+              ],
+            );
+          },
+          defaultBuilder: (context) => Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(width: 84, child: title),
+              const SizedBox(width: 6),
+              Expanded(child: defaultBuilder!(context)),
+            ],
+          ),
+          hoveredBuilder: (context) => Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(width: 84, child: title),
+              const SizedBox(width: 6),
+              Expanded(child: hoveredBuilder!(context)),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       child: Row(

@@ -103,4 +103,12 @@ abstract class ItemProvider {
     }
     return added;
   }
+
+  static bool removeTagFromItem(AnyRef ref, Item item, Tag tag) {
+    final removed = itemService.removeTagFromItem(item, tag);
+    if (removed) {
+      invalidateOne(ref, item);
+    }
+    return removed;
+  }
 }

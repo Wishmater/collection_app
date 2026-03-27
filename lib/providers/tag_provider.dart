@@ -21,7 +21,7 @@ abstract class TagProvider {
 
   // MUTATIONS
 
-  bool addTag(
+  static bool addTag(
     WidgetRef ref,
     Tag tag,
     Collection collection, {
@@ -58,7 +58,7 @@ abstract class TagProvider {
     return added;
   }
 
-  bool addChild(
+  static bool addChild(
     WidgetRef ref,
     Tag parent,
     Tag child, {
@@ -80,7 +80,7 @@ abstract class TagProvider {
     return added;
   }
 
-  bool addChildren(
+  static bool addChildren(
     WidgetRef ref,
     Tag parent,
     Iterable<Tag> children, {
@@ -104,7 +104,7 @@ abstract class TagProvider {
     return added;
   }
 
-  bool addSecondaryChild(
+  static bool addSecondaryChild(
     WidgetRef ref,
     Tag parent,
     Tag child, {
@@ -126,7 +126,7 @@ abstract class TagProvider {
     return added;
   }
 
-  bool addSecondaryChildren(
+  static bool addSecondaryChildren(
     WidgetRef ref,
     Iterable<Tag> parents,
     Iterable<Tag> children, {

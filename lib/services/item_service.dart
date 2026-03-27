@@ -106,6 +106,18 @@ class ItemService {
     return done;
   }
 
+  bool removeTagFromItem(
+    Item item,
+    Tag tag, {
+    bool saveToDb = true,
+  }) {
+    final removed = item.tags.remove(tag);
+    if (removed && saveToDb) {
+      Persistence.saveItem(item);
+    }
+    return removed;
+  }
+
   bool addItemToAlbum(
     Item item,
     Item album, {

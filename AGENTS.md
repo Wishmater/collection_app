@@ -28,6 +28,7 @@
 
 - Always run `flutter pub get` after modifying `pubspec.yaml`
 - Use `flutter doctor` to diagnose issues with the development environment
+- **NEVER use /services directly in widgets/ui**. Always use providers/ instead, the providers should then call the service, and also invalidate data as needed.
 
 ## UI Component Guidelines
 
