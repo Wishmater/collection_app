@@ -350,14 +350,6 @@ class _ItemDetailsViewState extends ConsumerState<ItemDetailsView> {
               title: const Text('Tags'),
               value: const SizedBox(),
               defaultBuilder: (context) {
-                if (widget.item.tags.isEmpty) {
-                  return Text(
-                    'None',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Theme.of(context).textTheme.bodySmall?.color,
-                    ),
-                  );
-                }
                 return Wrap(
                   spacing: 4,
                   runSpacing: 4,

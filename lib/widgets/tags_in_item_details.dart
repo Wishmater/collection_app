@@ -20,9 +20,16 @@ class TagChip extends StatelessWidget {
     return GestureDetector(
       onSecondaryTap: onRemove,
       onTertiaryTapDown: (_) => onRemove(),
-      child: Chip(
-        label: Text(tag.name),
-        visualDensity: VisualDensity.compact,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          border: Border.all(color: Theme.of(context).dividerColor),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Text(
+          tag.name,
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
       ),
     );
   }
