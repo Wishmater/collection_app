@@ -1,6 +1,8 @@
 { pkgs ? import <nixpkgs> { } }:
 
-let build = import ./build.nix { inherit pkgs; };
+let
+  build = import ./build.nix { inherit pkgs; };
+  sqliteLibPath = pkgs.lib.makeLibraryPath (with pkgs; [ sqlite ]);
 
 in pkgs.mkShell {
 
@@ -33,6 +35,13 @@ in pkgs.mkShell {
     libepoxy
     xorg.libXtst
 
+    sqlite
+
   ];
+
+  NIX_LD_LIBRARY_PATH = sqliteLibPath;
+  shellHook = ''
+    export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:${sqliteLibPath}"
+  '';
 
 }
